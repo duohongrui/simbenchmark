@@ -483,12 +483,29 @@ Figshare_function <- function(organs,
                                                data_list_smartseq2[str_which(data_list_smartseq2, pattern = organs)]),
                               header = TRUE,
                               row.names = 1)
+  ## Read 10× data
+  data1_file <- data_list_10X[droplet_file_index]
+  data1_10X <- as.data.frame(Seurat::Read10X(file.path("./FigShare_10X/droplet", data1_file[1])))
+  if(length(data1_file) != 1){
+    for(i in data1_file[2:length(data1_file)]){
+      data_tmp <- as.data.frame(Seurat::Read10X(file.path("./FigShare_10X/droplet", i)))
+      data1_10X <- cbind(data1_10X, data_tmp)
+    }
+  }
+  colnames(data1_10X) <- stringr::str_split(colnames(data1_10X),
+                                            pattern = "-",
+                                            simplify = TRUE)[, 1]
   anno_data1_smartseq2 <- cell_anno_smartseq2 %>% 
     filter(tissue == organs) %>% 
     filter(cell %in% intersect(colnames(data1_smartseq2), cell_anno_smartseq2$cell))
-  cell_type_num <- sort(table(anno_data1_smartseq2$cell_ontology_class), decreasing = TRUE)[seq_len(cell_type_index)]
+  anno_data1_10X <- cell_anno_10X %>% 
+    filter(tissue == droplet_organs) %>% 
+    filter(cell %in% intersect(colnames(data1_10X), cell))
+  cell_type_smartseq2 <- unique(anno_data1_smartseq2$cell_ontology_class)
+  cell_type_10X <- unique(anno_data1_10X$cell_ontology_class)
+  cell_type <- intersect(cell_type_smartseq2, cell_type_10X)[seq_len(cell_type_index)]
   anno_data1_smartseq2 <- anno_data1_smartseq2 %>% 
-    filter(cell_ontology_class %in% names(cell_type_num))
+    filter(cell_ontology_class %in% cell_type)
   data1_smartseq2 <- data1_smartseq2[, anno_data1_smartseq2$cell]
   #### Filter
   index <- colSums(data1_smartseq2) > 0
@@ -506,25 +523,11 @@ Figshare_function <- function(organs,
   data1_smartseq2 <- rbind(data1_smartseq2, ERCC_count)
   message("Smart-seq2 data done!")
   
-  ## Read 10× data
-  data1_file <- data_list_10X[droplet_file_index]
-  data1_10X <- as.data.frame(Seurat::Read10X(file.path("./FigShare_10X/droplet", data1_file[1])))
-  if(length(data1_file) != 1){
-    for(i in data1_file[2:length(data1_file)]){
-      data_tmp <- as.data.frame(Seurat::Read10X(file.path("./FigShare_10X/droplet", i)))
-      data1_10X <- cbind(data1_10X, data_tmp)
-    }
-  }
-  colnames(data1_10X) <- stringr::str_split(colnames(data1_10X),
-                                            pattern = "-",
-                                            simplify = TRUE)[, 1]
-  anno_data1_10X <- cell_anno_10X %>% 
-    filter(tissue == droplet_organs) %>% 
-    filter(cell %in% intersect(colnames(data1_10X), cell))
-  cell_type_num <- sort(table(anno_data1_10X$cell_ontology_class), decreasing = TRUE)[seq_len(cell_type_index)]
+  ## Filter 10X
   anno_data1_10X <- anno_data1_10X %>% 
-    filter(cell_ontology_class %in% names(cell_type_num))
+    filter(cell_ontology_class %in% cell_type)
   data1_10X <- data1_10X[, anno_data1_10X$cell]
+  print(table(anno_data1_10X$cell_ontology_class))
   #### Filter
   index <- colSums(data1_10X) > 0
   data1_10X <- data1_10X[, index]
@@ -615,7 +618,7 @@ Figshare_function(organs = "Thymus",
 
 ########## data17 FigShare Smartseq2 and 10× batch (Kidney)
 Figshare_function(organs = "Kidney",
-                  cell_type_index = 1,
+                  cell_type_index = 2,
                   droplet_file_index = 5:7,
                   droplet_organs = "Kidney",
                   data_id = "data17")
