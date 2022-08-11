@@ -41,7 +41,7 @@ merged_fun <- function(dir, list){
 ################################################################################
 dir.create(path = './datasets')
 setwd('./datasets/')
-GEO_list <- c("GSE102827", "GSE106202", "GSE108097",
+GEO_list <- c("GSE102827", "GSE106202", "GSE108097", "GSE95432",
               "GSE109205", "GSE112004", "GSE114727", "GSE117450", "GSE117617",
               "GSE133539", "GSE133542", "GSE167297", "GSE183590", "GSE184950",
               "GSE54006", "GSE54695", "GSE60361", "GSE62270", "GSE65525",
