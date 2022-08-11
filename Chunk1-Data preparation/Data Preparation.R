@@ -1135,6 +1135,7 @@ data_list <- list.files(path = './GSE67835', pattern = "csv.gz")
 data <- merged_fun(dir = './GSE67835', list = data_list)
 colnames(data) <- paste0("Cell", 1:ncol(data))
 ## rownames
+rownames(data) <- gsub(pattern = " ", replacement = "", rownames(data))
 rownames(data) <- str_replace_all(rownames(data),
                                   pattern = "_",
                                   replacement = "-")
@@ -1706,7 +1707,7 @@ saveRDS(data, file = '../preprocessed_data/data64_GSE102827.rds')
 
 
 ## data65 GSE87038 subset1 (forebrain)
-GSE87038 <- openxlsx::read.xlsx("./GSE87038/GSE87038_Mouse_Organogenesis_UMI_counts_matrix.xlsx")
+GSE87038 <- openxlsx::read.xlsx("./GSE87038/GSE87038_Mouse_Organogenesis_UMI_counts_matrix.xlsx", rowNames = TRUE)
 forebrain_index <- str_starts(colnames(GSE87038), pattern = "^forebrain")
 data <- GSE87038[, forebrain_index]
 filter_index <- str_split(colnames(data), pattern = "_", simplify = TRUE)[, 2] %in% c("E9.5", "E11.5")
