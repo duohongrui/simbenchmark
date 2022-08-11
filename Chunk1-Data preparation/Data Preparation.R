@@ -191,6 +191,8 @@ data <- read.table(file = './GSE72857/GSE72857_umitab.txt.gz',
                    row.names = 1,
                    sep = '\t')
 ## rownames
+gene_name <- str_split(rownames(data), pattern = ";", simplify = TRUE)[, 1]
+rownames(data) <- gene_name
 rownames(data) <- str_replace_all(rownames(data),
                                   pattern = "_",
                                   replacement = "-")
@@ -221,11 +223,16 @@ for(i in 1:length(data_list)){
   ## Filter
   data <- data[, colSums(data) > 0]
   print(table(colSums(data) > 0))
-  print(dim(data))
   ## rownames
+  gene_name <- str_split(rownames(data), pattern = "[.]", simplify = TRUE)[, 1]
+  data$gene_name <- gene_name
+  data <- aggregate(.~data$gene_name, data[, -ncol(data)], mean)
+  rownames(data) <- data$`data$gene_name`
+  data <- round(data[, -1])
   rownames(data) <- str_replace_all(rownames(data),
                                     pattern = "_",
                                     replacement = "-")
+  print(dim(data))
   data_info <- simutils::meta_info(id = paste0("data", i+2, '_GSE133542_subset', i),
                                    repository = "GEO",
                                    accession_number = "GSE133542",
@@ -744,7 +751,7 @@ data <- round(data)
 data$gene <- str_split(rownames(data), pattern = "__", simplify = TRUE)[, 1]
 data <- aggregate(.~data$gene, data[, -673], mean)
 rownames(data) <- data$`data$gene`
-data <- data[, -1]
+data <- round(data[, -1])
 ## ERCC count
 ERCC_count <- data[grep(rownames(data), pattern = "^ERCC-"), ]
 ## Gene transformation
@@ -788,31 +795,24 @@ data <- read.csv(file = './GSE85755/GSE85755_Merged_CEL-Seq_AllMiceAndLibrariesM
                  header = TRUE,
                  row.names = 1,
                  sep = '\t')
-data2 <- read.csv(file = './GSE85755/GSE85755_Merged_SORT-Seq_DissociationTimecourse.csv.gz',
-                  header = TRUE,
-                  row.names = 1)
-gene <- intersect(rownames(data), rownames(data2))
-## Combination
-data <- cbind(data[gene, ], data2[gene, ]) %>% round()
 ## rownames
+gene_name <- str_split(rownames(data), pattern = "__", simplify = TRUE)[, 1]
+data$gene_name <- gene_name
+data <- aggregate(.~ data$gene_name, data[, -ncol(data)], mean)
+rownames(data) <- data$`data$gene_name`
+data <- round(data[, -1])
 rownames(data) <- str_replace_all(rownames(data),
                                   pattern = "_",
                                   replacement = "-")
-## Batch
-batch <- c(rep("CEL-seq", 665), rep("SORT-seq", 768))
 ## data information
 data_info <- simutils::meta_info(id = "data24_GSE85755",
                                  repository = "GEO",
                                  accession_number = "GSE85755",
-                                 platform = c("CEL-seq",
-                                              "SORT-seq"),
-                                 species = c("Mus musculus",
-                                             "Danio rerio"),
-                                 organ = c("Muscle Stem Cells",
-                                           "fin"),
+                                 platform = "CEL-seq",
+                                 species = "Mus musculus",
+                                 organ = "Muscle Stem Cells",
                                  cell_num = ncol(data),
-                                 gene_num = nrow(data),
-                                 batch_info = batch)
+                                 gene_num = nrow(data))
 ## Save
 data <- list(data = as.matrix(data),
              data_info = data_info)
@@ -826,7 +826,12 @@ data <- read.csv(file = './GSE85241/GSE85241_cellsystems_dataset_4donors_updated
                  row.names = 1,
                  sep = '\t') %>% 
   round()
-rownames(data) <- str_replace_all(rownames(data), pattern = "__", replacement = "-")
+gene_name <- str_split(rownames(data), pattern = "__", simplify = TRUE)[, 1]
+data$gene_name <- gene_name
+data <- aggregate(.~ data$gene_name, data[, -ncol(data)], mean)
+rownames(data) <- data$`data$gene_name`
+data <- round(data[, -1])
+dim(data)
 ## data information
 data_info <- simutils::meta_info(id = "data25_GSE85241",
                                  repository = "GEO",
@@ -936,6 +941,12 @@ for(i in 1:length(data_list)){
                      header = TRUE,
                      row.names = 1,
                      sep = '\t')
+  gene_name <- str_split(rownames(data), pattern = "[.]", simplify = TRUE)[, 1]
+  data$gene_name <- gene_name
+  data <- aggregate(.~ data$gene_name, data[, -ncol(data)], mean)
+  rownames(data) <- data$`data$gene_name`
+  data <- round(data[, -1])
+  dim(data)
   ## data information
   data_info <- simutils::meta_info(id = paste0("data", i+32, "_GSE133539_subset", i),
                                    repository = "GEO",
@@ -1999,6 +2010,12 @@ for(i in data_list[2:20]){
 }
 colnames(GSE112004) <- str_remove_all(colnames(GSE112004), pattern = "[X]")
 colnames(GSE112004) <- str_replace_all(colnames(GSE112004), pattern = "[.]", replacement = "_")
+## rownames
+gene_name <- str_split(rownames(GSE112004), pattern = "[.]", simplify = TRUE)[, 1]
+GSE112004$gene_name <- gene_name
+GSE112004 <- aggregate(.~GSE112004$gene_name, GSE112004[, -ncol(GSE112004)], mean)
+rownames(GSE112004) <- GSE112004$`GSE112004$gene_name`
+GSE112004 <- round(GSE112004[, -1])
 ## time 0h vs 6h
 index <- cell_info$characteristics_ch1.4 %in% c("time point: 0h", "time point: 6h")
 data <- GSE112004[, index]
