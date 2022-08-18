@@ -977,6 +977,8 @@ for(i in 1:length(data_list)){
   rownames(data) <- str_replace_all(rownames(data),
                                     pattern = "_",
                                     replacement = "-")
+  ## Filter
+  data <- data[, colSums(data) > 0]
   ## data information
   data_info <- simutils::meta_info(id = paste0("data", i+34, "_GSE109205_subset", i),
                                    repository = "GEO",
