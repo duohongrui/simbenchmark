@@ -1,7 +1,7 @@
 data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data")
 save_path <- "./scGAN_preprocessed_data"
 
-for(i in 64:101){
+for(i in 1:101){
   data <- readRDS(file.path("/Users/duohongrui/Desktop/preprocessed_data", data_list[i]))
   message("-------------------------")
   message(data_list[i])
