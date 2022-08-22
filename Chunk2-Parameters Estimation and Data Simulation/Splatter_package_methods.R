@@ -2,16 +2,21 @@
 # This file contains six simulation methods:
 # 1. Splat  2. Simple  3. Kersplat  4. SplatPop  5. Lun  6. Lun2
 #------------------------------------------------------------------------------#
+library(simpipe)
+library(dplyr)
+library(stringr)
 
 ## data list
-data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data/")
+data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data/")[1:2]
 
-method <- c("Splat",
-            "Simple",
-            "Kersplat",
-            "SplatPop",
-            "Lun",
-            "Lun2")
+methods <- c("Splat",
+             "Simple",
+             "Kersplat",
+             "SplatPop",
+             "Lun",
+             "Lun2",
+             "ESCO",
+             "dropsim")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -66,7 +71,7 @@ for(i in 1:length(data_list)){
     de.prob <- 0.1
   }
   
-  ### batch
+  ### batch 
   if(!is.null(batch_info)){
     batchCells <- as.numeric(table(batch_info))
   }else{
@@ -82,47 +87,48 @@ for(i in 1:length(data_list)){
                      fc.group = 2,
                      nGenes = nrow(counts))
   
-  for(method in method){
+  for(method in methods){
     ## data save file
     save_name <- paste0(method, "_", data_id)
     message(save_name)
     
     ## estimation
     message("Estimating...")
-    tryCatch({
+    
+    try_result <- try(
       estimation_result <- simpipe::estimate_parameters(
         ref_data = counts,
         method = method,
-        other_prior = list(group_condition = group),
-        seed = 111,
-        verbose = FALSE,
-        use_docker = FALSE)
-    }, error = function(e){
-      estimation_error_file <- paste0(save_name, "_", "estimation_error.txt")
-      sink(estimation_error_file, type = "output", split = TRUE)
-      print(e)
-      sink()
+        other_prior = list(group.condition = group),
+        seed = 1,
+        verbose = TRUE,
+        use_docker = FALSE),
+      silent = FALSE,
+      outFile = paste0(save_name, "_", "estimation_error.txt"))
+    
+    if("try-error" %in% class(try_result)){
       next
-    })
+    }
+    
     
     ## simulation
     message("Simulation...")
-    tryCatch({
+    
+    try_result <- try(
       simulation_result <- simpipe::simulate_datasets(
         parameters = estimation_result,
         other_prior = other_prior,
         n = 1,
-        seed = 111,
+        seed = 1,
         return_format = "list",
-        verbose = FALSE,
-        use_docker = FALSE)
-    }, error = function(e){
-      simulation_error_file <- paste0(save_name, "_", "simulation_error.txt")
-      sink(simulation_error_file, type = "output", split = TRUE)
-      print(e)
-      sink()
+        verbose = TRUE,
+        use_docker = FALSE),
+      silent = FALSE,
+      outFile = paste0(save_name, "_", "estimation_error.txt"))
+    
+    if("try-error" %in% class(try_result)){
       next
-    })
+    }
     
     ## estimation step monitor
     message("Save information of simulated data...")
