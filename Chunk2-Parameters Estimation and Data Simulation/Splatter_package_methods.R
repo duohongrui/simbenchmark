@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-# This file contains six simulation methods:
+# This file contains nine simulation methods:
 # 1. Splat  2. Simple  3. Kersplat  4. SplatPop  5. Lun  6. Lun2  7. ESCO  8. dropsim
 # 9. zinbwave
 #------------------------------------------------------------------------------#
