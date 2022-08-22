@@ -1,22 +1,24 @@
 #------------------------------------------------------------------------------#
 # This file contains six simulation methods:
-# 1. Splat  2. Simple  3. Kersplat  4. SplatPop  5. Lun  6. Lun2
+# 1. Splat  2. Simple  3. Kersplat  4. SplatPop  5. Lun  6. Lun2  7. ESCO  8. dropsim
+# 9. zinbwave
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(dplyr)
 library(stringr)
 
 ## data list
-data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data/")[1:2]
+data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data/")
 
 methods <- c("Splat",
-             "Simple",
              "Kersplat",
              "SplatPop",
              "Lun",
              "Lun2",
              "ESCO",
-             "dropsim")
+             "dropsim",
+             "zinbwave",
+             "Simple")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -92,6 +94,10 @@ for(i in 1:length(data_list)){
     save_name <- paste0(method, "_", data_id)
     message(save_name)
     
+    if(method == "Lun2" & is.null(group)){
+      next
+    }
+    
     ## estimation
     message("Estimating...")
     
@@ -124,7 +130,7 @@ for(i in 1:length(data_list)){
         verbose = TRUE,
         use_docker = FALSE),
       silent = FALSE,
-      outFile = paste0(save_name, "_", "estimation_error.txt"))
+      outFile = paste0(save_name, "_", "simulation_error.txt"))
     
     if("try-error" %in% class(try_result)){
       next
