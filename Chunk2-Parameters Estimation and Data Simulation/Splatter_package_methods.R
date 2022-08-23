@@ -8,7 +8,7 @@ library(dplyr)
 library(stringr)
 
 ## data list
-data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data/")
+data_list <- list.files("../preprocessed_data/")
 
 methods <- c("Splat",
              "Kersplat",
@@ -26,7 +26,7 @@ for(i in 1:length(data_list)){
   message("-------------------------------------------------------------------")
   message(file_name)
   message("Read data...")
-  data <- readRDS(file.path("/Users/duohongrui/Desktop/preprocessed_data", file_name))
+  data <- readRDS(file.path("../preprocessed_data", file_name))
   data_info <- data$data_info
   if(dynwrap::is_wrapper_with_expression(data$data)){
     counts <- t(data$data[["counts"]])
@@ -62,6 +62,7 @@ for(i in 1:length(data_list)){
     result <- simutils::perform_DEA(data = counts,
                                     group = DEA_group,
                                     method = "edgeRQLFDetRate")
+    saveRDS(result, file = paste0("../DEA_result/", data_id, ".rds"))
     de_genes_per_group <- lapply(result, function(df){
       rownames(df)[df$PValue < 0.05]
     })
@@ -110,7 +111,9 @@ for(i in 1:length(data_list)){
         verbose = TRUE,
         use_docker = FALSE),
       silent = FALSE,
-      outFile = paste0(save_name, "_", "estimation_error.txt"))
+      outFile = paste0("../error_text/", save_name, "_", "estimation_error.txt"))
+    ### save
+    saveRDS(estimation_result, paste0("../estimation_result/", save_name, "_estimation_result.rds"))
     
     if("try-error" %in% class(try_result)){
       next
@@ -130,7 +133,7 @@ for(i in 1:length(data_list)){
         verbose = TRUE,
         use_docker = FALSE),
       silent = FALSE,
-      outFile = paste0(save_name, "_", "simulation_error.txt"))
+      outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
     
     if("try-error" %in% class(try_result)){
       next
@@ -186,7 +189,8 @@ for(i in 1:length(data_list)){
     message("Save data...")
     save_result <- list(sim_data = simulation_result[[1]][["simulate_result"]],
                         sim_data_info = sim_data_info)
-    # saveRDS(save_result)
+    ### save
+    saveRDS(save_result, paste0("../simulation_data/", save_name, "_simulation_result.rds"))
     message("Done...")
     message("-------------------------------------------------------------------")
   }
