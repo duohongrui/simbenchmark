@@ -8,7 +8,7 @@ library(dplyr)
 library(stringr)
 
 ## data list
-data_list <- list.files("../preprocessed_data/")
+data_list <- list.files("../preprocessed_data/")[1]
 
 methods <- c("Splat",
              "Kersplat",
@@ -108,15 +108,16 @@ for(i in 1:length(data_list)){
         method = method,
         other_prior = list(group.condition = group),
         seed = 1,
-        verbose = TRUE,
+        verbose = FALSE,
         use_docker = FALSE),
       silent = FALSE,
       outFile = paste0("../error_text/", save_name, "_", "estimation_error.txt"))
-    ### save
-    saveRDS(estimation_result, paste0("../estimation_result/", save_name, "_estimation_result.rds"))
     
     if("try-error" %in% class(try_result)){
       next
+    }else{
+      ### save
+      saveRDS(estimation_result, paste0("../estimation_result/", save_name, "_estimation_result.rds"))
     }
     
     
@@ -130,7 +131,7 @@ for(i in 1:length(data_list)){
         n = 1,
         seed = 1,
         return_format = "list",
-        verbose = TRUE,
+        verbose = FALSE,
         use_docker = FALSE),
       silent = FALSE,
       outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
@@ -190,7 +191,7 @@ for(i in 1:length(data_list)){
     save_result <- list(sim_data = simulation_result[[1]][["simulate_result"]],
                         sim_data_info = sim_data_info)
     ### save
-    saveRDS(save_result, paste0("../simulation_data/", save_name, "_simulation_result.rds"))
+    saveRDS(save_result, paste0("../simulation_data/", save_name, ".rds"))
     message("Done...")
     message("-------------------------------------------------------------------")
   }
