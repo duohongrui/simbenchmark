@@ -8,7 +8,7 @@ library(dplyr)
 library(stringr)
 
 ## data list
-data_list <- list.files("../preprocessed_data/")[1]
+data_list <- list.files("../preprocessed_data/")
 
 methods <- c("Splat",
              "Kersplat",
