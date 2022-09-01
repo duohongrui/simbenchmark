@@ -10,7 +10,8 @@ library(stringr)
 data_list <- list.files("../preprocessed_data/")
 
 methods <- c("scDD",
-             "hierarchicell")
+             "hierarchicell",
+             "POWSC")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -116,6 +117,8 @@ for(i in 1:length(data_list)){
     if(method == "scDD"){
       non_de_genes <- sum(table(sim_row_data$DEstatus)[which(names(table(sim_row_data$DEstatus)) %in% c("EE", "EP"))])
       de_gene_num <- nrow(sim_counts)-non_de_genes
+    }else if(method == "POWSC"){
+      de_gene_num <- sum(sim_row_data$de_gene == "yes")
     }else{
       de_gene_num <- "Not known"
     }
