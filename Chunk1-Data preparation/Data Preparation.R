@@ -1273,8 +1273,8 @@ data <- read.table(file = './GSE95445/GSE95445_GeneCounts.txt.gz',
                    sep = '\t')
 data <- data[, -1]
 ## cluster
-cluster <- c(rep("epithelial cell", 221),
-             rep("epithelial cell", 223))
+cluster <- c(rep("puberty epithelial cell", 221),
+             rep("adult epithelial cell", 223))
 ## data information
 data_info <- simutils::meta_info(id = "data49_GSE95445",
                                  repository = "GEO",
