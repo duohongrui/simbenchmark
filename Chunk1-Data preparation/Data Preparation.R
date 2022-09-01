@@ -661,7 +661,7 @@ data <- read.table(file = './GSE54695/GSE54695_data_transcript_counts.txt.gz',
 data <- data[, c(1:80, 161:240)]
 ## cell group
 treatment <- c(rep("2i", 80), rep("serum", 80))
-group_condition <- ifelse(treatment == "2i", 1, 0)
+group_condition <- ifelse(treatment == "2i", 2, 1)
 ## ERCC count
 ERCC_count <- data[grep(rownames(data), pattern = "^ERCC-"), ]
 ## Gene transformation
