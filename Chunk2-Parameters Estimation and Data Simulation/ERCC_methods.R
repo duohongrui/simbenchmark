@@ -14,6 +14,7 @@ methods <- c("powsimR",
              "SPARSim",
              "BEARscc")
 
+
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
   ## read data
