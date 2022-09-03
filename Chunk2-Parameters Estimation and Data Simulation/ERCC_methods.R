@@ -6,7 +6,6 @@ library(simpipe)
 library(dplyr)
 library(stringr)
 
-
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
