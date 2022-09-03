@@ -1,10 +1,11 @@
 #------------------------------------------------------------------------------#
-# This file contains two simulation methods:
+# This file contains four simulation methods:
 # 1. powsimR  2. BASiCS  3. SPARSim  4. BEARscc
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(dplyr)
 library(stringr)
+
 
 ## data list
 data_list <- list.files("../preprocessed_data/")
@@ -199,3 +200,4 @@ for(i in 1:length(data_list)){
     message("-------------------------------------------------------------------")
   }
 }
+
