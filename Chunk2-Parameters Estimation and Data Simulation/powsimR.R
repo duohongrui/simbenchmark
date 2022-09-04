@@ -80,7 +80,7 @@ for(i in 1:length(data_list)){
   }else{
     other_prior_est <- NULL
     ## data save file
-    save_name <- paste0(method, data_id)
+    save_name <- paste0(method, "_", data_id)
     message(save_name)
   }
   
