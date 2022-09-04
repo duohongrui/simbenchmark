@@ -122,24 +122,13 @@ for(i in 1:length(data_list)){
   ## simulated cell info
   ### group
   sim_col_data <- simulation_result[[1]][["simulate_result"]][["col_meta"]]
-  if("group" %in% colnames(sim_col_data)){
-    group_num <- length(unique(sim_col_data$group))
-  }else{
-    group_num <- 0
-  }
+  group_num <- 0
+  de_gene_num <- 0
   ### batch
   if("batch" %in% colnames(sim_col_data)){
     batch_num <- length(unique(sim_col_data$batch))
   }else{
     batch_num <- 0
-  }
-  
-  ## simulated gene info
-  sim_row_data <- simulation_result[[1]][["simulate_result"]][["row_meta"]]
-  if("de_gene" %in% colnames(sim_row_data)){
-    de_gene_num <- sum(sim_row_data$de_gene == "yes")
-  }else{
-    de_gene_num <- 0
   }
   sim_data_info <- list(sim_data_id = save_name,
                         method = method,
