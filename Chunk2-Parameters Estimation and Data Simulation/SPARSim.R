@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
-# This file contains one simulation method:
-# 1. powsimR (ERCC + group)
+# This file contains four simulation methods:
+# 1. powsimR  2. BASiCS  3. SPARSim  4. BEARscc
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(dplyr)
@@ -9,7 +9,7 @@ library(stringr)
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
-method <- "powsimR"
+method <- "SPARSim"
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -41,50 +41,39 @@ for(i in 1:length(data_list)){
     }
   }
   
-  if(method == "powsimR"){
-    ## 1) group
-    if(is.null(group) | length(unique(group)) != 2){
-      next
-    }else{
-      group_prob <- as.numeric(table(group)/length(group))
-      group_prob[2] <- 1 - group_prob[1]
-    }
-    
-    ## 2) batch
-    if(is.null(batch_info)){
-      batch_prob <- NULL
-    }else{
-      batch_prob <- as.numeric(table(batch_info)/length(batch_info))
-      batch_prob[2] <- 1 - batch_prob[1]
-    }
-    
-    other_prior_sim = list(nCells = ncol(counts),
-                           nGenes = nrow(counts),
-                           prob.group = group_prob,
-                           prob.batch = batch_prob)
+  ## 2) batch
+  if(is.null(batch_info)){
+    batch <- NULL
+  }else{
+    batch <- as.numeric(as.factor(batch_info))
   }
   
-  ## estimation
-  message("Estimating...")
-  colnames(counts) <- paste0("Cell", 1:ncol(counts))
+  if(method == "SPARSim"){
+    other_prior_est <- list(group.condition = group)
+    
+    other_prior_sim <- list(nCells = ncol(counts),
+                            nGenes = nrow(counts),
+                            batch.condition = batch)
+  }
   
-  ## ERCC check
   if(ERCC){
     other_prior_est <- list(dilution.factor = dilution,
                             volume = volume,
                             species = ifelse(data_info[["species"]] == "Mus musculus",
-                                             "mouse", "human"))
+                                             "mouse", "human"),
+                            group.condition = group)
     ## data save file
     save_name <- paste0(method, "_ERCC_", data_id)
     message(save_name)
   }else{
-    other_prior_est <- NULL
     ## data save file
     save_name <- paste0(method, data_id)
     message(save_name)
   }
   
-  ## Estimation
+  ## estimation
+  message("Estimating...")
+  colnames(counts) <- paste0("Cell", 1:ncol(counts))
   try_result <- try(
     estimation_result <- simpipe::estimate_parameters(
       ref_data = counts,
@@ -102,7 +91,6 @@ for(i in 1:length(data_list)){
     ### save
     saveRDS(estimation_result, paste0("../estimation_result/", save_name, "_estimation_result.rds"))
   }
-  
   
   ## simulation
   message("Simulation...")
@@ -174,6 +162,6 @@ for(i in 1:length(data_list)){
   saveRDS(save_result, paste0("../simulation_data/", save_name, ".rds"))
   message("Done...")
   message("-------------------------------------------------------------------")
-  
+    
 }
 

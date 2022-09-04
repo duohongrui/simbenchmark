@@ -49,7 +49,7 @@ for(i in 1:length(data_list)){
   other_prior_sim <- list(batchCells = batch_cells,
                           nGenes = nrow(counts))
   
-  ## estimation (SCRIP only uses splatEstimate function to estimate parameters from real data)
+  ## estimation
   message("Estimating...")
   colnames(counts) <- paste0("Cell", 1:ncol(counts))
   
