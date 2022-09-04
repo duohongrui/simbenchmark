@@ -9,8 +9,7 @@ library(stringr)
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
-methods <- c("powsimR",
-             "BASiCS",
+methods <- c("BASiCS",
              "SPARSim",
              "BEARscc")
 
