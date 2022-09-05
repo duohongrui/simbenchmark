@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
-# This file contains four simulation methods:
-# 1. powsimR  2. BASiCS  3. SPARSim  4. BEARscc
+# This file contains one simulation method:
+# 1. SPARSim (ERCC + batch)
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(dplyr)
@@ -41,6 +41,24 @@ for(i in 1:length(data_list)){
     }
   }
   
+  #### DEGs
+  if(!is.null(group)){
+    message("Read DEA result...")
+    result <- readRDS(paste0("../DEA_result/", data_id, ".rds"))
+    # result <- simutils::perform_DEA(data = counts,
+    #                                 group = DEA_group,
+    #                                 method = "edgeRQLFDetRate")
+    de_genes_per_group <- lapply(result, function(df){
+      rownames(df)[df$PValue < 0.05]
+    })
+    de_genes <- unique(BiocGenerics::Reduce(x = de_genes_per_group, f = union))
+    prob.group <- as.numeric(table(group))/length(group)
+    de.prob <- length(de_genes)/nrow(counts)
+  }else{
+    prob.group <- 1
+    de.prob <- 0.1
+  }
+  
   ## 2) batch
   if(is.null(batch_info)){
     batch <- NULL
@@ -53,7 +71,8 @@ for(i in 1:length(data_list)){
     
     other_prior_sim <- list(nCells = ncol(counts),
                             nGenes = nrow(counts),
-                            batch.condition = batch)
+                            batch.condition = batch,
+                            de.prob = de.prob)
   }
   
   if(ERCC){
@@ -101,7 +120,7 @@ for(i in 1:length(data_list)){
       n = 1,
       seed = 1,
       return_format = "list",
-      verbose = TRUE,
+      verbose = FALSE,
       use_docker = FALSE),
     silent = FALSE,
     outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))

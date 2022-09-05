@@ -78,11 +78,11 @@ for(i in 1:length(data_list)){
   ## simulation
   message("Simulation...")
   ### other information
-  other_prior = list(nCells = ncol(counts),
-                     nGenes = nrow(counts),
-                     de.prob = de.prob,
-                     group.condition = group,
-                     batch.condition = batch_condition)
+  other_prior <- list(nCells = ncol(counts),
+                      nGenes = nrow(counts),
+                      de.prob = de.prob,
+                      group.condition = group,
+                      batch.condition = batch_condition)
   
   try_result <- try(
     simulation_result <- simpipe::simulate_datasets(
@@ -100,11 +100,6 @@ for(i in 1:length(data_list)){
   if("try-error" %in% class(try_result)){
     next
   }
-  
-  ## estimation step monitor
-  message("Save information of simulated data...")
-  est_time <- estimation_result[[1]][["estimate_detection"]][1, 2]
-  est_peak_memory <- estimation_result[[1]][["estimate_detection"]][1, 4]
   
   ## simulation step monitor
   sim_time <- simulation_result[[1]][["simulate_detection"]][1, 2]

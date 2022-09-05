@@ -74,9 +74,10 @@ for(i in 1:length(data_list)){
   ## simulation
   message("Simulation...")
   ### other information
-  other_prior = list(nCells = ncol(counts),
-                     de.prob = de.prob,
-                     nGroups = nGroups)
+  other_prior <- list(nCells = ncol(counts),
+                      de.prob = de.prob,
+                      prob.group = prob.group,
+                      nGroups = nGroups)
   
   try_result <- try(
     simulation_result <- simpipe::simulate_datasets(
@@ -86,7 +87,7 @@ for(i in 1:length(data_list)){
       n = 1,
       seed = 1,
       return_format = "list",
-      verbose = TRUE,
+      verbose = FALSE,
       use_docker = FALSE),
     silent = FALSE,
     outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
@@ -94,11 +95,6 @@ for(i in 1:length(data_list)){
   if("try-error" %in% class(try_result)){
     next
   }
-  
-  ## estimation step monitor
-  message("Save information of simulated data...")
-  est_time <- estimation_result[[1]][["estimate_detection"]][1, 2]
-  est_peak_memory <- estimation_result[[1]][["estimate_detection"]][1, 4]
   
   ## simulation step monitor
   sim_time <- simulation_result[[1]][["simulate_detection"]][1, 2]

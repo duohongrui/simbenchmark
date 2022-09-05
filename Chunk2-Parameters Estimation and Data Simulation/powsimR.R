@@ -48,6 +48,18 @@ for(i in 1:length(data_list)){
     }else{
       group_prob <- as.numeric(table(group)/length(group))
       group_prob[2] <- 1 - group_prob[1]
+      #### DEGs
+      message("Read DEA result...")
+      result <- readRDS(paste0("../DEA_result/", data_id, ".rds"))
+      # result <- simutils::perform_DEA(data = counts,
+      #                                 group = DEA_group,
+      #                                 method = "edgeRQLFDetRate")
+      de_genes_per_group <- lapply(result, function(df){
+        rownames(df)[df$PValue < 0.05]
+      })
+      de_genes <- unique(BiocGenerics::Reduce(x = de_genes_per_group, f = union))
+      prob.group <- as.numeric(table(group))/length(group)
+      de.prob <- length(de_genes)/nrow(counts)
     }
     
     ## 2) batch
@@ -61,7 +73,8 @@ for(i in 1:length(data_list)){
     other_prior_sim = list(nCells = ncol(counts),
                            nGenes = nrow(counts),
                            prob.group = group_prob,
-                           prob.batch = batch_prob)
+                           prob.batch = batch_prob,
+                           de.prob = de.prob)
   }
   
   ## estimation
@@ -91,7 +104,7 @@ for(i in 1:length(data_list)){
       method = method,
       other_prior = other_prior_est,
       seed = 1,
-      verbose = TRUE,
+      verbose = FALSE,
       use_docker = FALSE),
     silent = FALSE,
     outFile = paste0("../error_text/", save_name, "_", "estimation_error.txt"))
@@ -113,7 +126,7 @@ for(i in 1:length(data_list)){
       n = 1,
       seed = 1,
       return_format = "list",
-      verbose = TRUE,
+      verbose = FALSE,
       use_docker = FALSE),
     silent = FALSE,
     outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
