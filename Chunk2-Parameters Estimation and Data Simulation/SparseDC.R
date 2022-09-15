@@ -40,11 +40,9 @@ for(i in 1:length(data_list)){
       group <- as.numeric(as.factor(cluster_info))
     }
   }
-  ## 2) cluster or treatment
-  if(is.null(treatment)){
-    DEA_group <- cluster_info
-  }else{
-    DEA_group <- treatment
+  
+  if(is.null(group)){
+    next
   }
   
   ## data save file
