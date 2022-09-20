@@ -3,13 +3,15 @@
 # 1. scDD  2. hierarchicell 3. POWSC
 #------------------------------------------------------------------------------#
 library(simpipe)
+library(simmethods)
 library(dplyr)
 library(stringr)
 
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
-methods <- c("prosstt")
+methods <- c("PROSSTT",
+             "TedSim")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -107,7 +109,11 @@ for(i in 1:length(data_list)){
     ## simulated cell info
     ### group
     sim_col_data <- simulation_result[[1]][["simulate_result"]][["col_meta"]]
-    group_num <- max(group)
+    if("group" %in% colnames(sim_col_data)){
+      group_num <- length(unique(sim_col_data$group))
+    }else{
+      group_num <- "Not known"
+    }
     ## simulated gene info
     sim_row_data <- simulation_result[[1]][["simulate_result"]][["row_meta"]]
     ### DEGs
