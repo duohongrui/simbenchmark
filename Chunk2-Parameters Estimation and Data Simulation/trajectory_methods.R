@@ -11,7 +11,8 @@ library(stringr)
 data_list <- list.files("../preprocessed_data/")
 
 methods <- c("PROSSTT",
-             "TedSim")
+             "TedSim",
+             "dyntoy")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -42,12 +43,29 @@ for(i in 1:length(data_list)){
       group <- as.numeric(as.factor(cluster_info))
     }
   }
-  # ## 2) cluster or treatment
-  # if(is.null(treatment)){
-  #   DEA_group <- cluster_info
-  # }else{
-  #   DEA_group <- treatment
-  # }
+  ## 2) cluster or treatment
+  if(is.null(treatment)){
+    DEA_group <- cluster_info
+  }else{
+    DEA_group <- treatment
+  }
+  
+  #### DEGs
+  if(!is.null(group)){
+    message("Read DEA result...")
+    result <- readRDS(paste0("../DEA_result/", data_id, ".rds"))
+    # result <- simutils::perform_DEA(data = counts,
+    #                                 group = DEA_group,
+    #                                 method = "edgeRQLFDetRate")
+    de_genes_per_group <- lapply(result, function(df){
+      rownames(df)[df$PValue < 0.05]
+    })
+    de_genes <- unique(BiocGenerics::Reduce(x = de_genes_per_group, f = union))
+    prob.group <- as.numeric(table(group))/length(group)
+    de.prob <- length(de_genes)/nrow(counts)
+  }else{
+    de.prob <- 0.1
+  }
   
   for(method in methods){
     ## data save file
@@ -82,7 +100,7 @@ for(i in 1:length(data_list)){
     try_result <- try(
       simulation_result <- simpipe::simulate_datasets(
         parameters = estimation_result,
-        other_prior = list(),
+        other_prior = list(de.prob = de.prob),
         n = 1,
         seed = 1,
         return_format = "list",
@@ -117,7 +135,11 @@ for(i in 1:length(data_list)){
     ## simulated gene info
     sim_row_data <- simulation_result[[1]][["simulate_result"]][["row_meta"]]
     ### DEGs
-    de_gene_num <- 0
+    if("de_gene" %in% colnames(sim_row_data)){
+      de_gene_num <- sum(sim_row_data$de_gene == "yes")
+    }else{
+      de_gene_num <- 0
+    }
     sim_data_info <- list(sim_data_id = save_name,
                           method = method,
                           ref_data_platform = data_info$platform,
