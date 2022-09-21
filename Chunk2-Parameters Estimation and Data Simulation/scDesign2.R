@@ -11,7 +11,7 @@ data_list <- list.files("../preprocessed_data/")
 
 method <- "scDesign2"
 
-for(i in 5:length(data_list)){
+for(i in 29:length(data_list)){
   file_name <- data_list[i]
   ## read data
   message("-------------------------------------------------------------------")
