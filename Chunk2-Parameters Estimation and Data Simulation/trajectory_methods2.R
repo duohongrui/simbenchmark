@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
-# This file contains seven simulation methods:
-# 1. PROSSTT  2. TedSim 3. dyntoy  4. SymSim  5. VeloSim  6. MFA  7. phenopath
+# This file contains four simulation methods:
+# 1. Splat-paths  2. SplatPop-paths 3. ESCO-traj  4. ESCO-tree
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(simmethods)
@@ -10,13 +10,10 @@ library(stringr)
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
-methods <- c("PROSSTT",
-             "TedSim",
-             "dyntoy",
-             "SymSim",
-             "VeloSim",
-             "MFA",
-             "phenopath")
+methods <- c("Splat-paths",
+             "SplatPop-paths",
+             "ESCO-traj",
+             "ESCO-ree")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -69,16 +66,19 @@ for(i in 1:length(data_list)){
     de.prob <- length(de_genes)/nrow(counts)
   }else{
     de.prob <- 0.1
+    prob.group <- 1
   }
   
-  for(method in methods){
-    
-    if(method == "MFA" & data[["data"]][["trajectory_type"]] != "bifurcation"){
-      next
+  for(method_id in methods){
+    traj <- stringr::str_split(method_id, pattern = "-", simplify = TRUE)[2]
+    method <- stringr::str_split(method_id, pattern = "-", simplify = TRUE)[1]
+    if(method == "ESCO"){
+      tree <- TRUE
+    }else{
+      tree <- NULL
     }
-    
     ## data save file
-    save_name <- paste0(method, "_", data_id)
+    save_name <- paste0(method_id, "_", data_id)
     message(save_name)
     
     ## estimation (SCRIP only uses splatEstimate function to estimate parameters from real data)
@@ -88,7 +88,8 @@ for(i in 1:length(data_list)){
         estimation_result <- simpipe::estimate_parameters(
           ref_data = counts,
           method = method,
-          other_prior = list(group.condition = group),
+          other_prior = list(group.condition = group,
+                             tree = tree),
           seed = 1,
           verbose = TRUE,
           use_docker = FALSE),
@@ -109,7 +110,9 @@ for(i in 1:length(data_list)){
     try_result <- try(
       simulation_result <- simpipe::simulate_datasets(
         parameters = estimation_result,
-        other_prior = list(de.prob = de.prob),
+        other_prior = list(de.prob = de.prob,
+                           prob.group = prob.group,
+                           paths = TRUE),
         n = 1,
         seed = 1,
         return_format = "list",
