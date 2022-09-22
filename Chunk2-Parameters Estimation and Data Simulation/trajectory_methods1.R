@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
 # This file contains three simulation methods:
-# 1. scDD  2. hierarchicell 3. POWSC
+# 1. PROSSTT  2. TedSim 3. dyntoy  4. SymSim  5. VeloSim  6. MFA  7. phenopath
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(simmethods)
@@ -12,7 +12,11 @@ data_list <- list.files("../preprocessed_data/")
 
 methods <- c("PROSSTT",
              "TedSim",
-             "dyntoy")
+             "dyntoy",
+             "SymSim",
+             "VeloSim",
+             "MFA",
+             "phenopath")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -68,6 +72,11 @@ for(i in 1:length(data_list)){
   }
   
   for(method in methods){
+    
+    if(method == "MFA" & data[["data"]][["trajectory_type"]] != "bifurcation"){
+      next
+    }
+    
     ## data save file
     save_name <- paste0(method, "_", data_id)
     message(save_name)
