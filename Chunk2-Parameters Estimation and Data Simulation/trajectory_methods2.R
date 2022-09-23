@@ -13,7 +13,7 @@ data_list <- list.files("../preprocessed_data/")
 methods <- c("Splat-paths",
              "SplatPop-paths",
              "ESCO-traj",
-             "ESCO-ree")
+             "ESCO-tree")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
