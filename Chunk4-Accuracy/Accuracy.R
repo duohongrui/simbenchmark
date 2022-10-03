@@ -7,7 +7,7 @@ for(ref_data_name in ref_data_list){
   print(ref_data_name)
   ref_data <- readRDS(paste0("/Users/duohongrui/Desktop/preprocessed_data/", ref_data_name))
   if(dynwrap::is_wrapper_with_expression(ref_data$data)){
-    ref_data <- ref_data$data$counts
+    ref_data <- t(ref_data$data$counts)
   }else{
     ref_data <- ref_data$data
   }
