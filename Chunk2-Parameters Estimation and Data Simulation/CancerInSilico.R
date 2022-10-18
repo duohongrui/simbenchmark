@@ -61,10 +61,7 @@ for(i in 1:length(data_list)){
   ## simulation
   message("Simulation...")
   ### other information
-  other_prior <- list(nCells = ncol(counts),
-                      nGenes = nrow(counts),
-                      de.prob = de.prob,
-                      nGroups = length(prob.group))
+  other_prior <- list(nCells = ncol(counts))
   
   try_result <- try(
     simulation_result <- simpipe::simulate_datasets(

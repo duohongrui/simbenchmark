@@ -3,6 +3,7 @@
 # 1. zingeR  2. zinbwaveZinger 3. POWSC
 #------------------------------------------------------------------------------#
 library(simpipe)
+library(simmethods)
 library(dplyr)
 library(stringr)
 
