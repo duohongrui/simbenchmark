@@ -20,7 +20,7 @@ for(i in sim_data_list[1:3]){
   
   ### Read real data property
   message("Read real data properties...")
-  data_name <- stringr::str_extract(i, pattern = "data[0-9]+[_][]")
+  data_name <- stringr::str_extract(i, pattern = "data[0-9]+[_]")
   ref_data_properties <- readRDS(file.path("F:/sim_bench/ref_data_properties",
                                            list.files("F:/sim_bench/ref_data_properties/", pattern = data_name)))
   ref_data_cell_properties <- ref_data_properties$cell_properties
