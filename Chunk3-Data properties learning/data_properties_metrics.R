@@ -1,3 +1,4 @@
+library(simpipe)
 sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat_")
 
 for(i in sim_data_list[1:3]){
