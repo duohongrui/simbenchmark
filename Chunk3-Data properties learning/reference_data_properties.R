@@ -1,6 +1,6 @@
-data_list <- list.files("/Users/duohongrui/Desktop/preprocessed_data/")
+data_list <- list.files("F:/sim_bench/preprocessed_data/")
 
-for(i in 1:50){
+for(i in data_list){
   ## Read data
   data_name <- data_list[i]
   data <- readRDS(paste0("/Users/duohongrui/Desktop/preprocessed_data/", data_name))

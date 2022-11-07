@@ -1,7 +1,38 @@
-sim_data_list
+sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat_")
 
-for(i in sim_data_list){
-  sim_result <- readRDS("./")
+for(i in sim_data_list[1:3]){
+  print(i)
+  message("Read simulated data...")
+  sim_result <- readRDS(file.path("F:/sim_bench/simulation_data", i))
+  sim_data <- sim_result$sim_data$count_data
+  message("Calculate cell properties...")
+  sim_data_cell_properties <- simutils::cell_properties(sim_data, verbose = TRUE)
+  message("Calculate gene properties...")
+  sim_data_gene_properties <- simutils::gene_properties(sim_data, verbose = TRUE)
   
-  sim_data
+  ### save data property
+  sim_data_properties <- dplyr::lst(cell_properties = sim_data_cell_properties,
+                                    gene_properties = sim_data_gene_properties)
+  
+  saveRDS(sim_data_properties, file.path("F:/sim_bench/sim_data_properties",
+                                         sim_result[["sim_data_info"]][["sim_data_id"]]))
+  
+  ### Read real data property
+  message("Read real data properties...")
+  data_name <- stringr::str_extract(i, pattern = "data[0-9]+[_][]")
+  ref_data_properties <- readRDS(file.path("F:/sim_bench/ref_data_properties",
+                                           list.files("F:/sim_bench/ref_data_properties/", pattern = data_name)))
+  ref_data_cell_properties <- ref_data_properties$cell_properties
+  ref_data_gene_properties <- ref_data_properties$gene_properties
+  
+  ### Calculate similarity
+  message("Calculating metrics...")
+  result <- simpipe::data_properties_summary(ref_data_cell_properties = ref_data_cell_properties,
+                                             sim_data_cell_properties = sim_data_cell_properties,
+                                             ref_data_gene_properties = ref_data_gene_properties,
+                                             sim_data_gene_properties = sim_data_gene_properties)
+  ### save result
+  message("Save results...")
+  saveRDS(result, file.path("F:/sim_bench/data_properties_result",
+                            sim_result[["sim_data_info"]][["sim_data_id"]]))
 }
