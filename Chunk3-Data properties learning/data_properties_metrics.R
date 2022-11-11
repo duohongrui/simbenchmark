@@ -1,11 +1,16 @@
 library(simpipe)
 sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat_")
 
-for(i in sim_data_list){
+for(i in sim_data_list[25:101]){
   print(i)
   message("Read simulated data...")
   sim_result <- readRDS(file.path("F:/sim_bench/simulation_data", i))
   sim_data <- sim_result$sim_data$count_data
+  
+  if(all(colSums(sim_data)>0)){
+    next
+  }
+  
   message("Calculate cell properties...")
   sim_data_cell_properties <- simutils::cell_properties(sim_data, verbose = TRUE)
   message("Calculate gene properties...")
