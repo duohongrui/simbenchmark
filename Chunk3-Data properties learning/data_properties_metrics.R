@@ -7,7 +7,7 @@ for(i in sim_data_list[25:101]){
   sim_result <- readRDS(file.path("F:/sim_bench/simulation_data", i))
   sim_data <- sim_result$sim_data$count_data
   
-  if(all(colSums(sim_data)>0)){
+  if(any(colSums(sim_data)==0)){
     next
   }
   
