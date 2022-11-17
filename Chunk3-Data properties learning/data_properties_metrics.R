@@ -1,7 +1,7 @@
 library(simpipe)
 sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat_")
 
-for(i in sim_data_list[25:101]){
+for(i in sim_data_list){
   print(i)
   message("Read simulated data...")
   sim_result <- readRDS(file.path("F:/sim_bench/simulation_data", i))
@@ -21,7 +21,7 @@ for(i in sim_data_list[25:101]){
                                     gene_properties = sim_data_gene_properties)
   
   saveRDS(sim_data_properties, file.path("F:/sim_bench/sim_data_properties",
-                                         sim_result[["sim_data_info"]][["sim_data_id"]]))
+                                         paste0(sim_result[["sim_data_info"]][["sim_data_id"]], ".rds")))
   
   ### Read real data property
   message("Read real data properties...")
