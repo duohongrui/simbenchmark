@@ -1,5 +1,5 @@
 library(simpipe)
-sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat_")
+sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SCRIP")
 
 for(i in sim_data_list){
   print(i)
