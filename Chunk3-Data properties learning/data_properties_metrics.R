@@ -1,11 +1,11 @@
 library(simpipe)
-sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SCRIP")
+sim_data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SplatPop")
 
 for(i in sim_data_list){
   print(i)
   message("Read simulated data...")
   sim_result <- readRDS(file.path("F:/sim_bench/simulation_data", i))
-  sim_data <- sim_result$sim_data$count_data
+  sim_data <- as.data.frame(sim_result$sim_data$count_data)
   
   if(any(colSums(sim_data)==0)){
     next
