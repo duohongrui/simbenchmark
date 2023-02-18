@@ -32,6 +32,15 @@ for(i in sim_data_list){
   ref_data_gene_properties <- ref_data_properties$gene_properties
   
   ### Calculate similarity
+  
+  cell_num <- length(ref_data_cell_properties[[1]]) != length(sim_data_cell_properties[[1]])
+  gene_num <- length(ref_data_gene_properties[[1]]) != length(sim_data_gene_properties[[1]])
+  
+  if(cell_num & gene_num){
+    message("The numbers of cell(&gene) are not identical...")
+    next
+  }
+  
   message("Calculating metrics...")
   result <- simpipe::data_properties_summary(ref_data_cell_properties = ref_data_cell_properties,
                                              sim_data_cell_properties = sim_data_cell_properties,
