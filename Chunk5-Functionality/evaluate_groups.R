@@ -2,12 +2,11 @@ library(tibble)
 data_list <- list.files()
 
 for(i in data_list){
-  
   data <- readRDS()
   
   if(data$sim_data_info$group >= 2 & "group" %in% colnames(data$sim_data$col_meta) |
      data$sim_data_info$group >= 2 & "plate" %in% colnames(data$sim_data$col_meta)){
-    
+  
     message(i)
     
     if("plate" %in% colnames(data$sim_data$col_meta)){
@@ -19,6 +18,7 @@ for(i in data_list){
     
     message("1-Calculating CDI...")
     CDI <- simutils::calculate_CDI(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group)
+    CDI <- min(CDI[1, 1], CDI[1, 2])
     
     message("2-Calculating ROUGE...")
     ROUGE <- simutils::calculate_ROGUE(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group)
@@ -46,7 +46,6 @@ for(i in data_list){
   }else{
     next
   }
-  
 }
 
 
