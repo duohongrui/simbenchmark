@@ -21,7 +21,13 @@ for(i in data_list){
     CDI <- min(CDI[1, 1], CDI[1, 2])
     
     message("2-Calculating ROUGE...")
-    ROUGE <- simutils::calculate_ROGUE(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group)
+    error <- try(
+      ROUGE <- simutils::calculate_ROGUE(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group),
+      silent = TRUE
+    )
+    if("try-error" %in% class(error)){
+      ROUGE <- NA
+    }
     
     message("3-Calculating silhouette...")
     silhouette <- simutils::calculate_silhouette(dist, cluster_info = data$sim_data$col_meta$group)
