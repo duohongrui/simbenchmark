@@ -17,12 +17,19 @@ for(i in data_list){
     dist <- parallelDist::parDist(t(as.matrix(data$sim_data$count_data)), threads = 5)
     
     message("1-Calculating CDI...")
-    CDI <- simutils::calculate_CDI(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group)
-    CDI <- min(CDI[1, 1], CDI[1, 2])
+    error <- try(
+      CDI <- simutils::calculate_CDI(as.matrix(data$sim_data$count_data), cluster_info = data$sim_data$col_meta$group),
+      silent = TRUE
+    )
+    if("try-error" %in% class(error)){
+      CDI <- NA
+    }else{
+      CDI <- min(CDI[1, 1], CDI[1, 2])
+    }
     
     message("2-Calculating ROUGE...")
     error <- try(
-      ROUGE <- simutils::calculate_ROGUE(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group),
+      ROUGE <- simutils::calculate_ROGUE(as.matrix(data$sim_data$count_data), cluster_info = data$sim_data$col_meta$group),
       silent = TRUE
     )
     if("try-error" %in% class(error)){
@@ -39,7 +46,7 @@ for(i in data_list){
     connectivity <- simutils::calculate_connectivity(dist, cluster_info = data$sim_data$col_meta$group)
     
     message("6-Calculating DB index...")
-    DB_index <- simutils::calculate_DB_index(data$sim_data$count_data, cluster_info = data$sim_data$col_meta$group)
+    DB_index <- simutils::calculate_DB_index(as.matrix(data$sim_data$count_data), cluster_info = data$sim_data$col_meta$group)
     
     group_metrics <- dplyr::lst(CDI,
                                 ROUGE,
