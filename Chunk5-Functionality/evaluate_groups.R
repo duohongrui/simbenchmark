@@ -1,5 +1,5 @@
 library(tibble)
-data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SplatPop_")
+data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SCRIP-")
 
 for(i in data_list){
   data <- readRDS(file.path("F:/sim_bench/simulation_data", i))
@@ -14,7 +14,7 @@ for(i in data_list){
     }
     
     message("Calculating distance matrix...")
-    dist <- parallelDist::parDist(t(as.matrix(data$sim_data$count_data)), threads = 5)
+    dist <- parallelDist::parDist(t(as.matrix(data$sim_data$count_data)), threads = 8)
     
     message("1-Calculating CDI...")
     error <- try(
