@@ -1,5 +1,5 @@
 library(tibble)
-data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SCRIP-")
+data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SPARSim_")
 
 for(i in data_list){
   data <- readRDS(file.path("F:/sim_bench/simulation_data", i))
