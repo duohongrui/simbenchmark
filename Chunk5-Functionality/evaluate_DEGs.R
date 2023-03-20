@@ -27,6 +27,7 @@ for(i in data_list){
         sim_DEGs[[conb_name]] <- DEGs
         
         ### Distribution
+        message("Distribution of null data...")
         col1 <- which(data[["sim_data"]][["col_meta"]][["group"]] %in% conb1)
         col2 <- which(data[["sim_data"]][["col_meta"]][["group"]] %in% conb2)
         sub_data <- sim_data[!index, c(col1, col2)]
@@ -44,6 +45,7 @@ for(i in data_list){
     }
     
     ### True proportions of DEGs
+    message("True proportions of DEGs...")
     DEGs_result <- simutils::true_DEGs_proportion(sim_data = sim_data,
                                                   group = group,
                                                   group_combn = group_combn,
@@ -52,6 +54,7 @@ for(i in data_list){
     saveRDS(DEGs_result, file.path("F:/sim_bench/DEGs_result", i))
     true_proportion <- DEGs_result[["weighted_true_prop"]]
     ### SVM
+    message("SVM...")
     SVM_result <- simutils::model_predict(data = sim_data,
                                           group = group,
                                           de_genes = de_genes,
@@ -70,7 +73,7 @@ for(i in data_list){
                        Precision,
                        Recall,
                        F1),
-            file.path("F:/sim_bench/batch_evaluation", i))
+            file.path("F:/sim_bench/DEGs_evaluation", i))
     
   }else{
     next
