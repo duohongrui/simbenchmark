@@ -64,12 +64,12 @@ for(i in data_list){
     AUC <- as.numeric(SVM_result$roc$auc)
     Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
     if(length(unique(group)) == 2){
-      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
-      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
-      F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]]["F1"], na.rm = TRUE)
+      Precision <- SVM_result[["conf_matrix"]][["byClass"]]["Precision"]
+      Recall <- SVM_result[["conf_matrix"]][["byClass"]]["Recall"]
+      F1 <- SVM_result[["conf_matrix"]][["byClass"]]["F1"]
     }else{
-      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"])
-      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"])
+      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"], na.rm = TRUE)
+      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"], na.rm = TRUE)
       F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
     }
     
