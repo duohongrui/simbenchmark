@@ -63,9 +63,15 @@ for(i in data_list){
     
     AUC <- as.numeric(SVM_result$roc$auc)
     Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
-    Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"])
-    Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"])
-    F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+    if(length(unique(group)) == 2){
+      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
+      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
+      F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]]["F1"], na.rm = TRUE)
+    }else{
+      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"])
+      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"])
+      F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+    }
     
     saveRDS(dplyr::lst(distribution_score,
                        true_proportion,
