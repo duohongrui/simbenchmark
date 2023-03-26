@@ -32,13 +32,18 @@ for(i in data_list){
         col2 <- which(data[["sim_data"]][["col_meta"]][["group"]] %in% conb2)
         sub_data <- sim_data[!index, c(col1, col2)]
         sub_group <- c(rep(conb1, length(col1)), rep(conb2, length(col2)))
-        sub_DEA_result <- simutils::perform_DEA(data = sub_data,
-                                                group = sub_group,
-                                                method = "edgeRQLFDetRate")
-        valid_DEGs_distribution[[conb_name]] <- sub_DEA_result[[1]]
-        p_values <- sub_DEA_result[[1]][["PValue"]]
-        uniform_result <- simutils::test_uni_distribution(p_values)
-        distribution_score <- append(distribution_score, uniform_result[["score"]])
+        error <- try(sub_DEA_result <- simutils::perform_DEA(data = sub_data,
+                                                             group = sub_group,
+                                                             method = "edgeRQLFDetRate"))
+        if(class(error) == "try-error"){
+          distribution_score <- append(distribution_score, NA)
+          valid_DEGs_distribution[[conb_name]] <- NA
+        }else{
+          valid_DEGs_distribution[[conb_name]] <- sub_DEA_result[[1]]
+          p_values <- sub_DEA_result[[1]][["PValue"]]
+          uniform_result <- simutils::test_uni_distribution(p_values)
+          distribution_score <- append(distribution_score, uniform_result[["score"]])
+        }
       }
       distribution_score <- mean(distribution_score)
       saveRDS(valid_DEGs_distribution, file.path("F:/sim_bench/valid_DEGs_distribution", i))
@@ -46,13 +51,18 @@ for(i in data_list){
     
     ### True proportions of DEGs
     message("True proportions of DEGs...")
-    DEGs_result <- simutils::true_DEGs_proportion(sim_data = sim_data,
-                                                  group = group,
-                                                  group_combn = group_combn,
-                                                  sim_DEGs = sim_DEGs,
-                                                  DEA_method = "edgeRQLFDetRate")
-    saveRDS(DEGs_result, file.path("F:/sim_bench/DEGs_result", i))
-    true_proportion <- DEGs_result[["weighted_true_prop"]]
+    error2 <- try(DEGs_result <- simutils::true_DEGs_proportion(sim_data = sim_data,
+                                                                group = group,
+                                                                group_combn = group_combn,
+                                                                sim_DEGs = sim_DEGs,
+                                                                DEA_method = "edgeRQLFDetRate"))
+    if(class(error2) == "try-error"){
+      true_proportion <- NA
+    }else{
+      saveRDS(DEGs_result, file.path("F:/sim_bench/DEGs_result", i))
+      true_proportion <- DEGs_result[["weighted_true_prop"]]
+    }
+    
     ### SVM
     message("SVM...")
     SVM_result <- simutils::model_predict(data = sim_data,
