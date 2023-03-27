@@ -1,7 +1,7 @@
 library(tibble)
 data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat")
 
-for(i in data_list){
+for(i in data_list[14:202]){
   data <- readRDS(file.path("F:/sim_bench/simulation_data", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
@@ -65,22 +65,29 @@ for(i in data_list){
     
     ### SVM
     message("SVM...")
-    SVM_result <- simutils::model_predict(data = sim_data,
-                                          group = group,
-                                          de_genes = de_genes,
-                                          method = "SVM")
-    saveRDS(SVM_result, file.path("F:/sim_bench/SVM_model", i))
-    
-    AUC <- as.numeric(SVM_result$roc$auc)
-    Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
-    if(length(unique(group)) == 2){
-      Precision <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
-      Recall <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
-      F1 <- unname(SVM_result[["conf_matrix"]][["byClass"]]["F1"])
+    error3 <- try(SVM_result <- simutils::model_predict(data = sim_data,
+                                                        group = group,
+                                                        de_genes = de_genes,
+                                                        method = "SVM"))
+    if(class(error3) == "try-error"){
+      AUC <- NA
+      Accuracy <- NA
+      Precision <- NA
+      Recall <- NA
+      F1 <- NA
     }else{
-      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"], na.rm = TRUE)
-      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"], na.rm = TRUE)
-      F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+      saveRDS(SVM_result, file.path("F:/sim_bench/SVM_model", i))
+      AUC <- as.numeric(SVM_result$roc$auc)
+      Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
+      if(length(unique(group)) == 2){
+        Precision <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
+        Recall <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
+        F1 <- unname(SVM_result[["conf_matrix"]][["byClass"]]["F1"])
+      }else{
+        Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"], na.rm = TRUE)
+        Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"], na.rm = TRUE)
+        F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+      }
     }
     
     saveRDS(dplyr::lst(distribution_score,
