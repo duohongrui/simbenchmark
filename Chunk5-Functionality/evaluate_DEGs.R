@@ -1,7 +1,7 @@
 library(tibble)
 data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat")
 
-for(i in data_list){
+for(i in data_list[14:202]){
   data <- readRDS(file.path("F:/sim_bench/simulation_data", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
@@ -32,13 +32,18 @@ for(i in data_list){
         col2 <- which(data[["sim_data"]][["col_meta"]][["group"]] %in% conb2)
         sub_data <- sim_data[!index, c(col1, col2)]
         sub_group <- c(rep(conb1, length(col1)), rep(conb2, length(col2)))
-        sub_DEA_result <- simutils::perform_DEA(data = sub_data,
-                                                group = sub_group,
-                                                method = "edgeRQLFDetRate")
-        valid_DEGs_distribution[[conb_name]] <- sub_DEA_result[[1]]
-        p_values <- sub_DEA_result[[1]][["PValue"]]
-        uniform_result <- simutils::test_uni_distribution(p_values)
-        distribution_score <- append(distribution_score, uniform_result[["score"]])
+        error <- try(sub_DEA_result <- simutils::perform_DEA(data = sub_data,
+                                                             group = sub_group,
+                                                             method = "edgeRQLFDetRate"))
+        if(class(error) == "try-error"){
+          distribution_score <- append(distribution_score, NA)
+          valid_DEGs_distribution[[conb_name]] <- NA
+        }else{
+          valid_DEGs_distribution[[conb_name]] <- sub_DEA_result[[1]]
+          p_values <- sub_DEA_result[[1]][["PValue"]]
+          uniform_result <- simutils::test_uni_distribution(p_values)
+          distribution_score <- append(distribution_score, uniform_result[["score"]])
+        }
       }
       distribution_score <- mean(distribution_score)
       saveRDS(valid_DEGs_distribution, file.path("F:/sim_bench/valid_DEGs_distribution", i))
@@ -46,31 +51,43 @@ for(i in data_list){
     
     ### True proportions of DEGs
     message("True proportions of DEGs...")
-    DEGs_result <- simutils::true_DEGs_proportion(sim_data = sim_data,
-                                                  group = group,
-                                                  group_combn = group_combn,
-                                                  sim_DEGs = sim_DEGs,
-                                                  DEA_method = "edgeRQLFDetRate")
-    saveRDS(DEGs_result, file.path("F:/sim_bench/DEGs_result", i))
-    true_proportion <- DEGs_result[["weighted_true_prop"]]
+    error2 <- try(DEGs_result <- simutils::true_DEGs_proportion(sim_data = sim_data,
+                                                                group = group,
+                                                                group_combn = group_combn,
+                                                                sim_DEGs = sim_DEGs,
+                                                                DEA_method = "edgeRQLFDetRate"))
+    if(class(error2) == "try-error"){
+      true_proportion <- NA
+    }else{
+      saveRDS(DEGs_result, file.path("F:/sim_bench/DEGs_result", i))
+      true_proportion <- DEGs_result[["weighted_true_prop"]]
+    }
+    
     ### SVM
     message("SVM...")
-    SVM_result <- simutils::model_predict(data = sim_data,
-                                          group = group,
-                                          de_genes = de_genes,
-                                          method = "SVM")
-    saveRDS(SVM_result, file.path("F:/sim_bench/SVM_model", i))
-    
-    AUC <- as.numeric(SVM_result$roc$auc)
-    Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
-    if(length(unique(group)) == 2){
-      Precision <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
-      Recall <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
-      F1 <- unname(SVM_result[["conf_matrix"]][["byClass"]]["F1"])
+    error3 <- try(SVM_result <- simutils::model_predict(data = sim_data,
+                                                        group = group,
+                                                        de_genes = de_genes,
+                                                        method = "SVM"))
+    if(class(error3) == "try-error"){
+      AUC <- NA
+      Accuracy <- NA
+      Precision <- NA
+      Recall <- NA
+      F1 <- NA
     }else{
-      Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"], na.rm = TRUE)
-      Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"], na.rm = TRUE)
-      F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+      saveRDS(SVM_result, file.path("F:/sim_bench/SVM_model", i))
+      AUC <- as.numeric(SVM_result$roc$auc)
+      Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
+      if(length(unique(group)) == 2){
+        Precision <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
+        Recall <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
+        F1 <- unname(SVM_result[["conf_matrix"]][["byClass"]]["F1"])
+      }else{
+        Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"], na.rm = TRUE)
+        Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"], na.rm = TRUE)
+        F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+      }
     }
     
     saveRDS(dplyr::lst(distribution_score,
