@@ -1,4 +1,3 @@
-library(simmethods)
 example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
 data <- example_data$data
 group_condition <- example_data$data_info$group_condition
@@ -7,7 +6,7 @@ group_condition <- example_data$data_info$group_condition
 gradient_num <- data.frame("cell" = c(100, 200, 500, 800, 1000, 2000, 3000, 5000, 8000, 10000, rep(1000, 10)),
                            "gene" = c(rep(1000, 10), 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000))
 
-## First class of methods which users can custome cell and gene number
+## First class of methods which users can custom cell and gene number
 
 for(i in 1:20){
   
