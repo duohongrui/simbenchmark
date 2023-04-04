@@ -1,5 +1,5 @@
 library(simmethods)
-example_data <- readRDS("/Users/duohongrui/Desktop/preprocessed_data/data42_GSE65525_subset3.rds")
+example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
 data <- example_data$data
 group_condition <- example_data$data_info$group_condition
 
