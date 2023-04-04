@@ -1,7 +1,7 @@
 library(tibble)
-data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^Splat")
+data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SCRIP")
 
-for(i in data_list[14:202]){
+for(i in data_list[418:505]){
   data <- readRDS(file.path("F:/sim_bench/simulation_data", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
@@ -34,7 +34,8 @@ for(i in data_list[14:202]){
         sub_group <- c(rep(conb1, length(col1)), rep(conb2, length(col2)))
         error <- try(sub_DEA_result <- simutils::perform_DEA(data = sub_data,
                                                              group = sub_group,
-                                                             method = "edgeRQLFDetRate"))
+                                                             method = "edgeRQLFDetRate",
+                                                             verbose = TRUE))
         if(class(error) == "try-error"){
           distribution_score <- append(distribution_score, NA)
           valid_DEGs_distribution[[conb_name]] <- NA
@@ -55,7 +56,8 @@ for(i in data_list[14:202]){
                                                                 group = group,
                                                                 group_combn = group_combn,
                                                                 sim_DEGs = sim_DEGs,
-                                                                DEA_method = "edgeRQLFDetRate"))
+                                                                DEA_method = "edgeRQLFDetRate",
+                                                                verbose = TRUE))
     if(class(error2) == "try-error"){
       true_proportion <- NA
     }else{
@@ -68,7 +70,8 @@ for(i in data_list[14:202]){
     error3 <- try(SVM_result <- simutils::model_predict(data = sim_data,
                                                         group = group,
                                                         de_genes = de_genes,
-                                                        method = "SVM"))
+                                                        method = "SVM",
+                                                        verbose = TRUE))
     if(class(error3) == "try-error"){
       AUC <- NA
       Accuracy <- NA
