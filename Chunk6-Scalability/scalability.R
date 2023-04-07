@@ -473,9 +473,9 @@ for(i in 1:20){
 
 
 ## Eighth class of methods (scDD)
-example_data <- readRDS("../preprocessed_data/data6_SCP1821.rds")
 library(scDD)
 data(scDatExSim)
+data(scDatEx)
 data <- SingleCellExperiment::normcounts(scDatExSim)
 group_condition <- SingleCellExperiment::colData(scDatExSim)$condition
 
@@ -491,22 +491,11 @@ for(i in 1:20){
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
   set.seed(i*10)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
-  
-  # sub_data <- scater::mockSCE(ncells = cell_num, ngenes = gene_num)
-  # sub_data <- SingleCellExperiment::counts(sub_data)
-  # group <- sample(1:2, cell_num, replace = TRUE)
-  
-  
+
   sub_data <- data[gene_index, sample_index]
   group <- group_condition[sample_index]
   rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
   colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
-  # set.seed(i*10)
-  # sub_data <- cbind(matrix(rpois(cell_num * gene_num/2, 0.1), nrow = gene_num, ncol = cell_num/2),
-  #                   matrix(rpois(cell_num * gene_num/2, 0.5), nrow = gene_num, ncol = cell_num/2))
-  # group <- c(rep(1, cell_num/2), rep(2, cell_num/2))
-  # rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
-  # colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
   
   for(n in 1:3){
     scala_result <- purrr::map(
@@ -528,28 +517,21 @@ for(i in 1:20){
         ### simulation
         parameters <- splatter::newSCDDParams()
         parameters <- splatter::setParams(parameters,
-                                          list(nDE = 1000,
-                                               nDP = 1000,
-                                               nDM = 1000,
-                                               nDB = 1000,
-                                               nEE = 1000,
-                                               nEP = 1000,
+                                          list(nDE = gene_num/5,
+                                               nDP = gene_num/5,
+                                               nDM = gene_num/5,
+                                               nDB = gene_num/5,
+                                               nEE = gene_num/5,
+                                               nEP = 0,
                                                SCdat = scDatEx,
                                                seed = i))
         simulate_detection <- peakRAM::peakRAM(
           simulate_result <- splatter::scDDSimulate(parameters,
                                                     verbose = TRUE,
-                                                    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+                                                    BPPARAM = BiocParallel::MulticoreParam(workers = 2))
         )
-        # sim <- simpipe::simulate_datasets(parameters = est,
-        #                                   other_prior = list(BPPARAM = BiocParallel::MulticoreParam(workers = 2)),
-        #                                   seed = 111,
-        #                                   return_format = "list",
-        #                                   verbose = FALSE)
-        
         sim_time <- simulate_detection[1,2]
         sim_memory <- simulate_detection[1,4]
-        
         tibble::tibble("method" = method,
                        "cell_num" = cell_num,
                        "gene_num" = gene_num,
