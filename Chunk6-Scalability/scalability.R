@@ -474,6 +474,8 @@ for(i in 1:20){
 
 ## Eighth class of methods (scDD)
 example_data <- readRDS("../preprocessed_data/data6_SCP1821.rds")
+library(scDD)
+data(scDatExSim)
 data <- SingleCellExperiment::normcounts(scDatExSim)
 group_condition <- SingleCellExperiment::colData(scDatExSim)$condition
 
@@ -485,11 +487,16 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i)
+  set.seed(i*10)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i)
+  set.seed(i*10)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
-
+  
+  # sub_data <- scater::mockSCE(ncells = cell_num, ngenes = gene_num)
+  # sub_data <- SingleCellExperiment::counts(sub_data)
+  # group <- sample(1:2, cell_num, replace = TRUE)
+  
+  
   sub_data <- data[gene_index, sample_index]
   group <- group_condition[sample_index]
   rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
@@ -519,8 +526,18 @@ for(i in 1:20){
         est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
         
         ### simulation
+        parameters <- splatter::newSCDDParams()
+        parameters <- splatter::setParams(parameters,
+                                          list(nDE = 1000,
+                                               nDP = 1000,
+                                               nDM = 1000,
+                                               nDB = 1000,
+                                               nEE = 1000,
+                                               nEP = 1000,
+                                               SCdat = scDatEx,
+                                               seed = i))
         simulate_detection <- peakRAM::peakRAM(
-          simulate_result <- splatter::scDDSimulate(est$refdata_scDD$estimate_result,
+          simulate_result <- splatter::scDDSimulate(parameters,
                                                     verbose = TRUE,
                                                     BPPARAM = BiocParallel::MulticoreParam(workers = 1))
         )
