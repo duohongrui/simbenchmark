@@ -202,9 +202,9 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i)
+  set.seed(i*10)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i)
+  set.seed(i*10)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
   
   sub_data <- data[gene_index, sample_index]
@@ -473,9 +473,9 @@ for(i in 1:20){
 
 
 ## Eighth class of methods (scDD)
-example_data <- readRDS("../preprocessed_data/data1_GSE54006.rds")
-data <- example_data$data
-group_condition <- example_data$data_info$group_condition
+example_data <- readRDS("../preprocessed_data/data6_SCP1821.rds")
+data <- SingleCellExperiment::normcounts(scDatExSim)
+group_condition <- SingleCellExperiment::colData(scDatExSim)$condition
 
 eighth_class <- c("scDD")
 for(i in 1:20){
@@ -489,11 +489,17 @@ for(i in 1:20){
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
   set.seed(i)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
-  
+
   sub_data <- data[gene_index, sample_index]
   group <- group_condition[sample_index]
   rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
   colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  # set.seed(i*10)
+  # sub_data <- cbind(matrix(rpois(cell_num * gene_num/2, 0.1), nrow = gene_num, ncol = cell_num/2),
+  #                   matrix(rpois(cell_num * gene_num/2, 0.5), nrow = gene_num, ncol = cell_num/2))
+  # group <- c(rep(1, cell_num/2), rep(2, cell_num/2))
+  # rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  # colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
   
   for(n in 1:3){
     scala_result <- purrr::map(
@@ -513,13 +519,19 @@ for(i in 1:20){
         est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
         
         ### simulation
-        sim <- simpipe::simulate_datasets(parameters = est,
-                                          seed = 111,
-                                          return_format = "list",
-                                          verbose = FALSE)
+        simulate_detection <- peakRAM::peakRAM(
+          simulate_result <- splatter::scDDSimulate(est$refdata_scDD$estimate_result,
+                                                    verbose = TRUE,
+                                                    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+        )
+        # sim <- simpipe::simulate_datasets(parameters = est,
+        #                                   other_prior = list(BPPARAM = BiocParallel::MulticoreParam(workers = 2)),
+        #                                   seed = 111,
+        #                                   return_format = "list",
+        #                                   verbose = FALSE)
         
-        sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
-        sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+        sim_time <- simulate_detection[1,2]
+        sim_memory <- simulate_detection[1,4]
         
         tibble::tibble("method" = method,
                        "cell_num" = cell_num,
