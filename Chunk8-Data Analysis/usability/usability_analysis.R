@@ -17,6 +17,9 @@ weight_data <- openxlsx::read.xlsx("Chunk7-Usability/Usability-scoringsheet.xlsx
 ### summarize usability score
 usability_score <- as.matrix(usability_data) %*% matrix(weight_data$Weight, ncol = 1)/100
 
+usability <- tibble(method = rownames(usability_data),
+                    usability_score = usability_score[,1])
+saveRDS(usability, file = "Chunk8-Data Analysis/usability/usability.rds")
 
 ##########################################################
 ###################   SUMMARY FIGURE   ###################
@@ -148,6 +151,6 @@ usability_plot <- wrap_plots(barplot, g,
                              design = layout)+
   plot_annotation(tag_levels = 'A')
 usability_plot
-ggsave(usability_plot, filename = "Chunk7-Usability/usability.pdf", width = 15, height = 15, units = "in")
+ggsave(usability_plot, filename = "Chunk8-Data Analysis/usability/usability.pdf", width = 15, height = 15, units = "in")
 
 

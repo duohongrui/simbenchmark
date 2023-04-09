@@ -97,12 +97,12 @@ accuracy_data <- accuracy_data %>%
   )
 
 
-### NA and NaN
-accuracy_data <- accuracy_data %>% 
-  mutate(
-    across(3:76, ~ replace_na(.x, 0))
-  )
-saveRDS(accuracy_data, file = "Chunk4-Accuracy/accuracy_data.rds")
+# ### NA and NaN
+# accuracy_data <- accuracy_data %>% 
+#   mutate(
+#     across(3:76, ~ replace_na(.x, 0))
+#   )
+saveRDS(accuracy_data, file = "Chunk8-Data Analysis/accuracy/accuracy_data.rds")
 ### turn to long table
 accuracy_long_data <- accuracy_data %>% 
   pivot_longer(., cols = 3:ncol(.), names_to = "metric_property", values_to = "value")
@@ -110,4 +110,4 @@ accuracy_long_data <- accuracy_data %>%
 ### split property to a single variable
 accuracy_long_data <- accuracy_long_data %>% 
   separate(., col = metric_property, sep = "_", into = c("metric", "property"))
-saveRDS(accuracy_long_data, file = "Chunk4-Accuracy/accuracy_long_data.rds")
+saveRDS(accuracy_long_data, file = "Chunk8-Data Analysis/accuracy/accuracy_long_data.rds")

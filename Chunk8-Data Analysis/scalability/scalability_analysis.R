@@ -103,6 +103,9 @@ scalability_model <- purrr::map(method, .f = function(method){
 scalability_model$SPsimSeq$estimation <- NULL
 scalability_model$scDesign$estimation <- NULL
 
+saveRDS(scalability_model, file = "Chunk8-Data Analysis/scalability/scalability_model.rds")
+
+
 ### long tibble
 scalability_long_data <- scalability_data %>% 
   pivot_longer(5:8, names_to = "feature", values_to = "value") %>% 
@@ -124,6 +127,11 @@ scalability_long_data <- scalability_long_data %>%
   mutate(
     classification = class
   )
+saveRDS(scalability_long_data, file = "Chunk8-Data Analysis/scalability/scalability_long_data.rds")
+
+##########################################################
+###################   SUMMARY FIGURE   ###################
+##########################################################
 
 class_palette <- c("<linear" = "#3d87a6",
                    "linear" = "#9bcde1",

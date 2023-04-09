@@ -4,20 +4,24 @@ library(dplyr)
 library(tidyr)
 
 
-data_list <- list.files("../group_evaluation/")
-a <- readRDS("../group_evaluation/Lun2_data100_stimulated-dendritic-cells-PAM_shalek.rds.rds")
-metric_name <- names(a)
+data_list <- list.files("../batch_evaluation/")
+a <- readRDS("../batch_evaluation/SCRIP-BGP-commonBCV_data11_Figshare_Aorta.rds")
+metric_name <- names(a)[-8]
 
 
 ### read data into a list
 all_result <- list()
 for (i in data_list) {
-  result <- readRDS(file.path("../group_evaluation", i))
+  result <- readRDS(file.path("../batch_evaluation", i))
+  name <- names(result)[-8]
+  result <- map(1:7, .f = function(x){
+    mean(result[[x]])
+  }) %>% setNames(name)
   all_result[[i]] <- result
 }
 
 ### turn to a tibble
-group_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
+batch_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   result <- as.numeric(all_result[[index]])
   names(result) <- metric_name
   data_name <- names(all_result)[index]
@@ -37,29 +41,39 @@ group_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   )
 
 ### normalize some values
-group_data <- group_data %>% 
+#### LISI
+batch_data <- batch_data %>% 
+  mutate(
+    across(LISI, ~ .x/2)
+  )
+#### MM
+batch_data <- batch_data %>% 
   group_by(Data) %>% 
   mutate(
-    across(metric_name[-2], ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+    across(mm, ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
+#### AWS_batch
+batch_data <- batch_data %>% 
+  mutate(
+    across(AWS_batch, abs)
+  )
 
 ### Subtract values by 1
-colume_name <- c("CDI", "connectivity", "DB_index")
-group_data <- group_data %>% 
+colume_name <- c("cms", "LISI", "shannon_entropy", "pcr")
+batch_data <- batch_data %>% 
   mutate(
     across(all_of(colume_name), ~ 1 - .x)
   )
 
 ### NA and NaN
-group_data <- group_data %>% 
+batch_data <- batch_data %>% 
   mutate(
     across(3:ncol(.), ~ replace_na(.x, 0))
   )
-saveRDS(group_data, file = "Chunk5-Functionality/group_data.rds")
+saveRDS(batch_data, file = "Chunk8-Data Analysis/functionality/batch_data.rds")
 ### turn to long table
-group_long_data <- group_data %>% 
+batch_long_data <- batch_data %>% 
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
-saveRDS(group_long_data, file = "Chunk5-Functionality/group_long_data.rds")
-
+saveRDS(batch_long_data, file = "Chunk8-Data Analysis/functionality/batch_long_data.rds")
 
