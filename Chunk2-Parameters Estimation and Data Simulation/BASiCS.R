@@ -59,11 +59,13 @@ for(i in 1:length(data_list)){
                             volume = volume,
                             species = ifelse(data_info[["species"]] == "Mus musculus",
                                              "mouse", "human"),
-                            batch.condition = batch_condition)
+                            batch.condition = batch_condition,
+                            n = 6000)
     ## data save file
     save_name <- paste0(method, "_ERCC_", data_id)
   }else{
-    other_prior_est <- list(batch.condition = batch_condition)
+    other_prior_est <- list(batch.condition = batch_condition,
+                            n = 6000)
     ## data save file
     save_name <- paste0(method, "_", data_id)
   }
