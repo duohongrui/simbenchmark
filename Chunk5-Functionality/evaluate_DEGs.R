@@ -9,7 +9,7 @@ for(i in data_list[91:117]){
     sim_data <- as.matrix(data$sim_data$count_data)
     group <- as.character(data$sim_data$col_meta$group)
     if(rlang::is_empty(group)){
-      group <- paste0("Group", as.numeric(data$sim_data$col_meta$plates))
+      group <- paste0("Group", as.numeric(data$sim_data$col_meta$plate))
     }
     group_combn <- utils::combn(unique(group), 2)
     de_genes <- rownames(sim_data)[which(data[["sim_data"]][["row_meta"]][["de_gene"]] == "yes")]
