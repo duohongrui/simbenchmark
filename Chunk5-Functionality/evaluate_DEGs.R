@@ -2,7 +2,7 @@ library(tibble)
 data_list <- list.files("../simulation_data/", pattern = "^Lun")
 
 for(i in data_list[91:117]){
-  data <- readRDS(file.path("../simulation_data/simulation_data", i))
+  data <- readRDS(file.path("../simulation_data/", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
     
