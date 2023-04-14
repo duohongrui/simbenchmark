@@ -1,8 +1,8 @@
 library(tibble)
-data_list <- list.files("G:/sim_bench/simulation_data/", pattern = "^Lun")
+data_list <- list.files("../simulation_data/", pattern = "^Lun")
 
-for(i in data_list[44:90]){
-  data <- readRDS(file.path("G:/sim_bench/simulation_data", i))
+for(i in data_list[91:117]){
+  data <- readRDS(file.path("../simulation_data/simulation_data", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
     
@@ -50,7 +50,7 @@ for(i in data_list[44:90]){
         }
       }
       distribution_score <- mean(distribution_score)
-      saveRDS(valid_DEGs_distribution, file.path("G:/sim_bench/valid_DEGs_distribution", i))
+      saveRDS(valid_DEGs_distribution, file.path("../simulation_data/valid_DEGs_distribution", i))
     }
     
     ### True proportions of DEGs
@@ -64,7 +64,7 @@ for(i in data_list[44:90]){
     if(class(error2) == "try-error"){
       true_proportion <- NA
     }else{
-      saveRDS(DEGs_result, file.path("G:/sim_bench/DEGs_result", i))
+      saveRDS(DEGs_result, file.path("../simulation_data/DEGs_result", i))
       true_proportion <- DEGs_result[["weighted_true_prop"]]
     }
     
@@ -82,7 +82,7 @@ for(i in data_list[44:90]){
       Recall <- NA
       F1 <- NA
     }else{
-      saveRDS(SVM_result, file.path("G:/sim_bench/SVM_model", i))
+      saveRDS(SVM_result, file.path("../simulation_data/SVM_model", i))
       AUC <- as.numeric(SVM_result$roc$auc)
       Accuracy <- unname(SVM_result[["conf_matrix"]][["overall"]][1])
       if(length(unique(group)) == 2){
@@ -102,7 +102,7 @@ for(i in data_list[44:90]){
                        Precision,
                        Recall,
                        F1),
-            file.path("G:/sim_bench/DEGs_evaluation", i))
+            file.path("../simulation_data/DEGs_evaluation", i))
     
   }else{
     next
