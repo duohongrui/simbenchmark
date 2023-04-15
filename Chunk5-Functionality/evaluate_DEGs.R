@@ -22,10 +22,15 @@ for(i in data_list){
       conb2 <- group_combn[2, conb]
       conb_name <- paste0(group_combn[, conb], collapse = "vs")
       message(conb_name)
-      fac1 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb1)]
-      fac2 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb2)]
-      index <- fac1 != fac2
-      DEGs <- rownames(data$sim_data$count_data)[index]
+      if(stringr::str_starts(i, pattern = "Splat") | stringr::str_starts(i, pattern = "SCRIP")){
+        fac1 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb1)]
+        fac2 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb2)]
+        index <- fac1 != fac2
+        DEGs <- rownames(data$sim_data$count_data)[index]
+      }else{
+        DEGs <- de_genes
+        index <- rownames(data[["sim_data"]][["count_data"]]) %in% de_genes
+      }
       sim_DEGs[[conb_name]] <- DEGs
       
       ### Distribution
@@ -99,7 +104,8 @@ for(i in data_list){
                        Accuracy,
                        Precision,
                        Recall,
-                       F1),
+                       F1,
+                       AUC),
             file.path("../DEGs_evaluation", i))
     
   }else{
