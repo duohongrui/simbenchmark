@@ -10,6 +10,7 @@
 ################################################################################
 library(Seurat)
 library(dplyr)
+library(ggplot2)
 library(stringr)
 library(R.utils)
 library(biomaRt)
@@ -2280,9 +2281,439 @@ for(i in 1:23){
 
 ################################################################################
 
+
 ########## data102
+## data and filter
+data <- read.table("./spatial_data/data102_spatial_data/B1.tsv.gz") %>% t()
+table(colSums(data) != 0)
+## metadata
+meta_data <- read.table("./spatial_data/data102_spatial_data/B1_labeled_coordinates.tsv", sep = "\t", header = TRUE) %>% 
+  mutate(
+    x = round(x),
+    y = round(y),
+    true_y = 42-y
+  ) %>% 
+  filter(label != "undetermined")
+rownames(meta_data) <- paste0(meta_data$x, "x", meta_data$y)
+index <- intersect(rownames(meta_data), colnames(data))
+data <- data[, index]
+meta_data <- meta_data[index, ]
+
+## location
+location <- meta_data %>% 
+  select(x, true_y)
+colnames(location) <- c("x", "y")
+rownames(location) <- paste0(location$x, "x", location$y)
+colnames(data) <- rownames(location)
+## group
+group_condition <- meta_data$label
+
+## start cell
+start_id <- start_cell(meta_data = meta_data)
+## data information
+data_info <- simutils::meta_info(id = "data102_spatial_B1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 platform = "ST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data102_spatial_B1.rds')
 
 
+########## data103
+## data and filter
+data <- read.table("./spatial_data/data103_spatial_data/C1.tsv.gz") %>% t()
+table(colSums(data) != 0)
+## metadata
+meta_data <- read.table("./spatial_data/data103_spatial_data/C1_labeled_coordinates.tsv", sep = "\t", header = TRUE) %>% 
+  mutate(
+    x = round(x),
+    y = round(y),
+    true_y = 35 - y
+  ) %>% 
+  filter(label != "undetermined")
+rownames(meta_data) <- paste0(meta_data$x, "x", meta_data$y)
+index <- intersect(rownames(meta_data), colnames(data))
+data <- data[, index]
+meta_data <- meta_data[index, ]
+
+## location
+location <- meta_data %>% 
+  select(x, true_y)
+colnames(location) <- c("x", "y")
+rownames(location) <- paste0(location$x, "x", location$y)
+colnames(data) <- rownames(location)
+## group
+group_condition <- meta_data$label
+
+## start cell
+start_id <- start_cell(meta_data = meta_data)
+
+## data information
+data_info <- simutils::meta_info(id = "data103_spatial_C1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 platform = "ST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data103_spatial_C1.rds')
+
+
+########## data104
+## data and filter
+data <- read.table("./spatial_data/data104_spatial_data/D1.tsv.gz") %>% t()
+table(colSums(data) != 0)
+## metadata
+meta_data <- read.table("./spatial_data/data104_spatial_data/D1_labeled_coordinates.tsv", sep = "\t", header = TRUE) %>% 
+  mutate(
+    x = round(x),
+    y = round(y),
+    true_y = 38 - y
+  ) %>% 
+  filter(label != "undetermined")
+rownames(meta_data) <- paste0(meta_data$x, "x", meta_data$y)
+index <- intersect(rownames(meta_data), colnames(data))
+data <- data[, index]
+meta_data <- meta_data[index, ]
+
+## location
+location <- meta_data %>% 
+  select(x, true_y)
+colnames(location) <- c("x", "y")
+rownames(location) <- paste0(location$x, "x", location$y)
+colnames(data) <- rownames(location)
+## group
+group_condition <- meta_data$label
+
+## start cell
+start_id <- simutils::start_cell(meta_data = meta_data)
+
+## data information
+data_info <- simutils::meta_info(id = "data104_spatial_D1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 platform = "ST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data104_spatial_D1.rds')
+
+
+########## data105
+## data and filter
+data <- read.table("./spatial_data/data105_spatial_data/E1.tsv.gz") %>% t()
+table(colSums(data) != 0)
+## metadata
+meta_data <- read.table("./spatial_data/data105_spatial_data/E1_labeled_coordinates.tsv", sep = "\t", header = TRUE) %>% 
+  mutate(
+    x = round(x),
+    y = round(y),
+    true_y = 36 - y
+  ) %>% 
+  filter(label != "undetermined")
+rownames(meta_data) <- paste0(meta_data$x, "x", meta_data$y)
+index <- intersect(rownames(meta_data), colnames(data))
+data <- data[, index]
+meta_data <- meta_data[index, ]
+
+## location
+location <- meta_data %>% 
+  select(x, true_y)
+colnames(location) <- c("x", "y")
+rownames(location) <- paste0(location$x, "x", location$y)
+colnames(data) <- rownames(location)
+## group
+group_condition <- meta_data$label
+
+## start cell
+start_id <- simutils::start_cell(meta_data = meta_data)
+
+## data information
+data_info <- simutils::meta_info(id = "data105_spatial_E1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 platform = "ST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data105_spatial_E1.rds')
+
+
+
+########## data106
+## data and filter
+data <- read.table("./spatial_data/data106_spatial_data/F1.tsv.gz") %>% t()
+table(colSums(data) != 0)
+## metadata
+meta_data <- read.table("./spatial_data/data106_spatial_data/F1_labeled_coordinates.tsv", sep = "\t", header = TRUE) %>% 
+  tidyr::drop_na() %>% 
+  mutate(
+    x = round(x),
+    y = round(y),
+    true_y = 35 - y
+  ) %>% 
+  filter(label != "undetermined")
+rownames(meta_data) <- paste0(meta_data$x, "x", meta_data$y)
+index <- intersect(rownames(meta_data), colnames(data))
+data <- data[, index]
+meta_data <- meta_data[index, ]
+
+## location
+location <- meta_data %>% 
+  select(x, true_y)
+colnames(location) <- c("x", "y")
+rownames(location) <- paste0(location$x, "x", location$y)
+colnames(data) <- rownames(location)
+## group
+group_condition <- meta_data$label
+
+## start cell
+start_id <- simutils::start_cell(meta_data = meta_data)
+
+## data information
+data_info <- simutils::meta_info(id = "data106_spatial_F1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 platform = "ST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data106_spatial_F1.rds')
+
+
+
+########## data107
+## data and filter
+data <- read.table("./spatial_data/data107_spatial_data/H1.tsv.gz") %>% t()
+table(colSums(data) != 0)
+## metadata
+meta_data <- read.table("./spatial_data/data107_spatial_data/H1_labeled_coordinates.tsv", sep = "\t", header = TRUE) %>% 
+  tidyr::drop_na() %>% 
+  mutate(
+    x = round(x),
+    y = round(y),
+    true_y = 43 - y
+  ) %>% 
+  filter(label != "undetermined")
+rownames(meta_data) <- paste0(meta_data$x, "x", meta_data$y)
+index <- intersect(rownames(meta_data), colnames(data))
+data <- data[, index]
+meta_data <- meta_data[index, ]
+
+## location
+location <- meta_data %>% 
+  select(x, true_y)
+colnames(location) <- c("x", "y")
+rownames(location) <- paste0(location$x, "x", location$y)
+colnames(data) <- rownames(location)
+## group
+group_condition <- meta_data$label
+
+## start cell
+start_id <- simutils::start_cell(meta_data = meta_data)
+
+## data information
+data_info <- simutils::meta_info(id = "data107_spatial_H1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 platform = "ST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data107_spatial_H1.rds')
+
+
+########## data108
+data <- readRDS("./spatial_data/data108_spatial_data/counts.rds")
+metadata <- readRDS("./spatial_data/data108_spatial_data/metadata.rds") %>% 
+  filter(celltype_mapped_refined != "low quality",
+         celltype_mapped_refined == "Forebrain/Midbrain/Hindbrain",
+         embryo == "embryo3")
+data <- data[, rownames(metadata)]
+
+location <- metadata %>% 
+  transmute(
+    x = y_global,
+    y = x_global
+  )
+
+seurat <- CreateSeuratObject(counts = as.matrix(data),
+                             project = "SlideSeq",
+                             assay = "Spatial",
+                             min.cells = 0,
+                             min.features = 0)
+seurat[['image']] = new(Class = "SlideSeq",
+                        assay = "Spatial",
+                        coordinates = location)
+
+seurat$"row" <- location$x
+seurat$"col" <- location$y
+
+
+seurat <- seurat %>% 
+  NormalizeData() %>% 
+  ScaleData() %>% 
+  DR.SC::FindSVGs(nfeatures = 2000) %>% 
+  DR.SC::DR.SC(K = 6, platform = "Other_SRT", ) %>% 
+  RunPCA() %>% 
+  FindNeighbors(reduction = "pca", dims = 1:20) %>% 
+  FindClusters() %>% 
+  RunTSNE(reduction = "pca", dims = 1:20)
+
+SpatialDimPlot(object = seurat, group.by = "spatial.drsc.cluster")
+
+Idents(seurat) <- factor(paste0("cluster", seurat@meta.data[["spatial.drsc.cluster"]]),
+                         levels = paste0("cluster", 1:6))
+
+DimPlot(seurat, reduction = "tsne", label = TRUE)
+
+markers <- FindAllMarkers(seurat,
+                          only.pos = TRUE,
+                          min.pct = 0.25,
+                          logfc.threshold = 0.5)
+
+markers %>%
+  group_by(cluster) %>%
+  top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(seurat, features = top10$gene)
+
+plot_data <- data.frame("x" = location$x,
+                        "y" = location$y,
+                        "group" = meta_data$label)
+
+genes <- openxlsx::read.xlsx(xlsxFile = "./spatial_data/data108_spatial_data/gkac219_supplemental_files/Supplementary-Tables.xlsx", sheet = 9)
+
+
+########## data109
+data <- read.table("./spatial_data/data109_spatial_data/E14.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz", header = TRUE)
+
+location <- data %>% 
+  group_by(cell) %>% 
+  summarise(
+    x = mean(x),
+    y = mean(y)
+  )
+location <- location %>% 
+  tibble::column_to_rownames(var = "cell")
+
+data <- data %>% 
+  select(1, 4, 5) %>% 
+  group_by(cell, geneID) %>% 
+  summarise(
+    MIDCounts = sum(MIDCounts)
+  ) %>% 
+  tidyr::pivot_wider(names_from = "cell", values_from = "MIDCounts", values_fill = 0) %>% 
+  tibble::column_to_rownames(var = "geneID") %>% 
+  as.matrix()
+
+seurat <- CreateSeuratObject(counts = as.matrix(data),
+                             project = "SlideSeq",
+                             assay = "Spatial",
+                             min.cells = 0,
+                             min.features = 0)
+seurat[['image']] = new(Class = "SlideSeq",
+                        assay = "Spatial",
+                        coordinates = location)
+
+seurat <- seurat %>% 
+  SCTransform(assay = "Spatial") %>% 
+  RunPCA() %>% 
+  FindNeighbors(reduction = "pca", dims = 1:20) %>% 
+  FindClusters() %>% 
+  RunUMAP(reduction = "pca", dims = 1:20)
+
+markers <- FindAllMarkers(seurat,
+                          only.pos = TRUE,
+                          min.pct = 0.25,
+                          logfc.threshold = 0.5)
+
+SpatialDimPlot(seurat)
+
+SpatialFeaturePlot(seurat, features = "Vim")
+
+ggplot(plot_data)+
+  geom_point(mapping = aes(x = x, y = y, fill = group), size = 7, shape = 21, color = "black")+
+  theme_minimal()
+# +
+#   theme(panel.grid = element_blank(),
+#         axis.title = element_blank(),
+#         axis.text = element_blank(),
+#         legend.position = "bottom")
+traj <- dynwrap::wrap_expression(counts = t(as.matrix(data)),
+                                 expression = log2(t(as.matrix(data)) + 1))
+groups <- data.frame("cell_id" = rownames(location),
+                     "group_id" = meta_data$label)
+traj <- dynwrap::add_grouping(traj, grouping = groups)
+traj <- dynwrap::add_prior_information(traj, start_id = start_id)
+model <- dynwrap::infer_trajectory(traj,
+                                   method = tislingshot::ti_slingshot(),
+                                   give_priors = NULL,
+                                   seed = 111,
+                                   verbose = TRUE,
+                                   parameters = NULL)
+dimred <- dyndimred::dimred_tsne(traj$expression)
+dynplot::plot_dimred(
+  model,
+  dimred = location,
+  expression_source = dataset$expression, 
+  grouping = traj$grouping, size_cells = 7
+)
 
 
 

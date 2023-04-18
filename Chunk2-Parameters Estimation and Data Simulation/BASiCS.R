@@ -52,10 +52,10 @@ for(i in 1:length(data_list)){
   
   ## ERCC check
   if(ERCC){
-    ## ERCC genes filter
-    # ERCC_counts <- counts[grep(rownames(counts), pattern = "^ERCC"), ]
-    # index <- unname(which(colSums(ERCC_counts) == 0))
-    # batch_condition <- batch_condition[-index]
+    # ERCC genes filter
+    ERCC_counts <- counts[grep(rownames(counts), pattern = "^ERCC"), ]
+    index <- unname(which(colSums(ERCC_counts) == 0))
+    batch_condition <- batch_condition[-index]
     other_prior_est <- list(dilution.factor = dilution,
                             volume = volume,
                             species = ifelse(data_info[["species"]] == "Mus musculus",
@@ -73,7 +73,7 @@ for(i in 1:length(data_list)){
   message(save_name)
   
   ## counts filter cells with zero ERCC genes
-  # counts <- counts[, -index]
+  counts <- counts[, -index]
   
   ## Estimation
   try_result <- try(
