@@ -4,7 +4,7 @@ group_condition <- example_data$data_info$group_condition
 
 
 gradient_num <- data.frame("cell" = c(100, 200, 500, 800, 1000, 2000, 3000, 5000, 8000, 10000, rep(1000, 10)),
-                           "gene" = c(rep(1000, 10), 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000))
+                           "gene" = c(rep(1000, 10), 500, 800, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000))
 
 ## First class of methods which users can custom cell and gene number
 
@@ -348,9 +348,9 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i)
+  set.seed(i*10)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i)
+  set.seed(i*10)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
   
   sub_data <- data[gene_index, sample_index]
