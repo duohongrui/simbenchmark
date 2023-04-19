@@ -272,8 +272,8 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i*10)
-  sub_data <- matrix(rpois(cell_num * gene_num, 2), nrow = gene_num, ncol = cell_num)
+  set.seed(i)
+  sub_data <- SingleCellExperiment::counts(scater::mockSCE(ncells = cell_num, ngenes = gene_num, nspikes = 0))
   
   rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
   colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
@@ -305,6 +305,8 @@ for(i in 1:20){
                                             verbose = TRUE)
         }else{
           sim <- simpipe::simulate_datasets(parameters = est,
+                                            other_prior = list(nCells = cell_num,
+                                                               nGenes = gene_num),
                                             seed = 111,
                                             return_format = "list",
                                             verbose = TRUE)
