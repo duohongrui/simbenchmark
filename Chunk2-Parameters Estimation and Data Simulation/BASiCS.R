@@ -11,6 +11,7 @@ data_list <- list.files("../preprocessed_data/")[21:101]
 
 method <- "BASiCS"
 
+
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
   ## read data
