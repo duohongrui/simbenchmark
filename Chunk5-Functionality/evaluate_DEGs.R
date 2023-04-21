@@ -5,7 +5,6 @@ for(i in data_list){
   data <- readRDS(file.path("../simulation_data/", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
-    
     sim_data <- as.matrix(data$sim_data$count_data)
     group <- as.character(data$sim_data$col_meta$group)
     if(rlang::is_empty(group)){
