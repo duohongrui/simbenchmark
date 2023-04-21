@@ -1,7 +1,6 @@
 library(simpipe)
 sim_data_list <- list.files("../simulation_data/", pattern = "^SPsimSeq")
 
-
 for(i in sim_data_list){
   print(i)
   message("Read simulated data...")
