@@ -409,8 +409,14 @@ for(i in 1:20){
   }
 }
 
-## Seventh class of methods (BACiCS)
-seventh_class <- c("BASiCS")
+## Seventh class of methods (BEARscc)
+example_data <- readRDS("../preprocessed_data/data23_GSE62270.rds")
+data <- example_data$data
+ERCC_count <- data[grep(rownames(data), pattern = "^ERCC"), ]
+data <- data[-grep(rownames(data), pattern = "^ERCC"), ]
+library(SingleCellExperiment)
+
+ninth_class <- c("BEARscc")
 for(i in 1:20){
   
   cell_num <- gradient_num[i, 1]
@@ -418,23 +424,24 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i*10)
-  sub_data <- cbind(matrix(rpois(cell_num * gene_num/2, 2), nrow = gene_num, ncol = cell_num/2),
-                    matrix(rpois(cell_num * gene_num/2, 6), nrow = gene_num, ncol = cell_num/2))
-  batch <- c(rep(1, cell_num/2), rep(2, cell_num/2))
-  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
-  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  set.seed(i)
+  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
+  set.seed(i)
+  gene_index <- sample(nrow(data), size = gene_num-92, replace = TRUE)
+  
+  sub_data <- rbind(data[gene_index, sample_index],
+                    ERCC_count[, sample_index])
   
   for(n in 1:3){
     scala_result <- purrr::map(
-      .x = seventh_class,
+      .x = ninth_class,
       .f = function(method){
         
         ### estimation
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = method,
-                                            other_prior = list(batch.condition = batch,
-                                                               n = 6000),
+                                            other_prior = list(dilution.factor = 50000,
+                                                               volume = 0.03),
                                             seed = 111,
                                             verbose = TRUE,
                                             use_docker = FALSE)
@@ -447,7 +454,7 @@ for(i in 1:20){
         sim <- simpipe::simulate_datasets(parameters = est,
                                           seed = 111,
                                           return_format = "list",
-                                          verbose = TRUE)
+                                          verbose = FALSE)
         
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
@@ -546,7 +553,7 @@ for(i in 1:20){
     scala <- purrr::map_dfr(scala_result, .f = rbind)
     Sys.sleep(1)
     saveRDS(scala, file = paste0("../scalability/",
-                                 "class07_",
+                                 "class08_",
                                  cell_num,
                                  "_",
                                  gene_num,
@@ -555,14 +562,9 @@ for(i in 1:20){
   }
 }
 
-## Ninth class of methods (scDD)
-example_data <- readRDS("../preprocessed_data/data23_GSE62270.rds")
-data <- example_data$data
-ERCC_count <- data[grep(rownames(data), pattern = "^ERCC"), ]
-data <- data[-grep(rownames(data), pattern = "^ERCC"), ]
-library(SingleCellExperiment)
 
-ninth_class <- c("BEARscc")
+## Nimth class of methods (BACiCS)
+seventh_class <- c("BASiCS")
 for(i in 1:20){
   
   cell_num <- gradient_num[i, 1]
@@ -570,24 +572,23 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i)
-  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i)
-  gene_index <- sample(nrow(data), size = gene_num-92, replace = TRUE)
-  
-  sub_data <- rbind(data[gene_index, sample_index],
-                    ERCC_count[, sample_index])
+  set.seed(i*10)
+  sub_data <- cbind(matrix(rpois(cell_num * gene_num/2, 2), nrow = gene_num, ncol = cell_num/2),
+                    matrix(rpois(cell_num * gene_num/2, 6), nrow = gene_num, ncol = cell_num/2))
+  batch <- c(rep(1, cell_num/2), rep(2, cell_num/2))
+  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
   
   for(n in 1:3){
     scala_result <- purrr::map(
-      .x = ninth_class,
+      .x = seventh_class,
       .f = function(method){
         
         ### estimation
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = method,
-                                            other_prior = list(dilution.factor = 50000,
-                                                               volume = 0.03),
+                                            other_prior = list(batch.condition = batch,
+                                                               n = 6000),
                                             seed = 111,
                                             verbose = TRUE,
                                             use_docker = FALSE)
@@ -600,7 +601,7 @@ for(i in 1:20){
         sim <- simpipe::simulate_datasets(parameters = est,
                                           seed = 111,
                                           return_format = "list",
-                                          verbose = FALSE)
+                                          verbose = TRUE)
         
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
@@ -617,7 +618,7 @@ for(i in 1:20){
     scala <- purrr::map_dfr(scala_result, .f = rbind)
     Sys.sleep(1)
     saveRDS(scala, file = paste0("../scalability/",
-                                 "class07_",
+                                 "class09_",
                                  cell_num,
                                  "_",
                                  gene_num,
