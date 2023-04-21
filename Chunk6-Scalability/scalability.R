@@ -338,9 +338,6 @@ for(i in 1:20){
 
 
 ## Sixth class of methods
-example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
-data <- example_data$data
-group_condition <- example_data$data_info$group_condition
 sixth_class <- c("SparseDC", "zinbwaveZinger")
 library(simmethods)
 for(i in 1:20){
@@ -350,13 +347,10 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i*10)
-  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i*10)
-  gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
-  
-  sub_data <- data[gene_index, sample_index]
-  group <- group_condition[sample_index]
+  set.seed(i)
+  sub_data <- SingleCellExperiment::counts(scater::mockSCE(ncells = cell_num, ngenes = gene_num, nspikes = 0))
+  set.seed(i)
+  group <- sample(1:2, ncol(sub_data), replace = TRUE)
   rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
   colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
   
@@ -369,7 +363,7 @@ for(i in 1:20){
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = method,
                                             other_prior = list(group.condition = group,
-                                                               nclusters = 3),
+                                                               nclusters = 2),
                                             seed = 111,
                                             verbose = TRUE,
                                             use_docker = FALSE)
