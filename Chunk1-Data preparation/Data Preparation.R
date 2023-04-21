@@ -10,7 +10,8 @@
 ################################################################################
 library(Seurat)
 library(dplyr)
-library(ggplot2)
+library(tibble)
+library(tidyverse)
 library(stringr)
 library(R.utils)
 library(biomaRt)
@@ -2579,117 +2580,222 @@ data <- list(data = as.matrix(data),
 saveRDS(data, file = '../preprocessed_data/data107_spatial_H1.rds')
 
 
+
 ########## data108
-data <- readRDS("./spatial_data/data108_spatial_data/counts.rds")
-metadata <- readRDS("./spatial_data/data108_spatial_data/metadata.rds") %>% 
-  filter(celltype_mapped_refined != "low quality",
-         celltype_mapped_refined == "Forebrain/Midbrain/Hindbrain",
-         embryo == "embryo3")
-data <- data[, rownames(metadata)]
+data <- read.table("./spatial_data/data109_spatial_data/CN21_C1_unmodgtf_filtered_red_ut_segments_final.tsv",
+                   header = TRUE,
+                   sep = "\t") %>% 
+  drop_na()
 
-location <- metadata %>% 
+meta_data <- read.table("./spatial_data/data109_spatial_data/CN21_C1_barcodes_under_tissue_annot.tsv",
+                       header = TRUE,
+                       sep = "\t")
+
+meta_data <- meta_data %>% 
+  filter(poly.ID != "missing", poly.ID != "Unknown")
+
+## intersect spot
+position1 <- paste0(data$spot_px_x, "x", data$spot_px_y)
+position2 <- paste0(meta_data$spot_px_x, "x", meta_data$spot_px_y)
+position_inter <- intersect(position1, position2)
+
+## filter data
+data <- data %>% 
+  tibble::add_column(position = position1) %>% 
+  filter(pull(., "position") %in% position_inter) %>% 
+  group_by(position, gene) %>% 
+  summarise(
+    count = sum(count)
+  ) %>% 
+  ungroup()
+
+## filter metadata
+meta_data <- meta_data %>% 
+  tibble::add_column(position = position2) %>% 
+  filter(pull(., "position") %in% position_inter)
+
+## construct gene matrix
+spot_name <- unique(data$position)
+gene_name <- unique(data$gene)
+count_list <- map(1:length(spot_name), .f = function(x){
+  print(x)
+  spot <- spot_name[x]
+  tmp <- data %>% 
+    filter(position == spot) %>% 
+    tidyr::pivot_wider(names_from = "position",
+                       values_from = "count",
+                       values_fill = 0)
+  tmp
+})
+saveRDS(count_list, file = "/Users/duohongrui/Downloads/count_list.rds")
+
+count <- Matrix::Matrix(data = 0,
+                        nrow = length(gene_name),
+                        ncol = length(spot_name),
+                        dimnames = list(gene_name, spot_name),
+                        sparse = TRUE)
+
+for(i in 1:length(count_list)){
+  print(i)
+  tmp <- count_list[[i]]
+  gene_name_tmp <- tmp %>% pull(., "gene")
+  spot_name_tmp <- colnames(tmp)[2]
+  value <- tmp %>% pull(., 2)
+  count[gene_name_tmp, spot_name_tmp] <- value
+}
+saveRDS(count, file = "/Users/duohongrui/Downloads/count.rds")
+saveRDS(meta_data, file = "/Users/duohongrui/Downloads/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- meta_data %>% 
   transmute(
-    x = y_global,
-    y = x_global
+    x = spot_px_x,
+    y = spot_px_y
   )
-
-seurat <- CreateSeuratObject(counts = as.matrix(data),
+seurat <- CreateSeuratObject(counts = count,
                              project = "SlideSeq",
                              assay = "Spatial",
                              min.cells = 0,
                              min.features = 0)
+
 seurat[['image']] = new(Class = "SlideSeq",
                         assay = "Spatial",
                         coordinates = location)
+seurat$"region" <- meta_data$poly.ID
 
-seurat$"row" <- location$x
-seurat$"col" <- location$y
+### cell selector
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
+p <- ggplot(location)+
+  geom_point(mapping = aes(x = x, y = y, fill = group), shape = 21, size = 0.5, color = "transparent")+
+  theme_minimal()+
+  scale_fill_manual(values = RColorBrewer::brewer.pal(name = "Set3", n = 12))+
+  theme(
+    legend.key = element_rect(fill = NA)
+  )+
+  guides(fill = guide_legend(override.aes = list(size = 4)))
+ggsave(p, filename = "./spatial_data/data109_spatial_data/dim_plot.pdf",
+       width = 12, height = 8, units = "in")
 
+#### every region seperation
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
 
-seurat <- seurat %>% 
-  NormalizeData() %>% 
-  ScaleData() %>% 
-  DR.SC::FindSVGs(nfeatures = 2000) %>% 
-  DR.SC::DR.SC(K = 6, platform = "Other_SRT", ) %>% 
-  RunPCA() %>% 
-  FindNeighbors(reduction = "pca", dims = 1:20) %>% 
-  FindClusters() %>% 
-  RunTSNE(reduction = "pca", dims = 1:20)
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## group
+group_condition <- location[cell_selected, "group"]
 
-SpatialDimPlot(object = seurat, group.by = "spatial.drsc.cluster")
+## start cell
+start_plot <- ggplot(meta_data)+
+  geom_point(mapping = aes(x = x, y = y, color = group),
+             size = 0.5)
+HoverLocator(start_plot)
+start_id <- "4826x6443"
 
-Idents(seurat) <- factor(paste0("cluster", seurat@meta.data[["spatial.drsc.cluster"]]),
-                         levels = paste0("cluster", 1:6))
+## data information
+data_info <- simutils::meta_info(id = "data108_spatial_HDST1",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data108_spatial_HDST1.rds')
 
-DimPlot(seurat, reduction = "tsne", label = TRUE)
-
-markers <- FindAllMarkers(seurat,
-                          only.pos = TRUE,
-                          min.pct = 0.25,
-                          logfc.threshold = 0.5)
-
-markers %>%
-  group_by(cluster) %>%
-  top_n(n = 10, wt = avg_log2FC) -> top10
-DoHeatmap(seurat, features = top10$gene)
-
-plot_data <- data.frame("x" = location$x,
-                        "y" = location$y,
-                        "group" = meta_data$label)
-
-genes <- openxlsx::read.xlsx(xlsxFile = "./spatial_data/data108_spatial_data/gkac219_supplemental_files/Supplementary-Tables.xlsx", sheet = 9)
 
 
 ########## data109
-data <- read.table("./spatial_data/data109_spatial_data/E14.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz", header = TRUE)
+meta_data <- readRDS("/Users/duohongrui/Downloads/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
 
-location <- data %>% 
-  group_by(cell) %>% 
-  summarise(
-    x = mean(x),
-    y = mean(y)
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
   )
-location <- location %>% 
-  tibble::column_to_rownames(var = "cell")
+## group
+group_condition <- location[cell_selected, "group"]
 
-data <- data %>% 
-  select(1, 4, 5) %>% 
-  group_by(cell, geneID) %>% 
-  summarise(
-    MIDCounts = sum(MIDCounts)
-  ) %>% 
-  tidyr::pivot_wider(names_from = "cell", values_from = "MIDCounts", values_fill = 0) %>% 
-  tibble::column_to_rownames(var = "geneID") %>% 
-  as.matrix()
+## start cell
+start_plot <- ggplot(meta_data)+
+  geom_point(mapping = aes(x = x, y = y, color = group),
+             size = 0.5)
+HoverLocator(start_plot)
+start_id <- "8249x6274"
 
-seurat <- CreateSeuratObject(counts = as.matrix(data),
-                             project = "SlideSeq",
-                             assay = "Spatial",
-                             min.cells = 0,
-                             min.features = 0)
-seurat[['image']] = new(Class = "SlideSeq",
-                        assay = "Spatial",
-                        coordinates = location)
+## data information
+data_info <- simutils::meta_info(id = "data108_spatial_HDST1",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data108_spatial_HDST1.rds')
 
-seurat <- seurat %>% 
-  SCTransform(assay = "Spatial") %>% 
-  RunPCA() %>% 
-  FindNeighbors(reduction = "pca", dims = 1:20) %>% 
-  FindClusters() %>% 
-  RunUMAP(reduction = "pca", dims = 1:20)
-
-markers <- FindAllMarkers(seurat,
-                          only.pos = TRUE,
-                          min.pct = 0.25,
-                          logfc.threshold = 0.5)
-
-SpatialDimPlot(seurat)
-
-SpatialFeaturePlot(seurat, features = "Vim")
-
-ggplot(plot_data)+
-  geom_point(mapping = aes(x = x, y = y, fill = group), size = 7, shape = 21, color = "black")+
-  theme_minimal()
 # +
 #   theme(panel.grid = element_blank(),
 #         axis.title = element_blank(),
@@ -2697,23 +2803,20 @@ ggplot(plot_data)+
 #         legend.position = "bottom")
 traj <- dynwrap::wrap_expression(counts = t(as.matrix(data)),
                                  expression = log2(t(as.matrix(data)) + 1))
-groups <- data.frame("cell_id" = rownames(location),
-                     "group_id" = meta_data$label)
+groups <- data.frame("cell_id" = colnames(data),
+                     "group_id" = meta_data$group)
 traj <- dynwrap::add_grouping(traj, grouping = groups)
 traj <- dynwrap::add_prior_information(traj, start_id = start_id)
 model <- dynwrap::infer_trajectory(traj,
                                    method = tislingshot::ti_slingshot(),
                                    give_priors = NULL,
-                                   seed = 111,
+                                   seed = 222,
                                    verbose = TRUE,
                                    parameters = NULL)
 dimred <- dyndimred::dimred_tsne(traj$expression)
 dynplot::plot_dimred(
   model,
-  dimred = location,
+  dimred = dimred,
   expression_source = dataset$expression, 
-  grouping = traj$grouping, size_cells = 7
+  grouping = traj$grouping, size_cells = 2
 )
-
-
-

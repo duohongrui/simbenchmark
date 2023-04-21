@@ -368,7 +368,8 @@ for(i in 1:20){
         ### estimation
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = method,
-                                            other_prior = list(group.condition = group),
+                                            other_prior = list(group.condition = group,
+                                                               nclusters = 3),
                                             seed = 111,
                                             verbose = TRUE,
                                             use_docker = FALSE)
