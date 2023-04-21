@@ -73,6 +73,7 @@ for(i in 1:length(data_list)){
                             n = 6000)
     ## data save file
     save_name <- paste0(method, "_", data_id)
+    index <- NULL
   }
   message(save_name)
   

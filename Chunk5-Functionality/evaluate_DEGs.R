@@ -1,11 +1,10 @@
 library(tibble)
-data_list <- list.files("../simulation_data/", pattern = "^muscat")
+data_list <- list.files("../simulation_data/", pattern = "^scDesign2")
 
 for(i in data_list){
   data <- readRDS(file.path("../simulation_data/", i))
   if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
     message(i)
-    
     sim_data <- as.matrix(data$sim_data$count_data)
     group <- as.character(data$sim_data$col_meta$group)
     if(rlang::is_empty(group)){
@@ -22,14 +21,27 @@ for(i in data_list){
       conb2 <- group_combn[2, conb]
       conb_name <- paste0(group_combn[, conb], collapse = "vs")
       message(conb_name)
-      if(stringr::str_starts(i, pattern = "Splat") | stringr::str_starts(i, pattern = "SCRIP")){
+      if(stringr::str_starts(i, pattern = "Splat") |
+         stringr::str_starts(i, pattern = "SCRIP") |
+         stringr::str_starts(i, pattern = "Lun")){
         fac1 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb1)]
         fac2 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb2)]
         index <- fac1 != fac2
         DEGs <- rownames(data$sim_data$count_data)[index]
-      }else{
+      }
+      if(stringr::str_starts(i, pattern = "powsimR") |
+         stringr::str_starts(i, pattern = "POWSC") |
+         stringr::str_starts(i, pattern = "scDD") | 
+         stringr::str_starts(i, pattern = "muscat") |
+         stringr::str_starts(i, pattern = "hierarchicell")){
         DEGs <- de_genes
         index <- rownames(data[["sim_data"]][["count_data"]]) %in% de_genes
+      }
+      if(stringr::str_starts(i, pattern = "scDesign") |
+         stringr::str_starts(i, pattern = "zinbwaveZinger") |
+         stringr::str_starts(i, pattern = "SPARSim")){
+        DEGs <- de_genes
+        index <- 1:nrow(data$sim_data$count_data)
       }
       sim_DEGs[[conb_name]] <- DEGs
       
