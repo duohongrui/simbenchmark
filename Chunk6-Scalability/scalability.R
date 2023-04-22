@@ -340,7 +340,7 @@ for(i in 1:20){
 ## Sixth class of methods
 sixth_class <- c("SparseDC", "zinbwaveZinger")
 library(simmethods)
-for(i in 1:20){
+for(i in 5:20){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -491,9 +491,9 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i*10)
+  set.seed(i+666)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i*10)
+  set.seed(i+666)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
 
   sub_data <- data[gene_index, sample_index]
@@ -531,8 +531,7 @@ for(i in 1:20){
                                                seed = i))
         simulate_detection <- peakRAM::peakRAM(
           simulate_result <- splatter::scDDSimulate(parameters,
-                                                    verbose = TRUE,
-                                                    BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+                                                    verbose = TRUE)
         )
         sim_time <- simulate_detection[1,2]
         sim_memory <- simulate_detection[1,4]
@@ -556,7 +555,7 @@ for(i in 1:20){
                                  ".rds"))
   }
 }
-
+## BPPARAM = BiocParallel::MulticoreParam(workers = 2)
 
 ## Nimth class of methods (BACiCS)
 seventh_class <- c("BASiCS")
