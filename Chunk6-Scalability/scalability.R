@@ -340,7 +340,7 @@ for(i in 1:20){
 ## Sixth class of methods
 sixth_class <- c("SparseDC", "zinbwaveZinger")
 library(simmethods)
-for(i in 5:20){
+for(i in 1:20){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
