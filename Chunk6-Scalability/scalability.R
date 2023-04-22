@@ -765,3 +765,227 @@ for(i in 1:20){
                                  ".rds"))
   }
 }
+
+
+
+## Twelfth class of methods
+data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
+group_condition <- data$data_info$cluster_info
+data <- t(data$data$counts)
+
+twelfth_class <- c("SCRIP-paths", "PROSSTT", "TedSim", "dyntoy", "SymSim", "VeloSim", "MFA", "phenopath")
+for(i in 1:20){
+  
+  cell_num <- gradient_num[i, 1]
+  print(cell_num)
+  gene_num <- gradient_num[i, 2]
+  print(gene_num)
+  
+  set.seed(i * 10)
+  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
+  set.seed(i * 10)
+  gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
+  
+  sub_data <- data[gene_index, sample_index]
+  group <- as.numeric(factor(group_condition[sample_index]))
+  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  
+  for(n in 1:3){
+    scala_result <- purrr::map(
+      .x = twelfth_class,
+      .f = function(method){
+        
+        ### SCRIP method
+        if(method == "SCRIP-paths"){
+          sub_method <- "SCRIP"
+        }else{
+          sub_method <- method
+        }
+        
+        ### TedSim
+        if(sub_method == "TedSim"){
+          if(cell_num == 800 | cell_num == 3000 | cell_num == 5000 | cell_num == 10000){
+            tibble::tibble("method" = "TedSim",
+                           "cell_num" = NA,
+                           "gene_num" = NA,
+                           "repeat_time" = NA,
+                           "estimation_time" = NA,
+                           "estimation_memory" = NA,
+                           "simulation_time" = NA,
+                           "simulation_memory" = NA)
+          }else{
+            ### estimation
+            est <- simpipe::estimate_parameters(ref_data = sub_data,
+                                                method = sub_method,
+                                                other_prior = list(group.condition = group),
+                                                seed = 111,
+                                                verbose = TRUE,
+                                                use_docker = FALSE)
+            time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
+            method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
+            est_time <- as.numeric(time)
+            est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
+            
+            ### simulation
+            sim <- simpipe::simulate_datasets(ref_data = sub_data,
+                                              parameters = est,
+                                              other_prior = list(paths = TRUE),
+                                              seed = 111,
+                                              return_format = "list",
+                                              verbose = TRUE)
+            
+            sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
+            sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+            
+            tibble::tibble("method" = method,
+                           "cell_num" = cell_num,
+                           "gene_num" = gene_num,
+                           "repeat_time" = n,
+                           "estimation_time" = est_time,
+                           "estimation_memory" = est_memory,
+                           "simulation_time" = sim_time,
+                           "simulation_memory" = sim_memory)
+          }
+        }else{
+          ### estimation
+          est <- simpipe::estimate_parameters(ref_data = sub_data,
+                                              method = sub_method,
+                                              other_prior = list(group.condition = group),
+                                              seed = 111,
+                                              verbose = TRUE,
+                                              use_docker = FALSE)
+          time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
+          method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
+          est_time <- as.numeric(time)
+          est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
+          
+          ### simulation
+          sim <- simpipe::simulate_datasets(ref_data = sub_data,
+                                            parameters = est,
+                                            other_prior = list(paths = TRUE),
+                                            seed = 111,
+                                            return_format = "list",
+                                            verbose = TRUE)
+          
+          sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
+          sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+          
+          tibble::tibble("method" = method,
+                         "cell_num" = cell_num,
+                         "gene_num" = gene_num,
+                         "repeat_time" = n,
+                         "estimation_time" = est_time,
+                         "estimation_memory" = est_memory,
+                         "simulation_time" = sim_time,
+                         "simulation_memory" = sim_memory)
+        }
+      })
+    scala <- purrr::map_dfr(scala_result, .f = rbind)
+    Sys.sleep(1)
+    saveRDS(scala, file = paste0("../scalability/",
+                                 "class12_",
+                                 cell_num,
+                                 "_",
+                                 gene_num,
+                                 "_", n,
+                                 ".rds"))
+  }
+}
+
+
+
+## Thirteenth class of methods 
+data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
+group_condition <- data$data_info$cluster_info
+data <- t(data$data$counts)
+
+thirteenth_class <- c("Splat-paths", "SplatPop-paths", "ESCO-traj", "ESCO-tree")
+for(i in 1:20){
+  
+  cell_num <- gradient_num[i, 1]
+  print(cell_num)
+  gene_num <- gradient_num[i, 2]
+  print(gene_num)
+  
+  set.seed(i * 10)
+  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
+  set.seed(i * 10)
+  gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
+  
+  sub_data <- data[gene_index, sample_index]
+  group <- as.numeric(factor(group_condition[sample_index]))
+  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  
+  for(n in 1:1){
+    scala_result <- purrr::map(
+      .x = thirteenth_class,
+      .f = function(method){
+        
+        ### SCRIP method
+        if(method == "Splat-paths"){
+          sub_method <- "Splat"
+          est_prior <- NULL
+          sim_prior <- list(paths = TRUE)
+        }
+        if(method == "SplatPop-paths"){
+          sub_method <- "SplatPop"
+          est_prior <- NULL
+          sim_prior <- list(paths = TRUE)
+        }
+        if(method == "ESCO-traj"){
+          sub_method <- "ESCO"
+          est_prior <- list(tree = TRUE,
+                            group.condition = group)
+          sim_prior <- list(type = "traj")
+        }
+        if(method == "ESCO-tree"){
+          sub_method <- "ESCO"
+          est_prior <- list(tree = TRUE,
+                            group.condition = group)
+          sim_prior <- list(type = "tree")
+        }
+        
+        ### estimation
+        est <- simpipe::estimate_parameters(ref_data = sub_data,
+                                            method = sub_method,
+                                            other_prior = est_prior,
+                                            seed = 111,
+                                            verbose = TRUE,
+                                            use_docker = FALSE)
+        time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
+        method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
+        est_time <- as.numeric(time)
+        est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
+        
+        ### simulation
+        sim <- simpipe::simulate_datasets(parameters = est,
+                                          other_prior = sim_prior,
+                                          seed = 111,
+                                          return_format = "list",
+                                          verbose = TRUE)
+        
+        sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
+        sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+        
+        tibble::tibble("method" = method,
+                       "cell_num" = cell_num,
+                       "gene_num" = gene_num,
+                       "repeat_time" = n,
+                       "estimation_time" = est_time,
+                       "estimation_memory" = est_memory,
+                       "simulation_time" = sim_time,
+                       "simulation_memory" = sim_memory)
+      })
+    scala <- purrr::map_dfr(scala_result, .f = rbind)
+    Sys.sleep(1)
+    saveRDS(scala, file = paste0("../scalability/",
+                                 "class13_",
+                                 cell_num,
+                                 "_",
+                                 gene_num,
+                                 "_", n,
+                                 ".rds"))
+  }
+}
