@@ -557,7 +557,7 @@ for(i in 1:20){
 }
 ## BPPARAM = BiocParallel::MulticoreParam(workers = 2)
 
-## Nimth class of methods (BACiCS)
+## Ninth class of methods (BACiCS)
 seventh_class <- c("BASiCS")
 for(i in 1:20){
   
@@ -613,6 +613,70 @@ for(i in 1:20){
     Sys.sleep(1)
     saveRDS(scala, file = paste0("../scalability/",
                                  "class09_",
+                                 cell_num,
+                                 "_",
+                                 gene_num,
+                                 "_", n,
+                                 ".rds"))
+  }
+}
+
+
+## Tenth class of methods (Lun2)
+tenth_class <- c("Lun2")
+for(i in 1:20){
+  
+  cell_num <- gradient_num[i, 1]
+  print(cell_num)
+  gene_num <- gradient_num[i, 2]
+  print(gene_num)
+  
+  set.seed(i*10)
+  sub_data <- cbind(matrix(rpois(cell_num * gene_num/2, 2), nrow = gene_num, ncol = cell_num/2),
+                    matrix(rpois(cell_num * gene_num/2, 6), nrow = gene_num, ncol = cell_num/2))
+  group <- c(rep(1, cell_num/2), rep(2, cell_num/2))
+  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  
+  for(n in 1:3){
+    scala_result <- purrr::map(
+      .x = tenth_class,
+      .f = function(method){
+        
+        ### estimation
+        est <- simpipe::estimate_parameters(ref_data = sub_data,
+                                            method = method,
+                                            other_prior = list(group.condition = group),
+                                            seed = 111,
+                                            verbose = TRUE,
+                                            use_docker = FALSE)
+        time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
+        method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
+        est_time <- as.numeric(time)
+        est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
+        
+        ### simulation
+        sim <- simpipe::simulate_datasets(parameters = est,
+                                          seed = 111,
+                                          return_format = "list",
+                                          verbose = TRUE)
+        
+        sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
+        sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+        
+        tibble::tibble("method" = method,
+                       "cell_num" = cell_num,
+                       "gene_num" = gene_num,
+                       "repeat_time" = n,
+                       "estimation_time" = est_time,
+                       "estimation_memory" = est_memory,
+                       "simulation_time" = sim_time,
+                       "simulation_memory" = sim_memory)
+      })
+    scala <- purrr::map_dfr(scala_result, .f = rbind)
+    Sys.sleep(1)
+    saveRDS(scala, file = paste0("../scalability/",
+                                 "class10_",
                                  cell_num,
                                  "_",
                                  gene_num,
