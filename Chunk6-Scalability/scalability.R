@@ -692,23 +692,23 @@ data <- simmethods::data
 group_condition <- as.numeric(simmethods::group_condition)
 
 eleventh_class <- c("zingeR")
-for(i in 1:20){
+for(i in 10:20){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i * 10)
+  set.seed(i)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i * 10)
+  set.seed(i)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
   
   sub_data <- data[gene_index, sample_index]
   while(any(colSums(sub_data) == 0)){
     message("Resampling...")
     zero_cell_index <- which(colSums(sub_data) == 0)
-    new_index <- sample(ncol(data), size = length(zero_cell_index), replace = FALSE)
+    new_index <- sample(ncol(data), size = length(zero_cell_index), replace = TRUE)
     for(j in 1:length(new_index)){
       sub_data[, zero_cell_index[j]] <- data[gene_index, new_index[j]]
     }
