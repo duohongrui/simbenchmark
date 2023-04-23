@@ -1,5 +1,5 @@
 library(tibble)
-data_list <- list.files("../simulation_data/")
+data_list <- list.files("../batch_evaluation/")
 
 for(i in data_list){
   data <- readRDS(file.path("../simulation_data", i))
@@ -13,7 +13,6 @@ for(i in data_list){
                                                           verbose = T,
                                                           k = k)
     saveRDS(batch_matrics, file.path("../batch_evaluation", i))
-    
   }else{
     next
   }
