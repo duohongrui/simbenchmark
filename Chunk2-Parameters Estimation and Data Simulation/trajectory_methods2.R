@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
 # This file contains four simulation methods:
-# 1. Splat-paths  2. SplatPop-paths 3. ESCO-traj  4. ESCO-tree
+# 1. Splat-paths  2. SplatPop-paths 3. ESCO-traj  4. ESCO-tree  5. SCRIP-paths
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(simmethods)
@@ -13,7 +13,8 @@ data_list <- list.files("../preprocessed_data/")
 methods <- c("Splat-paths",
              "SplatPop-paths",
              "ESCO-traj",
-             "ESCO-tree")
+             "ESCO-tree",
+             "SCRIP-paths")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -110,6 +111,7 @@ for(i in 1:length(data_list)){
     try_result <- try(
       simulation_result <- simpipe::simulate_datasets(
         parameters = estimation_result,
+        ref_data = counts,
         other_prior = list(de.prob = de.prob,
                            prob.group = prob.group,
                            paths = TRUE,
