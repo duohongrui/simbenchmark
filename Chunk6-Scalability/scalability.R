@@ -769,6 +769,7 @@ for(i in 1:20){
 
 
 ## Twelfth class of methods
+library(simmethods)
 data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
 group_condition <- data$data_info$cluster_info
 data <- t(data$data$counts)
