@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
 # This file contains one simulation methods:
-# 1. POWSC
+# 1. hierarchicell
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(dplyr)
@@ -9,7 +9,7 @@ library(stringr)
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
-methods <- c("POWSC")
+methods <- c("hierarchicell")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -34,23 +34,6 @@ for(i in 1:length(data_list)){
   batch_info <- data_info$batch_info
   cluster_info <- data_info$cluster_info
   
-  ## 1) group
-  if(is.null(group)){
-    if(!is.null(cluster_info)){
-      group <- as.numeric(as.factor(cluster_info))
-    }
-  }
-  ## 2) cluster or treatment
-  if(is.null(treatment)){
-    DEA_group <- cluster_info
-  }else{
-    DEA_group <- treatment
-  }
-  
-  if(length(unique(group)) != 2){
-    next
-  }
-  
   for(method in methods){
     ## data save file
     save_name <- paste0(method, "_", data_id)
@@ -64,7 +47,6 @@ for(i in 1:length(data_list)){
         estimation_result <- simpipe::estimate_parameters(
           ref_data = counts,
           method = method,
-          other_prior = list(group.condition = group),
           seed = 1,
           verbose = TRUE,
           use_docker = FALSE),
@@ -78,14 +60,15 @@ for(i in 1:length(data_list)){
         saveRDS(estimation_result, paste0("../estimation_result/", save_name, "_estimation_result.rds"))
       }
     }
-  
+    
     ## simulation
     message("Simulation...")
     
     try_result <- try(
       simulation_result <- simpipe::simulate_datasets(
         parameters = estimation_result,
-        other_prior = list(),
+        other_prior = list(nCells = ncol(counts),
+                           nGenes = nrow(counts)),
         n = 1,
         seed = 1,
         return_format = "list",
@@ -116,7 +99,7 @@ for(i in 1:length(data_list)){
     ## simulated gene info
     sim_row_data <- simulation_result[[1]][["simulate_result"]][["row_meta"]]
     ### DEGs
-    de_gene_num <- sum(sim_row_data$de_gene == "yes")
+    de_gene_num <- "Not known"
     sim_data_info <- list(sim_data_id = save_name,
                           method = method,
                           ref_data_platform = data_info$platform,

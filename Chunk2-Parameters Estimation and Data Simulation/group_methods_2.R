@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------#
 # This file contains one simulation methods:
-# 1. POWSC
+# 1. scDD
 #------------------------------------------------------------------------------#
 library(simpipe)
 library(dplyr)
@@ -9,7 +9,7 @@ library(stringr)
 ## data list
 data_list <- list.files("../preprocessed_data/")
 
-methods <- c("POWSC")
+methods <- c("scDD")
 
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
@@ -78,7 +78,7 @@ for(i in 1:length(data_list)){
         saveRDS(estimation_result, paste0("../estimation_result/", save_name, "_estimation_result.rds"))
       }
     }
-  
+    
     ## simulation
     message("Simulation...")
     
@@ -116,7 +116,8 @@ for(i in 1:length(data_list)){
     ## simulated gene info
     sim_row_data <- simulation_result[[1]][["simulate_result"]][["row_meta"]]
     ### DEGs
-    de_gene_num <- sum(sim_row_data$de_gene == "yes")
+    non_de_genes <- sum(table(sim_row_data$DEstatus)[which(names(table(sim_row_data$DEstatus)) %in% c("EE", "EP"))])
+    de_gene_num <- nrow(sim_counts)-non_de_genes
     sim_data_info <- list(sim_data_id = save_name,
                           method = method,
                           ref_data_platform = data_info$platform,
