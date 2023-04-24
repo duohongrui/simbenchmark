@@ -1,5 +1,5 @@
 library(simpipe)
-sim_data_list <- list.files("../simulation_data/", pattern = "^SPsimSeq")
+sim_data_list <- list.files("../simulation_data/", pattern = "^hierarchicell")
 
 for(i in sim_data_list){
   print(i)
@@ -7,7 +7,11 @@ for(i in sim_data_list){
   sim_result <- readRDS(file.path("../simulation_data", i))
   sim_data <- as.data.frame(sim_result$sim_data$count_data)
   
-  if(any(colSums(sim_data)==0)){
+  if(stringr::str_starts(i, pattern = "PROSSTT")){
+    sim_data <- t(sim_data)
+  }
+  
+  if(any(colSums(sim_data, na.rm = TRUE)==0)){
     next
   }
   
