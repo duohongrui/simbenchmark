@@ -1,8 +1,8 @@
 library(tibble)
-data_list <- list.files("F:/sim_bench/simulation_data/", pattern = "^SPARSim_")
+data_list <- list.files("../simulation_data/", pattern = "^scGAN")
 
 for(i in data_list){
-  data <- readRDS(file.path("F:/sim_bench/simulation_data", i))
+  data <- readRDS(file.path("../simulation_data", i))
   
   if(data$sim_data_info$group >= 2 & "group" %in% colnames(data$sim_data$col_meta) |
      data$sim_data_info$group >= 2 & "plate" %in% colnames(data$sim_data$col_meta)){
@@ -55,7 +55,7 @@ for(i in data_list){
                                 connectivity,
                                 DB_index)
     
-    saveRDS(group_metrics, file.path("F:/sim_bench/group_evaluation", i))
+    saveRDS(group_metrics, file.path("../group_evaluation", i))
     
   }else{
     next
