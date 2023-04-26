@@ -1006,9 +1006,9 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i * 10)
+  set.seed(10)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i * 10)
+  set.seed(10)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
   
   sub_data <- data[gene_index, sample_index]
@@ -1023,7 +1023,7 @@ for(i in 1:20){
         
         ### estimation
         est <- simpipe::estimate_parameters(ref_data = sub_data,
-                                            method = sub_method,
+                                            method = method,
                                             other_prior = list(group.condition = group),
                                             seed = 111,
                                             verbose = TRUE,
