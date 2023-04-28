@@ -9,9 +9,14 @@
 #        &         %           Intel(R)Core(TM)i5-8250U CPU@1.60GHz 1.80 GHz   #                                                                                                       #
 ################################################################################
 library(Seurat)
+library(SeuratDisk)
+library(rliger)
+library(SpaCET)
+library(rliger)
 library(dplyr)
 library(tibble)
 library(tidyverse)
+library(SpatialPCA)
 library(stringr)
 library(R.utils)
 library(biomaRt)
@@ -2306,11 +2311,13 @@ location <- meta_data %>%
 colnames(location) <- c("x", "y")
 rownames(location) <- paste0(location$x, "x", location$y)
 colnames(data) <- rownames(location)
+## cluster
+cluster <- meta_data$label
 ## group
-group_condition <- meta_data$label
+group_condition <- as.numeric(factor(cluster))
 
 ## start cell
-start_id <- start_cell(meta_data = meta_data)
+start_id <- simutils::start_cell(meta_data = meta_data)
 ## data information
 data_info <- simutils::meta_info(id = "data102_spatial_B1",
                                  repository = "Github",
@@ -2321,9 +2328,11 @@ data_info <- simutils::meta_info(id = "data102_spatial_B1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = location,
                                  start_cell = start_id)
+str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
@@ -2354,11 +2363,13 @@ location <- meta_data %>%
 colnames(location) <- c("x", "y")
 rownames(location) <- paste0(location$x, "x", location$y)
 colnames(data) <- rownames(location)
+## cluster
+cluster <- meta_data$label
 ## group
-group_condition <- meta_data$label
+group_condition <- as.numeric(factor(cluster))
 
 ## start cell
-start_id <- start_cell(meta_data = meta_data)
+start_id <- simutils::start_cell(meta_data = meta_data)
 
 ## data information
 data_info <- simutils::meta_info(id = "data103_spatial_C1",
@@ -2370,9 +2381,11 @@ data_info <- simutils::meta_info(id = "data103_spatial_C1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = location,
                                  start_cell = start_id)
+str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
@@ -2403,8 +2416,10 @@ location <- meta_data %>%
 colnames(location) <- c("x", "y")
 rownames(location) <- paste0(location$x, "x", location$y)
 colnames(data) <- rownames(location)
+## cluster
+cluster <- meta_data$label
 ## group
-group_condition <- meta_data$label
+group_condition <- as.numeric(factor(cluster))
 
 ## start cell
 start_id <- simutils::start_cell(meta_data = meta_data)
@@ -2419,9 +2434,11 @@ data_info <- simutils::meta_info(id = "data104_spatial_D1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = location,
                                  start_cell = start_id)
+str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
@@ -2452,8 +2469,10 @@ location <- meta_data %>%
 colnames(location) <- c("x", "y")
 rownames(location) <- paste0(location$x, "x", location$y)
 colnames(data) <- rownames(location)
+## cluster
+cluster <- meta_data$label
 ## group
-group_condition <- meta_data$label
+group_condition <- as.numeric(factor(cluster))
 
 ## start cell
 start_id <- simutils::start_cell(meta_data = meta_data)
@@ -2468,9 +2487,11 @@ data_info <- simutils::meta_info(id = "data105_spatial_E1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = location,
                                  start_cell = start_id)
+str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
@@ -2503,8 +2524,10 @@ location <- meta_data %>%
 colnames(location) <- c("x", "y")
 rownames(location) <- paste0(location$x, "x", location$y)
 colnames(data) <- rownames(location)
+## cluster
+cluster <- meta_data$label
 ## group
-group_condition <- meta_data$label
+group_condition <- as.numeric(factor(cluster))
 
 ## start cell
 start_id <- simutils::start_cell(meta_data = meta_data)
@@ -2519,9 +2542,11 @@ data_info <- simutils::meta_info(id = "data106_spatial_F1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = location,
                                  start_cell = start_id)
+str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
@@ -2554,8 +2579,10 @@ location <- meta_data %>%
 colnames(location) <- c("x", "y")
 rownames(location) <- paste0(location$x, "x", location$y)
 colnames(data) <- rownames(location)
+## cluster
+cluster <- meta_data$label
 ## group
-group_condition <- meta_data$label
+group_condition <- as.numeric(factor(cluster))
 
 ## start cell
 start_id <- simutils::start_cell(meta_data = meta_data)
@@ -2570,9 +2597,11 @@ data_info <- simutils::meta_info(id = "data107_spatial_H1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = location,
                                  start_cell = start_id)
+str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
@@ -2582,12 +2611,12 @@ saveRDS(data, file = '../preprocessed_data/data107_spatial_H1.rds')
 
 
 ########## data108
-data <- read.table("./spatial_data/data109_spatial_data/CN21_C1_unmodgtf_filtered_red_ut_segments_final.tsv",
+data <- read.table("./spatial_data/data108_spatial_data/CN21_C1_unmodgtf_filtered_red_ut_segments_final.tsv",
                    header = TRUE,
                    sep = "\t") %>% 
   drop_na()
 
-meta_data <- read.table("./spatial_data/data109_spatial_data/CN21_C1_barcodes_under_tissue_annot.tsv",
+meta_data <- read.table("./spatial_data/data108_spatial_data/CN21_C1_barcodes_under_tissue_annot.tsv",
                        header = TRUE,
                        sep = "\t")
 
@@ -2627,7 +2656,7 @@ count_list <- map(1:length(spot_name), .f = function(x){
                        values_fill = 0)
   tmp
 })
-saveRDS(count_list, file = "/Users/duohongrui/Downloads/count_list.rds")
+saveRDS(count_list, file = "./spatial_data/data108_spatial_data/count_list.rds")
 
 count <- Matrix::Matrix(data = 0,
                         nrow = length(gene_name),
@@ -2643,8 +2672,8 @@ for(i in 1:length(count_list)){
   value <- tmp %>% pull(., 2)
   count[gene_name_tmp, spot_name_tmp] <- value
 }
-saveRDS(count, file = "/Users/duohongrui/Downloads/count.rds")
-saveRDS(meta_data, file = "/Users/duohongrui/Downloads/meta_data.rds")
+saveRDS(count, file = "./spatial_data/data108_spatial_data/count.rds")
+saveRDS(meta_data, file = "./spatial_data/data108_spatial_data/meta_data.rds")
 meta_data <- meta_data %>% 
   tibble::column_to_rownames(var = "position")
 meta_data <- meta_data[colnames(count), ]
@@ -2665,7 +2694,7 @@ seurat[['image']] = new(Class = "SlideSeq",
 seurat$"region" <- meta_data$poly.ID
 
 ### cell selector
-location <- location %>% 
+location <- location %>%
   tibble::add_column("group" = seurat$region)
 p <- ggplot(location)+
   geom_point(mapping = aes(x = x, y = y, fill = group), shape = 21, size = 0.5, color = "transparent")+
@@ -2675,7 +2704,7 @@ p <- ggplot(location)+
     legend.key = element_rect(fill = NA)
   )+
   guides(fill = guide_legend(override.aes = list(size = 4)))
-ggsave(p, filename = "./spatial_data/data109_spatial_data/dim_plot.pdf",
+ggsave(p, filename = "./spatial_data/data108_spatial_data/dim_plot.pdf",
        width = 12, height = 8, units = "in")
 
 #### every region seperation
@@ -2693,7 +2722,8 @@ for(i in region){
   region_cells <- CellSelector(plot = p)
   cell_selected <- append(cell_selected, region_cells)
 }
-
+length(cell_selected)
+saveRDS(cell_selected, "./spatial_data/data108_spatial_data/cell_selected.rds")
 ## subset datasets
 data <- count[, cell_selected]
 table(colSums(data) == 0)
@@ -2703,18 +2733,13 @@ meta_data <- meta_data[cell_selected, ] %>%
     y = spot_px_y,
     group = poly.ID
   )
+## cluster
+cluster <- location[cell_selected, "group"]
 ## group
-group_condition <- location[cell_selected, "group"]
-
-## start cell
-start_plot <- ggplot(meta_data)+
-  geom_point(mapping = aes(x = x, y = y, color = group),
-             size = 0.5)
-HoverLocator(start_plot)
-start_id <- "4826x6443"
+group_condition <- as.numeric(factor(cluster))
 
 ## data information
-data_info <- simutils::meta_info(id = "data108_spatial_HDST1",
+data_info <- simutils::meta_info(id = "data108_spatial_HDST",
                                  repository = "Single Cell Portal",
                                  accession_number = "SCP420",
                                  URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
@@ -2724,24 +2749,26 @@ data_info <- simutils::meta_info(id = "data108_spatial_HDST1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = meta_data %>% select(-3),
-                                 start_cell = start_id)
+                                 start_cell = NULL)
 str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
              data_info = data_info)
-saveRDS(data, file = '../preprocessed_data/data108_spatial_HDST1.rds')
+saveRDS(data, file = '../preprocessed_data/data108_spatial_HDST.rds')
 
 
 
 ########## data109
-meta_data <- readRDS("/Users/duohongrui/Downloads/meta_data.rds")
+meta_data <- readRDS("./spatial_data/data108_spatial_data/meta_data.rds")
 meta_data <- meta_data %>% 
   tibble::column_to_rownames(var = "position")
 meta_data <- meta_data[colnames(count), ]
-
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
 region <- unique(location$group)
 cell_selected <- c()
 for(i in region){
@@ -2756,6 +2783,8 @@ for(i in region){
   region_cells <- CellSelector(plot = p)
   cell_selected <- append(cell_selected, region_cells)
 }
+length(cell_selected)
+saveRDS(cell_selected, "./spatial_data/data109_spatial_data/cell_selected.rds")
 ## subset datasets
 data <- count[, cell_selected]
 table(colSums(data) == 0)
@@ -2765,18 +2794,12 @@ meta_data <- meta_data[cell_selected, ] %>%
     y = spot_px_y,
     group = poly.ID
   )
+## cluster
+cluster <- location[cell_selected, "group"]
 ## group
-group_condition <- location[cell_selected, "group"]
-
-## start cell
-start_plot <- ggplot(meta_data)+
-  geom_point(mapping = aes(x = x, y = y, color = group),
-             size = 0.5)
-HoverLocator(start_plot)
-start_id <- "8249x6274"
-
+group_condition <- as.numeric(factor(cluster))
 ## data information
-data_info <- simutils::meta_info(id = "data108_spatial_HDST1",
+data_info <- simutils::meta_info(id = "data109_spatial_HDST",
                                  repository = "Single Cell Portal",
                                  accession_number = "SCP420",
                                  URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
@@ -2786,37 +2809,2697 @@ data_info <- simutils::meta_info(id = "data108_spatial_HDST1",
                                  cell_num = ncol(data),
                                  gene_num = nrow(data),
                                  treatment = NULL,
+                                 cluster_info = cluster,
                                  group_condition = group_condition,
                                  spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data109_spatial_HDST.rds')
+
+
+
+########## data110
+meta_data <- readRDS("./spatial_data/data108_spatial_data/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+cell_selected <- cell_selected[-which(cell_selected %in% c("7429x3254", "7437x3254", "7454x3269"))]
+length(cell_selected)
+saveRDS(cell_selected, file = "./spatial_data/data110_spatial_data/cell_selected.rds")
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## cluster
+cluster <- location[cell_selected, "group"]
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data110_spatial_HDST",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data110_spatial_HDST.rds')
+
+
+########## data111
+data <- read.table("./spatial_data/data111_spatial_data/CN21_D1_unmodgtf_filtered_red_ut_segments_final.tsv",
+                   header = TRUE,
+                   sep = "\t") %>% 
+  drop_na()
+
+meta_data <- read.table("./spatial_data/data111_spatial_data/CN21_D1_barcodes_under_tissue_annot.tsv",
+                        header = TRUE,
+                        sep = "\t")
+
+meta_data <- meta_data %>% 
+  filter(poly.ID != "missing", poly.ID != "Unknown")
+
+## intersect spot
+position1 <- paste0(data$spot_px_x, "x", data$spot_px_y)
+position2 <- paste0(meta_data$spot_px_x, "x", meta_data$spot_px_y)
+position_inter <- intersect(position1, position2)
+
+## filter data
+data <- data %>% 
+  tibble::add_column(position = position1) %>% 
+  filter(pull(., "position") %in% position_inter) %>% 
+  group_by(position, gene) %>% 
+  summarise(
+    count = sum(count)
+  ) %>% 
+  ungroup()
+
+## filter metadata
+meta_data <- meta_data %>% 
+  tibble::add_column(position = position2) %>% 
+  filter(pull(., "position") %in% position_inter)
+
+## construct gene matrix
+spot_name <- unique(data$position)
+gene_name <- unique(data$gene)
+count_list <- map(1:length(spot_name), .f = function(x){
+  print(x)
+  spot <- spot_name[x]
+  tmp <- data %>% 
+    filter(position == spot) %>% 
+    tidyr::pivot_wider(names_from = "position",
+                       values_from = "count",
+                       values_fill = 0)
+  tmp
+})
+saveRDS(count_list, file = "./spatial_data/data111_spatial_data/count_list.rds")
+
+count <- Matrix::Matrix(data = 0,
+                        nrow = length(gene_name),
+                        ncol = length(spot_name),
+                        dimnames = list(gene_name, spot_name),
+                        sparse = TRUE)
+
+for(i in 1:length(count_list)){
+  print(i)
+  tmp <- count_list[[i]]
+  gene_name_tmp <- tmp %>% pull(., "gene")
+  spot_name_tmp <- colnames(tmp)[2]
+  value <- tmp %>% pull(., 2)
+  count[gene_name_tmp, spot_name_tmp] <- value
+}
+saveRDS(count, file = "./spatial_data/data111_spatial_data/count.rds")
+saveRDS(meta_data, file = "./spatial_data/data111_spatial_data/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- meta_data %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y
+  )
+seurat <- CreateSeuratObject(counts = count,
+                             project = "SlideSeq",
+                             assay = "Spatial",
+                             min.cells = 0,
+                             min.features = 0)
+
+seurat[['image']] = new(Class = "SlideSeq",
+                        assay = "Spatial",
+                        coordinates = location)
+seurat$"region" <- meta_data$poly.ID
+
+### cell selector
+location <- location %>%
+  tibble::add_column("group" = seurat$region)
+p <- ggplot(location)+
+  geom_point(mapping = aes(x = x, y = y, fill = group), shape = 21, size = 0.5, color = "transparent")+
+  theme_minimal()+
+  scale_fill_manual(values = RColorBrewer::brewer.pal(name = "Set3", n = 12))+
+  theme(
+    legend.key = element_rect(fill = NA)
+  )+
+  guides(fill = guide_legend(override.aes = list(size = 4)))
+ggsave(p, filename = "./spatial_data/data111_spatial_data/dim_plot.pdf",
+       width = 12, height = 8, units = "in")
+
+#### every region seperation
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+length(cell_selected)
+saveRDS(cell_selected, "./spatial_data/data111_spatial_data/cell_selected.rds")
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## cluster
+cluster <- location[cell_selected, "group"]
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data111_spatial_HDST",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data111_spatial_HDST.rds')
+
+
+
+########## data112
+meta_data <- readRDS("./spatial_data/data111_spatial_data/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+length(cell_selected)
+saveRDS(cell_selected, file = "./spatial_data/data112_spatial_data/cell_selected.rds")
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## cluster
+cluster <- location[cell_selected, "group"]
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data112_spatial_HDST",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data112_spatial_HDST.rds')
+
+
+
+########## data113
+meta_data <- readRDS("./spatial_data/data111_spatial_data/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+length(cell_selected)
+saveRDS(cell_selected, file = "./spatial_data/data113_spatial_data/cell_selected.rds")
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## cluster
+cluster <- location[cell_selected, "group"]
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data113_spatial_HDST",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data113_spatial_HDST.rds')
+
+
+
+########## data114
+meta_data <- readRDS("./spatial_data/data111_spatial_data/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+length(cell_selected)
+saveRDS(cell_selected, "./spatial_data/data114_spatial_data/cell_selected.rds")
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## cluster
+cluster <- location[cell_selected, "group"]
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data114_spatial_HDST",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data114_spatial_HDST.rds')
+
+
+
+########## data115
+meta_data <- readRDS("./spatial_data/data111_spatial_data/meta_data.rds")
+meta_data <- meta_data %>% 
+  tibble::column_to_rownames(var = "position")
+meta_data <- meta_data[colnames(count), ]
+location <- location %>% 
+  tibble::add_column("group" = seurat$region)
+region <- unique(location$group)
+cell_selected <- c()
+for(i in region){
+  print(i)
+  region_data <- location %>% 
+    filter(group == i)
+  p <- ggplot(region_data)+
+    geom_point(mapping = aes(x = x, y = y),
+               shape = 21,
+               size = 0.5,
+               color = RColorBrewer::brewer.pal(name = "Set3", n = 12)[4])
+  region_cells <- CellSelector(plot = p)
+  cell_selected <- append(cell_selected, region_cells)
+}
+length(cell_selected)
+saveRDS(cell_selected, "./spatial_data/data115_spatial_data/cell_selected.rds")
+## subset datasets
+data <- count[, cell_selected]
+table(colSums(data) == 0)
+meta_data <- meta_data[cell_selected, ] %>% 
+  transmute(
+    x = spot_px_x,
+    y = spot_px_y,
+    group = poly.ID
+  )
+## cluster
+cluster <- location[cell_selected, "group"]
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data115_spatial_HDST",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP420",
+                                 URL = "https://singlecell.broadinstitute.org/single_cell/study/SCP420/hdst",
+                                 platform = "HDST",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Tumor",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = meta_data %>% select(-3),
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data115_spatial_HDST.rds')
+
+
+
+########## data116
+image <- Read10X_Image("./spatial_data/data116_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data116_spatial_data/",
+                        filename = "Visium_FFPE_Human_Prostate_IF_raw_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "PRAD", coreNo = 5)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data116_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = 65 - row,
+    y = col
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "CTTCATTGTCAGTGGA-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data116_spatial_PRAD",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-prostate-cancer-adjacent-normal-section-with-if-staining-ffpe-1-standard",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Prostate Cancer",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
                                  start_cell = start_id)
 str(data_info)
 print(dim(data))
 ## Save
 data <- list(data = as.matrix(data),
              data_info = data_info)
-saveRDS(data, file = '../preprocessed_data/data108_spatial_HDST1.rds')
+saveRDS(data, file = '../preprocessed_data/data116_spatial_PRAD.rds')
 
-# +
-#   theme(panel.grid = element_blank(),
-#         axis.title = element_blank(),
-#         axis.text = element_blank(),
-#         legend.position = "bottom")
+
+
+########## data117
+image <- Read10X_Image("./spatial_data/data117_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data117_spatial_data/",
+                        filename = "CytAssist_FFPE_Human_Lung_Squamous_Cell_Carcinoma_raw_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "LUSC", coreNo = 4)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data117_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = col,
+    y = 77 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "TGTCTGTAAGCGAACT-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data117_spatial_LUSC",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-lung-cancer-ffpe-2-standard",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Lung Cancer",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data117_spatial_LUSC.rds')
+
+
+
+########## data118
+image <- Read10X_Image("./spatial_data/data118_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data118_spatial_data/",
+                        filename = "Targeted_Visium_Human_OvarianCancer_Immunology_filtered_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "OV", coreNo = 4)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+data <- data[, colnames(deconv_result)]
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data118_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = 129 - col,
+    y = 88 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "CTCTATTTGGCTGCAG-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data118_spatial_OV",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-ovarian-cancer-targeted-immunology-panel-stains-dapi-anti-pan-ck-anti-cd-45-1-standard-1-2-0",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Ovarian Cancer",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data118_spatial_OV.rds')
+
+
+
+########## data119
+image <- Read10X_Image("./spatial_data/data119_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data119_spatial_data/",
+                        filename = "Visium_FFPE_Human_Cervical_Cancer_filtered_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "CESC", coreNo = 4)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data119_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = col,
+    y = 77 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "GACAACGACCATTGAA-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data119_spatial_CESA",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-cervical-cancer-1-standard",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Cervical Cancer",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data119_spatial_CESA.rds')
+
+
+
+
+########## data120
+image <- Read10X_Image("./spatial_data/data120_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data120_spatial_data/",
+                        filename = "Visium_FFPE_Human_Ovarian_Cancer_filtered_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "OV", coreNo = 4)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data120_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = col,
+    y = 75 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "GTCCGGACCTGAAATT-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data120_spatial_OV",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-ovarian-cancer-1-standard",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Ovarian Cancer",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data120_spatial_OV.rds')
+
+
+
+########## data121
+image <- Read10X_Image("./spatial_data/data121_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data121_spatial_data/",
+                        filename = "Targeted_Visium_Human_Glioblastoma_Pan_Cancer_filtered_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "GBM", coreNo = 4)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data121_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = col,
+    y = 77 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "CGGGCAGCTAAACCGC-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data121_spatial_GBM",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-glioblastoma-targeted-pan-cancer-panel-1-standard-1-2-0",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Glioblastoma",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data121_spatial_GBM.rds')
+
+
+
+########## data122
+image <- Read10X_Image("./spatial_data/data122_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data122_spatial_data/",
+                        filename = "Targeted_Visium_Human_BreastCancer_Immunology_filtered_feature_bc_matrix.h5",
+                        image = image)
+### Create SpaCET Object
+data <- data[, rownames(data@images$slice1@coordinates)]
+spa_cet <- create.SpaCET.object(counts = data@assays$Spatial@counts,
+                                spotCoordinates = data@images$slice1@coordinates,
+                                imagePath = NA,
+                                platform = "Visium")
+SpaCET_obj <- SpaCET.quality.control(spa_cet)
+SpaCET_obj <- SpaCET.deconvolution(SpaCET_obj, cancerType = "BRCA", coreNo = 4)
+deconv_result <- SpaCET_obj@results$deconvolution$propMat
+data <- data[, colnames(deconv_result)]
+deconv_result <- apply(deconv_result, 2, FUN = function(x){
+  x / sum(x)
+})
+ref_cell_type <- rownames(deconv_result)
+cell_type <- lapply(1:ncol(deconv_result), FUN = function(x){
+  x <- deconv_result[, x]
+  index <- which(x == max(x))
+  if(length(index) != 1){
+    if(1 %in% index){
+      "transition cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }else{
+    if(index ==1){
+      "malignant cell"
+    }else{
+      "immune/stromal cell"
+    }
+  }
+}) %>% unlist()
+data$"cell_type" <- cell_type
+## Save seurat object
+saveRDS(data, file = "./spatial_data/data122_spatial_data/seurat.rds")
+
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = col,
+    y = 76 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+## cluster
+cluster <- cell_type
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## start cell
+start_id <- "TCAACACATTGGGTAA-1"
+
+## data information
+data_info <- simutils::meta_info(id = "data122_spatial_BRCA",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://www.10xgenomics.com/resources/datasets/human-breast-cancer-targeted-immunology-panel-1-standard-1-2-0",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "Breast Cancer",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = start_id)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data122_spatial_BRCA.rds')
+
+
+
+########## data123
+image <- Read10X_Image("./spatial_data/data123_spatial_data/spatial/")
+data <- Load10X_Spatial(data.dir = "./spatial_data/data123_spatial_data/",
+                        filename = "151507_raw_feature_bc_matrix.h5",
+                        image = image)
+### Create Seurat Object
+metadata <- read.table("./spatial_data/data123_spatial_data/metadata.tsv", header = T, sep = "\t")
+data <- data[, metadata$barcode]
+data@meta.data$"cluster" <- metadata$layer_guess
+filter <- !is.na(data@meta.data$"cluster")
+data <- data[, filter]
+## cluster
+cluster <- data$cluster
+
+## location
+location <- data@images[["slice1"]]@coordinates %>% 
+  transmute(
+    x = col,
+    y = 77 - row
+  )
+## count
+data <- as.matrix(data@assays$Spatial@counts)
+table(colSums(data)==0)
+
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data123_spatial_DLPFC1",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 URL = "https://github.com/LieberInstitute/HumanPilot/",
+                                 platform = "10X Visium",
+                                 species = "Homo sapiens",
+                                 organ = "DLPFC",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data123_spatial_DLPFC1.rds')
+
+
+
+########## data124
+library(SpatialPCA)
+load(paste0("./spatial_data/data124_spatial_data/slideseq.rds"))
+
+mem_sparse1 <- peakRAM({
+  start_time <- Sys.time()
+  slideseq = CreateSpatialPCAObject(counts=sp_count,
+                                    location=location,
+                                    project = "SpatialPCA",
+                                    gene.type="spatial",
+                                    sparkversion="sparkx",
+                                    numCores_spark=5,
+                                    customGenelist=NULL,
+                                    min.loctions = 20,
+                                    min.features=20)
+  end_time <- Sys.time()
+  T_sparse1 = end_time - start_time
+})
+
+mem_sparse1 <- peakRAM({
+  start_time <- Sys.time()
+  slideseq <- SpatialPCA_buildKernel(slideseq,
+                                     kerneltype = "gaussian",
+                                     bandwidthtype = "Silverman",
+                                     bandwidth.set.by.user = NULL,
+                                     sparseKernel = TRUE,
+                                     sparseKernel_tol = 1e-20,
+                                     sparseKernel_ncore = 10)
+  slideseq <- SpatialPCA_EstimateLoading(slideseq,
+                                         fast = TRUE,
+                                         SpatialPCnum = 20)
+  slideseq <- SpatialPCA_SpatialPCs(slideseq, fast = TRUE)
+  end_time <- Sys.time()
+  T_sparse1 <- end_time - start_time
+})
+saveRDS(slideseq, file = "./spatial_data/data124_spatial_data/SpatialPCA.rds")
+clusterlabel <- louvain_clustering(clusternum = 8,
+                                   latent_dat = as.matrix(slideseq@SpatialPCs),
+                                   knearest = round(sqrt(dim(slideseq@SpatialPCs)[2])))
+cbp_spatialpca <- c("lightyellow2",
+                    "coral",
+                    "lightcyan2",
+                    "#66C2A5",
+                    "cornflowerblue",
+                    "#FFD92F",
+                    "#E78AC3",
+                    "skyblue1")
+p <- plot_cluster(legend="right",
+                  location=slideseq@location,
+                  clusterlabel,
+                  pointsize=1,
+                  text_size=20,
+                  title_in=paste0("SpatialPCA"),
+                  color_in=cbp_spatialpca)
+
+meta_data <- tibble("spot" = colnames(slideseq@counts[, rownames(slideseq@location)]),
+                    "cluster" = clusterlabel) %>% 
+  mutate(
+    region = case_when(
+      cluster == "1" ~ "Choroid plexus",
+      cluster == "2" ~ "White matter",
+      cluster == "3" ~ "Granule middle sublayer",
+      cluster == "4" ~ "Granule inner sublayer",
+      cluster == "5" ~ "Cerebellar nucleus",
+      cluster == "6" ~ "Molecular layer",
+      cluster == "7" ~ "Granule outer sublayer",
+      cluster == "8" ~ "Purkinje layer"
+    ),
+    x = slideseq@location[, 1],
+    y = slideseq@location[, 2]
+  )
+saveRDS(meta_data, file = "./spatial_data/data124_spatial_data/meta_data.rds")
+counts <- slideseq@counts[, meta_data$spot]
+saveRDS(counts, file = "./spatial_data/data124_spatial_data/raw_matrix.rds")
+
+### subset datasets (White matter and Cerebellar nucleus)
+sub_meta <- meta_data %>% 
+  filter(region == "White matter" | region == "Cerebellar nucleus")
+data <- counts[, sub_meta$spot]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$region
+
+## location
+location <- sub_meta %>% 
+  select(1, 4, 5) %>% 
+  column_to_rownames("spot")
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data124_spatial_cerebellum",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP354",
+                                 platform = "Slide-Seq",
+                                 species = "Mus musculus",
+                                 organ = "Cerebellum",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data124_spatial_cerebellum.rds')
+
+
+
+### data125 (Molecular layer)
+sub_meta <- meta_data %>% 
+  filter(region == "Molecular layer")
+data <- counts[, sub_meta$spot]
+table(colSums(data)==0)
+## cluster
+# cluster <- sub_meta$region
+
+## location
+location <- sub_meta %>% 
+  select(1, 4, 5) %>% 
+  column_to_rownames("spot")
+## group
+# group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data125_spatial_cerebellum",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP354",
+                                 platform = "Slide-Seq",
+                                 species = "Mus musculus",
+                                 organ = "Cerebellum",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data125_spatial_cerebellum.rds')
+
+
+
+### data126 (Purkinje layer, Granule outer sublayer)
+sub_meta <- meta_data %>% 
+  filter(region == "Purkinje layer" | region == "Granule outer sublayer")
+data <- counts[, sub_meta$spot]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$region
+
+## location
+location <- sub_meta %>% 
+  select(1, 4, 5) %>% 
+  column_to_rownames("spot")
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data126_spatial_cerebellum",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP354",
+                                 platform = "Slide-Seq",
+                                 species = "Mus musculus",
+                                 organ = "Cerebellum",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data126_spatial_cerebellum.rds')
+
+
+
+### data127
+load("./spatial_data/data127_spatial_data/SlideseqV2_SpatialPCA_result.rdata")
+clusterlabel <- louvain_clustering(14,
+                                   latent_dat = as.matrix(SpatialPCA_result$SpatialPCs),
+                                   310) 
+# spatial domain cluster label for each location
+cbp_spatialpca <- c("#FD7446",
+                   "#709AE1",
+                   "#31A354",
+                   "#9EDAE5",
+                   "#DE9ED6",
+                   "#BCBD22",
+                   "#CE6DBD",
+                   "#DADAEB",
+                   "yellow",
+                   "#FF9896",
+                   "#91D1C2",
+                   "#C7E9C0",
+                   "#6B6ECF",
+                   "#7B4173")
+loc1 <- unlist(SpatialPCA_result$location[,1])
+loc2 <- unlist(SpatialPCA_result$location[,2])
+cluster <- as.character(clusterlabel)
+datt = data.frame(cluster, loc1, loc2)
+p <- ggplot(datt, aes(x = loc1, y = loc2, color = cluster, fill = cluster)) +
+  geom_point(alpha = 1, size=1, shape = 21) +
+  scale_color_manual(values = cbp_spatialpca)+
+  scale_fill_manual(values = cbp_spatialpca)+
+  theme_void()+
+  theme(text = element_text(size = 8),
+        legend.position = "bottom",
+        legend.key.size = unit(1, 'in'))
+p
+load("./spatial_data/data127_spatial_data/Puck_200115_08_count_location.rdata")
+counts <- as.matrix(countmat[, rownames(SpatialPCA_result$location)])
+rm(countmat)
+meta_data <- tibble("spot" = colnames(counts),
+                    "cluster" = clusterlabel) %>% 
+  mutate(
+    region = case_when(
+      cluster == "1" ~ "Layer 5",
+      cluster == "2" ~ "Hippocampus(slm)",
+      cluster == "3" ~ "Layer 6",
+      cluster == "4" ~ "Dentate gyrus",
+      cluster == "5" ~ "Layer 4",
+      cluster == "6" ~ "Hippocampus(so/sr)",
+      cluster == "7" ~ "Thalamus subregion1",
+      cluster == "8" ~ "Thalamus subregion3",
+      cluster == "9" ~ "CA3",
+      cluster == "10" ~ "CA1",
+      cluster == "11" ~ "Third ventricle",
+      cluster == "12" ~ "Thalamus subregion2",
+      cluster == "13" ~ "Hippocampus(so)",
+      cluster == "14" ~ "Corpus callosum"
+    ),
+    x = SpatialPCA_result$location[, 1],
+    y = SpatialPCA_result$location[, 2]
+  )
+saveRDS(meta_data, file = "./spatial_data/data127_spatial_data/meta_data.rds")
+counts <- counts[, meta_data$spot]
+saveRDS(counts, file = "./spatial_data/data127_spatial_data/raw_matrix.rds")
+
+# seurat <- CreateSeuratObject(counts = counts,
+#                                   project = "SlideSeq",
+#                                   assay = "Spatial",
+#                                   min.cells = 0,
+#                                   min.features = 0)
+# seurat[['image']] = new(Class = "SlideSeq",
+#                         assay = "Spatial",
+#                         coordinates = as.data.frame(SpatialPCA_result$location))
+# seurat$"region" <- clusterlabel
+# 
+# SpatialDimPlot(seurat, group.by = "region", pt.size.factor = 0.8, label = TRUE)+
+#   scale_fill_manual(values = cbp_spatialpca)
+
+### subset datasets (Dentate gyrus and Hippocampus(so))
+sub_meta <- meta_data %>% 
+  filter(region == "Dentate gyrus" | region == "Hippocampus(so)")
+data <- counts[, sub_meta$spot]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$region
+
+## location
+location <- sub_meta %>% 
+  select(1, 4, 5) %>% 
+  column_to_rownames("spot")
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data127_spatial_hippocampus",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP815",
+                                 platform = "Slide-SeqV2",
+                                 species = "Mus musculus",
+                                 organ = "Hippocampus",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data127_spatial_hippocampus.rds')
+
+
+
+### data128 subset datasets (CA1 and CA3)
+sub_meta <- meta_data %>% 
+  filter(region == "CA1" | region == "CA3")
+data <- counts[, sub_meta$spot]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$region
+
+## location
+location <- sub_meta %>% 
+  select(1, 4, 5) %>% 
+  column_to_rownames("spot")
+## group
+group_condition <- as.numeric(factor(cluster))
+
+## data information
+data_info <- simutils::meta_info(id = "data128_spatial_hippocampus",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP815",
+                                 platform = "Slide-SeqV2",
+                                 species = "Mus musculus",
+                                 organ = "Hippocampus",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data128_spatial_hippocampus.rds')
+
+
+
+### data129 subset datasets (Hippocampus(so/sr))
+sub_meta <- meta_data %>% 
+  filter(region == "Hippocampus(so/sr)")
+data <- counts[, sub_meta$spot]
+table(colSums(data)==0)
+
+## location
+location <- sub_meta %>% 
+  select(1, 4, 5) %>% 
+  column_to_rownames("spot")
+
+## data information
+data_info <- simutils::meta_info(id = "data129_spatial_hippocampus",
+                                 repository = "Single Cell Portal",
+                                 accession_number = "SCP815",
+                                 platform = "Slide-SeqV2",
+                                 species = "Mus musculus",
+                                 organ = "Hippocampus",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data129_spatial_hippocampus.rds')
+
+
+
+### data130 seq-FISH (Cardiomyocytes)
+counts <- readRDS("./spatial_data/data130_spatial_data/counts.rds")
+meta_data <- readRDS("./spatial_data/data130_spatial_data/metadata.rds") %>% 
+  filter(embryo == "embryo1" & celltype_mapped_refined != "Low quality")
+counts <- counts[, meta_data$uniqueID]
+meta_data <- meta_data %>% 
+  transmute(
+    x = x_global,
+    y = y_global,
+    cell_type = celltype_mapped_refined
+  )
+sub_meta <- meta_data %>% 
+  filter(cell_type == "Cardiomyocytes" | cell_type == "Dermomyotome")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$cell_type
+## location
+location <- sub_meta %>% 
+  select(1, 2)
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data130_spatial_gastrulation",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://content.cruk.cam.ac.uk/jmlab/SpatialMouseAtlas2020/",
+                                 platform = "seqFISH",
+                                 species = "Mus musculus",
+                                 organ = "Gastrulation",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = as.character(cluster),
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data130_spatial_gastrulation.rds')
+
+
+
+### data131 (Forebrain/midbrain/hindbrain)
+sub_meta <- meta_data %>% 
+  filter(cell_type == "Forebrain/Midbrain/Hindbrain")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data)==0)
+## cluster
+# cluster <- sub_meta$cell_type
+## location
+location <- sub_meta %>% 
+  select(1, 2)
+## group
+# group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data131_spatial_gastrulation",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://content.cruk.cam.ac.uk/jmlab/SpatialMouseAtlas2020/",
+                                 platform = "seqFISH",
+                                 species = "Mus musculus",
+                                 organ = "Gastrulation",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data131_spatial_gastrulation.rds')
+
+
+
+### data132 (Lateral plate mesoderm, Intermediate mesoderm)
+sub_meta <- meta_data %>% 
+  filter(cell_type == "Lateral plate mesoderm" | cell_type == "Intermediate mesoderm")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$cell_type
+## location
+location <- sub_meta %>% 
+  select(1, 2)
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data132_spatial_gastrulation",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://content.cruk.cam.ac.uk/jmlab/SpatialMouseAtlas2020/",
+                                 platform = "seqFISH",
+                                 species = "Mus musculus",
+                                 organ = "Gastrulation",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = as.character(cluster),
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data132_spatial_gastrulation.rds')
+
+
+
+### data133 (Endothelium, Dermomyotome)
+sub_meta <- meta_data %>% 
+  filter(cell_type == "Endothelium" | cell_type == "Dermomyotome")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data)==0)
+## cluster
+cluster <- sub_meta$cell_type
+## location
+location <- sub_meta %>% 
+  select(1, 2)
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data133_spatial_gastrulation",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://content.cruk.cam.ac.uk/jmlab/SpatialMouseAtlas2020/",
+                                 platform = "seqFISH",
+                                 species = "Mus musculus",
+                                 organ = "Gastrulation",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = as.character(cluster),
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data133_spatial_gastrulation.rds')
+
+
+
+### data134 (Allantois)
+sub_meta <- meta_data %>% 
+  filter(cell_type == "Allantois")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data)==0)
+## location
+location <- sub_meta %>% 
+  select(1, 2)
+## data information
+data_info <- simutils::meta_info(id = "data134_spatial_gastrulation",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://content.cruk.cam.ac.uk/jmlab/SpatialMouseAtlas2020/",
+                                 platform = "seqFISH",
+                                 species = "Mus musculus",
+                                 organ = "Gastrulation",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data134_spatial_gastrulation.rds')
+
+
+
+### data135 (seqFISH+ cortex)
+data <- read.csv("./spatial_data/data135_spatial_data/cortex_svz_counts.csv") %>% 
+  t()
+colnames(data) <- paste0("cell", 1:ncol(data))
+meta_data <- read.csv("./spatial_data/data135_spatial_data/cortex_svz_cellcentroids.csv") %>% 
+  transmute(
+    x = X,
+    y = Y,
+    region = Region
+  )
+rownames(meta_data) <- colnames(data)
+## cluster
+cluster <- meta_data$region
+## location
+location <- meta_data %>% 
+  select(1, 2)
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data135_spatial_cortex",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 URL = "https://github.com/CaiGroup/seqFISH-PLUS",
+                                 platform = "seqFISH+",
+                                 species = "Mus musculus",
+                                 organ = "Cortex",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data135_spatial_cortex.rds')
+
+
+
+### data136 (seqFISH+  Olfactory Bulb)
+data <- read.csv("./spatial_data/data136_spatial_data/ob_counts.csv") %>% 
+  t()
+colnames(data) <- paste0("cell", 1:ncol(data))
+meta_data <- read.csv("./spatial_data/data136_spatial_data/ob_cellcentroids.csv") %>% 
+  transmute(
+    x = X,
+    y = Y
+  )
+rownames(meta_data) <- colnames(data)
+## location
+location <- meta_data %>% 
+  select(1, 2)
+## data information
+data_info <- simutils::meta_info(id = "data136_spatial_olfactorybulb",
+                                 repository = "Github",
+                                 accession_number = NULL,
+                                 URL = "https://github.com/CaiGroup/seqFISH-PLUS",
+                                 platform = "seqFISH+",
+                                 species = "Mus musculus",
+                                 organ = "Olfactory Bulb",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data136_spatial_olfactorybulb.rds')
+
+
+
+### data137 (osmFISH)
+library(SeuratDisk)
+loom_data <- Connect(filename = "./spatial_data/data137_spatial_data/osmFISH_SScortex_mouse_all_cells.loom", mode = "r")
+data <- as.data.frame(t(loom_data[["matrix"]][,]))
+cell_name <- loom_data[["/col_attrs/CellID"]][]
+gene_name <- loom_data[["/row_attrs/Gene"]][]
+colnames(data) <- cell_name
+rownames(data) <- gene_name
+## filter
+table(colSums(data) == 0)
+data <- data[, colSums(data) != 0] %>% 
+  as.matrix()
+## region
+meta_data <- data.frame("x" = loom_data[["/col_attrs/X"]][],
+                        "y" = loom_data[["/col_attrs/Y"]][],
+                        "region" = loom_data[["/col_attrs/Region"]][],
+                        row.names = loom_data[["/col_attrs/CellID"]][])
+meta_data <- meta_data[colnames(data), ]
+## location
+location <- meta_data %>% 
+  transmute(
+    x = x,
+    y = y
+  )
+## cell_type
+cell_type <- loom_data[["/col_attrs/ClusterName"]][]
+## cluster
+cluster <- meta_data$region
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data137_spatial_cortex",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "http://linnarssonlab.org/osmFISH/availability/",
+                                 platform = "osmFISH",
+                                 species = "Mus musculus",
+                                 organ = "Cortex",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data137_spatial_cortex.rds')
+
+
+
+### data138 (sci-Space, sample1)
+data <- Matrix::readMM("./spatial_data/data138_spatial_data/GSE166692_sciSpace_count_matrix.mtx.gz")
+colnames(data) <- meta_data$Cell
+meta_data <- read.table("./spatial_data/data138_spatial_data/GSE166692_sciSpace_cell_metadata.tsv.gz", sep = "\t")
+gene_data <- read.table("./spatial_data/data138_spatial_data/GSE166692_sciSpace_gene_metadata.tsv.gz", sep = "\t")
+rownames(data) <- gene_data$id
+saveRDS(data, file = "./spatial_data/data138_spatial_data/counts.rds")
+#### filter cortex
+meta_data <- meta_data %>% 
+  filter(anatomical_annotation == "Cortex") %>% 
+  filter(brain_region == "hindbrain" | brain_region == "midbrain") %>% 
+  filter(final_cluster_label == "Radial glia" | final_cluster_label == "Neuron" | final_cluster_label == "Glial Cells")
+saveRDS(meta_data, file = "./spatial_data/data138_spatial_data/meta_data.rds")
+#### filter sample
+sub_meta <- meta_data %>% 
+  filter(sample == 1)
+data <- data[, sub_meta$Cell]
+table(colSums(data) == 0)
+data <- data[rowSums(data) != 0, ]
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = coords.x1,
+    y = coords.x2
+  )
+## cluster
+cluster <- sub_meta$final_cluster_label
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data138_spatial_cortex",
+                                 repository = "Github",
+                                 accession_number = "GSE166692",
+                                 URL = NULL,
+                                 platform = "sci-Space",
+                                 species = "Mus musculus",
+                                 organ = "Cortex",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data138_spatial_cortex.rds')
+
+
+
+#### data139 (sample2)
+sub_meta <- meta_data %>% 
+  filter(sample == 2)
+data <- counts[, sub_meta$Cell]
+table(colSums(data) == 0)
+data <- data[rowSums(data) != 0, ]
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = coords.x1,
+    y = coords.x2
+  )
+## cluster
+cluster <- sub_meta$final_cluster_label
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data139_spatial_cortex",
+                                 repository = "Github",
+                                 accession_number = "GSE166692",
+                                 URL = NULL,
+                                 platform = "sci-Space",
+                                 species = "Mus musculus",
+                                 organ = "Cortex",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data139_spatial_cortex.rds')
+
+
+
+#### data140 (sample3)
+sub_meta <- meta_data %>% 
+  filter(sample == 3)
+data <- counts[, sub_meta$Cell]
+table(colSums(data) == 0)
+data <- data[rowSums(data) != 0, ]
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = coords.x1,
+    y = coords.x2
+  )
+## cluster
+cluster <- sub_meta$final_cluster_label
+## group
+group_condition <- as.numeric(factor(cluster))
+## data information
+data_info <- simutils::meta_info(id = "data140_spatial_cortex",
+                                 repository = "Github",
+                                 accession_number = "GSE166692",
+                                 URL = NULL,
+                                 platform = "sci-Space",
+                                 species = "Mus musculus",
+                                 organ = "Cortex",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = cluster,
+                                 group_condition = group_condition,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data140_spatial_cortex.rds')
+
+
+
+### data141 (MERFISH, cortical layer II/III, neuron, slide0, age == "4wk")
+counts <- readRDS("./spatial_data/data146_spatial_data/MERFISH.rds")
+meta_data <- counts@meta.data
+sub_meta <- meta_data %>% 
+  filter(tissue == "cortical layer II/III" & cell_type == "neuron" & slice == 0 & age == "4wk")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = as.numeric(as.character(center_x)),
+    y = as.numeric(as.character(center_y))
+  )
+## data information
+data_info <- simutils::meta_info(id = "data141_spatial_neuron",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://cellxgene.cziscience.com/collections/31937775-0602-4e52-a799-b6acdd2bac2e",
+                                 platform = "MERFISH",
+                                 species = "Mus musculus",
+                                 organ = "Brain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data@assays$RNA@counts),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data141_spatial_neuron.rds')
+
+
+
+### data142 (MERFISH, cortical layer II/III, microglial, slide0, age == "4wk")
+sub_meta <- meta_data %>% 
+  filter(tissue == "cortical layer II/III" & cell_type == "microglial cell" & slice == 0 & age == "4wk")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = as.numeric(as.character(center_x)),
+    y = as.numeric(as.character(center_y))
+  )
+## data information
+data_info <- simutils::meta_info(id = "data142_spatial_microglial",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://cellxgene.cziscience.com/collections/31937775-0602-4e52-a799-b6acdd2bac2e",
+                                 platform = "MERFISH",
+                                 species = "Mus musculus",
+                                 organ = "Brain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data@assays$RNA@counts),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data142_spatial_microglial.rds')
+
+
+### data143 (MERFISH, cortical layer II/III, oligodendrocyte)
+sub_meta <- meta_data %>% 
+  filter(tissue == "cortical layer II/III" & cell_type == "oligodendrocyte")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = as.numeric(as.character(center_x)),
+    y = as.numeric(as.character(center_y))
+  )
+## data information
+data_info <- simutils::meta_info(id = "data143_spatial_oligodendrocyte",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://cellxgene.cziscience.com/collections/31937775-0602-4e52-a799-b6acdd2bac2e",
+                                 platform = "MERFISH",
+                                 species = "Mus musculus",
+                                 organ = "Brain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data@assays$RNA@counts),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data143_spatial_oligodendrocyte.rds')
+
+
+
+### data144 (MERFISH, cortical layer VI, endothelial cell)
+sub_meta <- meta_data %>% 
+  filter(tissue == "cortical layer VI" & cell_type == "endothelial cell")
+data <- counts[, rownames(sub_meta)]
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = as.numeric(as.character(center_x)),
+    y = as.numeric(as.character(center_y))
+  )
+## data information
+data_info <- simutils::meta_info(id = "data144_spatial_endothelial",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://cellxgene.cziscience.com/collections/31937775-0602-4e52-a799-b6acdd2bac2e",
+                                 platform = "MERFISH",
+                                 species = "Mus musculus",
+                                 organ = "Brain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data@assays$RNA@counts),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data144_spatial_endothelial.rds')
+
+
+### data145 (MERFISH, cortical layer VI, neuron, slice0)
+sub_meta <- meta_data %>% 
+  filter(tissue == "cortical layer VI" & cell_type == "neuron" & slice == 0)
+data <- counts[, rownames(sub_meta)]
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = as.numeric(as.character(center_x)),
+    y = as.numeric(as.character(center_y))
+  )
+## data information
+data_info <- simutils::meta_info(id = "data145_spatial_neuron",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://cellxgene.cziscience.com/collections/31937775-0602-4e52-a799-b6acdd2bac2e",
+                                 platform = "MERFISH",
+                                 species = "Mus musculus",
+                                 organ = "Brain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = as.matrix(data@assays$RNA@counts),
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data145_spatial_neuron.rds')
+
+
+
+### data146 Stereo-Seq (foregut)
+library(SeuratDisk)
+Convert("./spatial_data/data146_spatial_data/E14-16h_a_count_normal_stereoseq.h5ad", dest = "h5seurat", overwrite = TRUE)
+counts <- LoadH5Seurat("./spatial_data/data151_spatial_data/E14-16h_a_count_normal_stereoseq.h5seurat")
+meta_data <- counts@meta.data
+
+sub_meta <- meta_data %>% 
+  filter(annotation == "foregut") %>% 
+  transmute(
+    x = raw_x,
+    y = raw_y,
+    region = as.character(annotation)
+  )
+data <- counts[, rownames(sub_meta)]
+data <- data@assays[["raw_counts"]]@data
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = x,
+    y = y
+  )
+## data information
+data_info <- simutils::meta_info(id = "data146_spatial_foregut",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/flysta3d/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Drosophila melanogaster",
+                                 organ = "foregut",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data146_spatial_foregut.rds')
+
+
+### data147 Stereo-Seq (muscle)
+sub_meta <- meta_data %>% 
+  filter(annotation == "muscle") %>% 
+  transmute(
+    x = raw_x,
+    y = raw_y,
+    region = as.character(annotation)
+  )
+data <- counts[, rownames(sub_meta)]
+data <- data@assays[["raw_counts"]]@data
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = x,
+    y = y
+  )
+## data information
+data_info <- simutils::meta_info(id = "data147_spatial_muscle",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/flysta3d/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Drosophila melanogaster",
+                                 organ = "muscle",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data147_spatial_muscle.rds')
+
+
+
+### data148 Stereo-Seq (trachea)
+sub_meta <- meta_data %>% 
+  filter(annotation == "trachea") %>% 
+  transmute(
+    x = raw_x,
+    y = raw_y,
+    region = as.character(annotation)
+  )
+data <- counts[, rownames(sub_meta)]
+data <- data@assays[["raw_counts"]]@data
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = x,
+    y = y
+  )
+## data information
+data_info <- simutils::meta_info(id = "data148_spatial_trachea",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/flysta3d/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Drosophila melanogaster",
+                                 organ = "trachea",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data148_spatial_trachea.rds')
+
+
+### data149 Stereo-Seq (fat body)
+sub_meta <- meta_data %>% 
+  filter(annotation == "fat body") %>% 
+  transmute(
+    x = raw_x,
+    y = raw_y,
+    region = as.character(annotation)
+  )
+data <- counts[, rownames(sub_meta)]
+data <- data@assays[["raw_counts"]]@data
+table(colSums(data) == 0)
+## location
+location <- sub_meta %>% 
+  transmute(
+    x = x,
+    y = y
+  )
+## data information
+data_info <- simutils::meta_info(id = "data149_spatial_fatbody",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/flysta3d/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Drosophila melanogaster",
+                                 organ = "trachea",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data149_spatial_fatbody.rds')
+
+
+
+### data150 (Stereo-Seq MOSTA E14.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz)
+library(SeuratDisk)
+loom_data <- Connect(filename = "./spatial_data/data150_spatial_data/dev_all.loom", mode = "r")
+### counts
+counts <- Matrix::Matrix(t(loom_data[["matrix"]][,]), sparse = TRUE)
+rownames(counts) <- loom_data[["/row_attrs/Gene"]][]
+colnames(counts) <- loom_data[["/col_attrs/CellID"]][]
+### meta data
+meta_names <- names(loom_data[["/col_attrs"]])[-c(2, 14, 16, 23, 38, 43, 44)]
+meta_data <- c()
+for(i in meta_names){
+  message(i)
+  tmp <- loom_data[[paste0("/col_attrs/", i)]][]
+  meta_data <- cbind(meta_data, tmp)
+}
+meta_data <- as.data.frame(meta_data)
+colnames(meta_data) <- meta_names
+rownames(meta_data) <- meta_data$CellID
+
+### subset cells (Dorsal mindbrain, E14.5)
+sub_data <- meta_data %>% 
+  filter(Age == "e14.5") %>% 
+  filter(Region == "Midbrain")
+data_ref <- counts[, rownames(sub_data)]
+saveRDS(data_ref, file = "./spatial_data/data150_spatial_data/data_ref.rds")
+saveRDS(sub_data, file = "./spatial_data/data150_spatial_data/meta_ref.rds")
+### read Stereo-Seq data
+data <- read.table("./spatial_data/data150_spatial_data/E14.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz",
+                   header = TRUE)
+location <- data %>% 
+  group_by(cell) %>% 
+  summarise(x = mean(x),
+            y = mean(y)) %>% 
+  column_to_rownames("cell")
+head(location)
+saveRDS(location, file = "./spatial_data/data150_spatial_data/location.rds")
+data <- data %>% 
+  select(1,4,5) %>% 
+  group_by(cell, geneID) %>% 
+  summarise(MIDCounts = sum(MIDCounts))
+data$cell <- as.character(data$cell)
+data <- data %>% 
+  tidyr::pivot_wider(names_from = "cell",
+                     values_from = "MIDCounts",
+                     values_fill = 0) %>% 
+  tibble::column_to_rownames(var = "geneID")
+data <- data[, rownames(location)]
+saveRDS(data, file = "./spatial_data/data150_spatial_data/data.rds")
+
+### Seurat
+seurat <- CreateSeuratObject(counts = data,
+                             project = "SlideSeq",
+                             assay = "Spatial",
+                             min.cells = 0,
+                             min.features = 0)
+seurat[['image']] = new(Class = "SlideSeq",
+                        assay = "Spatial",
+                        coordinates = location)
+seurat <- seurat %>% 
+  SCTransform(assay = "Spatial") %>% 
+  RunPCA(dims = 1:30) %>% 
+  RunUMAP(dims = 1:30) %>% 
+  FindNeighbors() %>% 
+  FindClusters(resolution = 0.5)
+data_ref <- readRDS("./spatial_data/data150_spatial_data/data_ref.rds")
+sub_data <- readRDS("./spatial_data/data150_spatial_data/meta_ref.rds") %>% 
+  transmute(
+    celltype = Class
+  )
+ref_seurat <- CreateSeuratObject(counts = data_ref,
+                                 min.cells = 0,
+                                 min.features = 0,
+                                 meta.data = sub_data) %>% 
+  SCTransform()
+anchors <- FindTransferAnchors(reference = ref_seurat,
+                               query = seurat,
+                               normalization.method = "SCT",
+                               npcs = 50)
+predictions.assay <- TransferData(anchorset = anchors,
+                                  refdata = ref_seurat$celltype,
+                                  prediction.assay = TRUE,
+                                  weight.reduction = seurat[["pca"]],
+                                  dims = 1:50)
+seurat[["predictions"]] <- predictions.assay
+seurat$predicted.id <- GetTransferPredictions(seurat, score.filter = 0.5)
+### select Radial glia cells
+seurat <- subset(seurat, predicted.id == "Radial glia")
+location <- location[colnames(seurat), ]
+data <- as.matrix(seurat@assays$Spatial@counts)
+
+## data information
+data_info <- simutils::meta_info(id = "data150_spatial_radialglia",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/mosta/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Mus musculus",
+                                 organ = "Mindbrain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data150_spatial_radialglia.rds')
+# ### rliger
+# liger <- createLiger(list(data = data, data_ref = data_ref))
+# liger <- normalize(liger)
+# liger <- selectGenes(liger,
+#                      var.thres= 0.3,
+#                      unshared = TRUE,
+#                      unshared.datasets = list(2),
+#                      unshared.thresh= 0.3)
+# liger <- scaleNotCenter(liger)
+# ## select lambda
+# lambda <- suggestLambda(liger, k = 40, num.cores = 3, knn_k = 56, ref_dataset = "data_ref")
+# saveRDS(lambda, file = "./spatial_data/data156_spatial_data/lambda_k40.rds")
+# ## select K
+# K <- suggestK(liger, lambda = 10, num.cores = 4)
+# saveRDS(K, file = "./spatial_data/data156_spatial_data/K_lambda10.rds")
+# liger <- optimizeALS(liger,
+#                      lambda = 10,
+#                      use.unshared = TRUE,
+#                      k = 10)
+# liger <- quantile_norm(liger, ref_dataset = "data_ref")
+# liger <- louvainCluster(liger)
+# liger <- runUMAP(liger)
+# saveRDS(liger, file = "./spatial_data/data156_spatial_data/liger.rds")
+# ### UMAP embedding
+# umap <- liger@tsne.coords
+# data_label <- liger@cell.data$dataset
+# ref_label <- meta_ref$Class
+# ### Define cell types of spatial data
+# distance <- as.matrix(dist(x = umap, method = "euclidean"))
+# knn_graph <- cccd::nng(dx = distance, k = 10)
+# ref_match <- data.frame("cell_type" = ref_label, row.names = (ncol(data)+1):length(knn_graph))
+# spatial_cell_type <- c()
+# for(i in 1:ncol(data)){
+#   print(colnames(data)[i])
+#   nearest_neighbors <- as.character(knn_graph[[i]][[1]])
+#   cell_type <- na.omit(ref_match[nearest_neighbors, "cell_type"])
+#   if(length(cell_type) == 0){
+#     dominant_cell_type <- NA
+#   }else{
+#     dominant_cell_type <- names(table(cell_type)[max(table(cell_type)) == table(cell_type)])
+#     if(length(dominant_cell_type) >= 2){
+#       if("Neuroblast" %in% dominant_cell_type){
+#         dominant_cell_type <- "Neuroblast"
+#       }else if("Radial glia" %in% dominant_cell_type){
+#         dominant_cell_type <- "Radial glia"
+#       }else if("Glioblast" %in% dominant_cell_type){
+#         dominant_cell_type <- "Glioblast"
+#       }else{
+#         dominant_cell_type <- dominant_cell_type[1]
+#       }
+#     }
+#   }
+#   spatial_cell_type <- append(spatial_cell_type, dominant_cell_type)
+# }
+# ### filter cell types
+# meta_data <- location %>% 
+#   add_column(cell_type = spatial_cell_type,
+#              cell_name = colnames(data)) %>% 
+#   filter(cell_type == "Glioblast" | cell_type == "Neuroblast" | cell_type == "Radial glia") %>% 
+#   column_to_rownames("cell_name")
+# location <- meta_data %>% 
+#   select(1,2)
+# data <- data[, rownames(meta_data)]
+
+
+
+### data151 (Stereo-Seq E16.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz)
+library(SeuratDisk)
+loom_data <- Connect(filename = "./spatial_data/data150_spatial_data/dev_all.loom", mode = "r")
+### counts
+counts <- readRDS("./spatial_data/data150_spatial_data/sparse_counts.rds")
+### meta data
+meta_names <- names(loom_data[["/col_attrs"]])[-c(2, 14, 16, 23, 38, 43, 44)]
+meta_data <- c()
+for(i in meta_names){
+  message(i)
+  tmp <- loom_data[[paste0("/col_attrs/", i)]][]
+  meta_data <- cbind(meta_data, tmp)
+}
+meta_data <- as.data.frame(meta_data)
+colnames(meta_data) <- meta_names
+rownames(meta_data) <- meta_data$CellID
+
+### subset cells (Dorsal mindbrain, E16.5)
+sub_data <- meta_data %>% 
+  filter(Age == "e16.5") %>% 
+  filter(Region == "Midbrain")
+data_ref <- counts[, rownames(sub_data)]
+saveRDS(data_ref, file = "./spatial_data/data151_spatial_data/data_ref.rds")
+saveRDS(sub_data, file = "./spatial_data/data151_spatial_data/meta_ref.rds")
+
+### read Stereo-Seq data
+data <- read.table("./spatial_data/data151_spatial_data/E16.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz", header = TRUE)
+location <- data %>% 
+  group_by(cell) %>% 
+  summarise(x = mean(x),
+            y = mean(y)) %>% 
+  column_to_rownames("cell")
+head(location)
+saveRDS(location, file = "./spatial_data/data151_spatial_data/location.rds")
+data <- data %>% 
+  select(1,4,5) %>% 
+  group_by(cell, geneID) %>% 
+  summarise(MIDCount = sum(MIDCount))
+data$cell <- as.character(data$cell)
+data <- data %>% 
+  tidyr::pivot_wider(names_from = "cell",
+                     values_from = "MIDCount",
+                     values_fill = 0) %>% 
+  tibble::column_to_rownames(var = "geneID")
+data <- data[, rownames(location)]
+saveRDS(data, file = "./spatial_data/data151_spatial_data/data.rds")
+
+### Seurat
+seurat <- CreateSeuratObject(counts = data,
+                             project = "SlideSeq",
+                             assay = "Spatial",
+                             min.cells = 0,
+                             min.features = 0)
+seurat[['image']] = new(Class = "SlideSeq",
+                        assay = "Spatial",
+                        coordinates = location)
+seurat <- seurat %>% 
+  SCTransform(assay = "Spatial") %>% 
+  RunPCA(dims = 1:30) %>% 
+  RunUMAP(dims = 1:30) %>% 
+  FindNeighbors() %>% 
+  FindClusters(resolution = 0.5)
+data_ref <- readRDS("./spatial_data/data151_spatial_data/data_ref.rds")
+sub_data <- readRDS("./spatial_data/data151_spatial_data/meta_ref.rds") %>% 
+  transmute(
+    celltype = Class
+  )
+ref_seurat <- CreateSeuratObject(counts = data_ref,
+                                 min.cells = 0,
+                                 min.features = 0,
+                                 meta.data = sub_data) %>% 
+  SCTransform()
+anchors <- FindTransferAnchors(reference = ref_seurat,
+                               query = seurat,
+                               normalization.method = "SCT",
+                               npcs = 50)
+predictions.assay <- TransferData(anchorset = anchors,
+                                  refdata = ref_seurat$celltype,
+                                  prediction.assay = TRUE,
+                                  weight.reduction = seurat[["pca"]],
+                                  dims = 1:50)
+seurat[["predictions"]] <- predictions.assay
+seurat$predicted.id <- GetTransferPredictions(seurat, score.filter = 0.5)
+### select Radial glia cells
+seurat <- subset(seurat, predicted.id == "Radial glia")
+location <- location[colnames(seurat), ]
+data <- as.matrix(seurat@assays$Spatial@counts)
+
+## data information
+data_info <- simutils::meta_info(id = "data151_spatial_radialglia",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/mosta/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Mus musculus",
+                                 organ = "Mindbrain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data151_spatial_radialglia.rds')
+
+
+
+### data152 (Stereo-Seq E12.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz)
+library(SeuratDisk)
+loom_data <- Connect(filename = "./spatial_data/data150_spatial_data/dev_all.loom", mode = "r")
+### counts
+counts <- readRDS("./spatial_data/data150_spatial_data/sparse_counts.rds")
+### meta data
+meta_names <- names(loom_data[["/col_attrs"]])[-c(2, 14, 16, 23, 38, 43, 44)]
+meta_data <- c()
+for(i in meta_names){
+  message(i)
+  tmp <- loom_data[[paste0("/col_attrs/", i)]][]
+  meta_data <- cbind(meta_data, tmp)
+}
+meta_data <- as.data.frame(meta_data)
+colnames(meta_data) <- meta_names
+rownames(meta_data) <- meta_data$CellID
+
+### subset cells (Dorsal mindbrain, E12.5)
+sub_data <- meta_data %>% 
+  filter(Age == "e12.5") %>% 
+  filter(Region == "Midbrain")
+data_ref <- counts[, rownames(sub_data)]
+saveRDS(data_ref, file = "./spatial_data/data152_spatial_data/data_ref.rds")
+saveRDS(sub_data, file = "./spatial_data/data152_spatial_data/meta_ref.rds")
+
+### read Stereo-Seq data
+data <- read.table("./spatial_data/data152_spatial_data/E12.5_E1S3_Dorsal_Midbrain_GEM_CellBin.tsv.gz",
+                   header = TRUE)
+location <- data %>% 
+  group_by(cell) %>% 
+  summarise(x = mean(x),
+            y = mean(y)) %>% 
+  column_to_rownames("cell")
+head(location)
+saveRDS(location, file = "./spatial_data/data152_spatial_data/location.rds")
+data <- data %>% 
+  select(1,4,5) %>% 
+  group_by(cell, geneID) %>% 
+  summarise(MIDCounts = sum(MIDCounts))
+data$cell <- as.character(data$cell)
+data <- data %>% 
+  tidyr::pivot_wider(names_from = "cell",
+                     values_from = "MIDCounts",
+                     values_fill = 0) %>% 
+  tibble::column_to_rownames(var = "geneID")
+data <- data[, rownames(location)]
+saveRDS(data, file = "./spatial_data/data152_spatial_data/data.rds")
+
+### Seurat
+seurat <- CreateSeuratObject(counts = data,
+                             project = "SlideSeq",
+                             assay = "Spatial",
+                             min.cells = 0,
+                             min.features = 0)
+seurat[['image']] = new(Class = "SlideSeq",
+                        assay = "Spatial",
+                        coordinates = location)
+seurat <- seurat %>% 
+  SCTransform(assay = "Spatial") %>% 
+  RunPCA(dims = 1:30) %>% 
+  RunUMAP(dims = 1:30) %>% 
+  FindNeighbors() %>% 
+  FindClusters(resolution = 0.5)
+data_ref <- readRDS("./spatial_data/data152_spatial_data/data_ref.rds")
+sub_data <- readRDS("./spatial_data/data152_spatial_data/meta_ref.rds") %>% 
+  transmute(
+    celltype = Class
+  )
+ref_seurat <- CreateSeuratObject(counts = data_ref,
+                                 min.cells = 0,
+                                 min.features = 0,
+                                 meta.data = sub_data) %>% 
+  SCTransform()
+anchors <- FindTransferAnchors(reference = ref_seurat,
+                               query = seurat,
+                               normalization.method = "SCT",
+                               npcs = 50)
+predictions.assay <- TransferData(anchorset = anchors,
+                                  refdata = ref_seurat$celltype,
+                                  prediction.assay = TRUE,
+                                  weight.reduction = seurat[["pca"]],
+                                  dims = 1:50)
+seurat[["predictions"]] <- predictions.assay
+seurat$predicted.id <- GetTransferPredictions(seurat, score.filter = 0.5)
+### select Radial glia cells
+seurat <- subset(seurat, predicted.id == "Radial glia")
+location <- location[colnames(seurat), ]
+data <- as.matrix(seurat@assays$Spatial@counts)
+
+## data information
+data_info <- simutils::meta_info(id = "data152_spatial_radialglia",
+                                 repository = NULL,
+                                 accession_number = NULL,
+                                 URL = "https://db.cngb.org/stomics/mosta/download/",
+                                 platform = "Stereo-Seq",
+                                 species = "Mus musculus",
+                                 organ = "Mindbrain",
+                                 cell_num = ncol(data),
+                                 gene_num = nrow(data),
+                                 treatment = NULL,
+                                 cluster_info = NULL,
+                                 group_condition = NULL,
+                                 spatial_coordinate = location,
+                                 start_cell = NULL)
+str(data_info)
+print(dim(data))
+## Save
+data <- list(data = data,
+             data_info = data_info)
+saveRDS(data, file = '../preprocessed_data/data152_spatial_radialglia.rds')
+
+
+
+ggplot(location, aes(x = x, y = y))+
+  geom_point()+
+  theme(panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "bottom")
+p <- ggplot(location %>% add_column(group = cluster), aes(x = x, y = y))+
+  geom_point(aes(color = cluster))+
+  theme(panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "bottom")
+
+HoverLocator(p)
+data2 <- data
+index <- apply(data, 1, function(x){ sum(x != 0) >= 50})
+data <- data[index, ]
 traj <- dynwrap::wrap_expression(counts = t(as.matrix(data)),
                                  expression = log2(t(as.matrix(data)) + 1))
 groups <- data.frame("cell_id" = colnames(data),
-                     "group_id" = meta_data$group)
+                     "group_id" = meta_data$cell_type)
 traj <- dynwrap::add_grouping(traj, grouping = groups)
 traj <- dynwrap::add_prior_information(traj, start_id = start_id)
 model <- dynwrap::infer_trajectory(traj,
                                    method = tislingshot::ti_slingshot(),
                                    give_priors = NULL,
-                                   seed = 222,
+                                   seed = 1,
                                    verbose = TRUE,
                                    parameters = NULL)
-dimred <- dyndimred::dimred_tsne(traj$expression)
+dimred <- dyndimred::dimred_umap(traj$expression)
 dynplot::plot_dimred(
   model,
-  dimred = dimred,
+  dimred = location,
   expression_source = dataset$expression, 
-  grouping = traj$grouping, size_cells = 2
+  grouping = traj$grouping,
+  size_cells = 2,
+  size_milestones = 1,
+  arrow = grid::arrow(length = unit(0.1, "inches"))
 )
