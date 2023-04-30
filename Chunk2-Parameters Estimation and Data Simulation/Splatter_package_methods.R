@@ -58,11 +58,11 @@ for(i in 1:length(data_list)){
   
   #### DEGs
   if(!is.null(group)){
-    message("Performing DEA...")
-    result <- simutils::perform_DEA(data = counts,
-                                    group = DEA_group,
-                                    method = "edgeRQLFDetRate")
-    saveRDS(result, file = paste0("../DEA_result/", data_id, ".rds"))
+    message("Read DEA result...")
+    result <- readRDS(paste0("../DEA_result/", data_id, ".rds"))
+    # result <- simutils::perform_DEA(data = counts,
+    #                                 group = DEA_group,
+    #                                 method = "edgeRQLFDetRate")
     de_genes_per_group <- lapply(result, function(df){
       rownames(df)[df$PValue < 0.05]
     })

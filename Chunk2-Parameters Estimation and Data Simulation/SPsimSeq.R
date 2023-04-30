@@ -11,7 +11,7 @@ data_list <- list.files("../preprocessed_data/")
 
 method <- "SPsimSeq"
 
-for(i in 22:length(data_list)){
+for(i in 1:length(data_list)){
   file_name <- data_list[i]
   ## read data
   message("-------------------------------------------------------------------")
