@@ -6,11 +6,9 @@ for(i in sim_data_list){
   message("Read simulated data...")
   sim_result <- readRDS(file.path("../simulation_data", i))
   sim_data <- as.data.frame(sim_result$sim_data$count_data)
-  
   if(any(colSums(sim_data, na.rm = TRUE)==0)){
     next
   }
-  
   message("Calculate cell properties...")
   sim_data_cell_properties <- simutils::cell_properties(sim_data, verbose = TRUE)
   message("Calculate gene properties...")
