@@ -5463,6 +5463,34 @@ data <- list(data = data,
 saveRDS(data, file = '../preprocessed_data/data152_spatial_radialglia.rds')
 
 
+### perform trajectory inference on spatial data
+data_list <- list.files("../preprocessed_data/", pattern = "(spatial)")
+
+for(i in data_list){
+  data <- readRDS(paste0("../preprocessed_data/", i))
+  if(is.null(data$data_info$start_cell)){
+    next
+  }
+  cat("----------------\n")
+  cat(paste0(i, "\n"))
+  ref_data <- dynwrap::wrap_expression(counts = t(data$data),
+                                       expression = log2(t(data$data) + 1))
+  ref_data <- dynwrap::add_grouping(dataset = ref_data,
+                                    grouping = data$data_info$cluster_info)
+  ref_model <- dynwrap::infer_trajectory(dataset = ref_data,
+                                         method = tislingshot::ti_slingshot(),
+                                         parameters = NULL,
+                                         give_priors = NULL,
+                                         seed = 111,
+                                         verbose = TRUE)
+  ref_model <- dynwrap::add_expression(dataset = ref_model,
+                                       counts = ref_data$counts,
+                                       expression = ref_data$expression)
+  data$data <- ref_model
+  saveRDS(data, file = paste0("../preprocessed_data/", i))
+}
+
+
 
 ggplot(location, aes(x = x, y = y))+
   geom_point()+

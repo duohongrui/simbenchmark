@@ -104,66 +104,66 @@ for(i in 1:length(data_list)){
   }
   
   
-  # ## simulation
-  # message("Simulation...")
-  # 
-  # try_result <- try(
-  #   simulation_result <- simpipe::simulate_datasets(
-  #     parameters = parameters,
-  #     other_prior = other_prior_sim,
-  #     n = 1,
-  #     seed = 3,
-  #     return_format = "list",
-  #     verbose = TRUE,
-  #     use_docker = FALSE),
-  #   silent = FALSE,
-  #   outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
-  # 
-  # if("try-error" %in% class(try_result)){
-  #   next
-  # }
-  # 
-  # ## estimation step monitor
-  # message("Save information of simulated data...")
-  # est_time <- estimation_result[[1]][["estimate_detection"]][1, 2]
-  # est_peak_memory <- estimation_result[[1]][["estimate_detection"]][1, 4]
-  # 
-  # ## simulation step monitor
-  # sim_time <- simulation_result[[1]][["simulate_detection"]][1, 2]
-  # sim_peak_memory <- simulation_result[[1]][["simulate_detection"]][1, 4]
-  # 
-  # ## simulated data info
-  # sim_counts <- simulation_result[[1]][["simulate_result"]][["count_data"]]
-  # ## simulated cell info
-  # ### group
-  # sim_col_data <- simulation_result[[1]][["simulate_result"]][["col_meta"]]
-  # group_num <- 0
-  # de_gene_num <- 0
-  # ### batch
-  # if("batch" %in% colnames(sim_col_data)){
-  #   batch_num <- length(unique(sim_col_data$batch))
-  # }else{
-  #   batch_num <- 0
-  # }
-  # sim_data_info <- list(sim_data_id = save_name,
-  #                       method = method,
-  #                       ref_data_platform = data_info$platform,
-  #                       cell_num = ncol(sim_counts),
-  #                       gene_num = nrow(sim_counts),
-  #                       group = group_num,
-  #                       batch = batch_num,
-  #                       de_gene_num = de_gene_num,
-  #                       estimate_time = est_time,
-  #                       estimate_memory = est_peak_memory,
-  #                       simulation_time = sim_time,
-  #                       simulation_memory = sim_peak_memory)
-  # message("Save data...")
-  # save_result <- list(sim_data = simulation_result[[1]][["simulate_result"]],
-  #                     sim_data_info = sim_data_info)
-  # ### save
-  # saveRDS(save_result, paste0("../simulation_data/", save_name, ".rds"))
-  # message("Done...")
-  # message("-------------------------------------------------------------------")
+  ## simulation
+  message("Simulation...")
+
+  try_result <- try(
+    simulation_result <- simpipe::simulate_datasets(
+      parameters = estimation_result,
+      other_prior = other_prior_sim,
+      n = 1,
+      seed = 777777,
+      return_format = "list",
+      verbose = TRUE,
+      use_docker = FALSE),
+    silent = FALSE,
+    outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
+
+  if("try-error" %in% class(try_result)){
+    next
+  }
+
+  ## estimation step monitor
+  message("Save information of simulated data...")
+  est_time <- estimation_result[[1]][["estimate_detection"]][1, 2]
+  est_peak_memory <- estimation_result[[1]][["estimate_detection"]][1, 4]
+
+  ## simulation step monitor
+  sim_time <- simulation_result[[1]][["simulate_detection"]][1, 2]
+  sim_peak_memory <- simulation_result[[1]][["simulate_detection"]][1, 4]
+
+  ## simulated data info
+  sim_counts <- simulation_result[[1]][["simulate_result"]][["count_data"]]
+  ## simulated cell info
+  ### group
+  sim_col_data <- simulation_result[[1]][["simulate_result"]][["col_meta"]]
+  group_num <- 0
+  de_gene_num <- 0
+  ### batch
+  if("batch" %in% colnames(sim_col_data)){
+    batch_num <- length(unique(sim_col_data$batch))
+  }else{
+    batch_num <- 0
+  }
+  sim_data_info <- list(sim_data_id = save_name,
+                        method = method,
+                        ref_data_platform = data_info$platform,
+                        cell_num = ncol(sim_counts),
+                        gene_num = nrow(sim_counts),
+                        group = group_num,
+                        batch = batch_num,
+                        de_gene_num = de_gene_num,
+                        estimate_time = est_time,
+                        estimate_memory = est_peak_memory,
+                        simulation_time = sim_time,
+                        simulation_memory = sim_peak_memory)
+  message("Save data...")
+  save_result <- list(sim_data = simulation_result[[1]][["simulate_result"]],
+                      sim_data_info = sim_data_info)
+  ### save
+  saveRDS(save_result, paste0("../simulation_data/", save_name, ".rds"))
+  message("Done...")
+  message("-------------------------------------------------------------------")
   
 }
 
