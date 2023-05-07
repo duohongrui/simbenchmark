@@ -86,7 +86,7 @@ for(i in 1:length(data_list)){
     if(!is.null(group)){
       try_result <- try(
         estimation_result <- simpipe::estimate_parameters(
-          ref_data = counts,
+          ref_data = as.matrix(counts),
           method = method,
           other_prior = list(group.condition = group),
           seed = 1,
