@@ -4721,7 +4721,7 @@ saveRDS(data, file = '../preprocessed_data/data140_spatial_cortex.rds')
 
 
 ### data141 (MERFISH, cortical layer II/III, neuron, slide0, age == "4wk")
-counts <- readRDS("./spatial_data/data146_spatial_data/MERFISH.rds")
+counts <- readRDS("./spatial_data/data141_spatial_data/MERFISH.rds")
 meta_data <- counts@meta.data
 sub_meta <- meta_data %>% 
   filter(tissue == "cortical layer II/III" & cell_type == "neuron" & slice == 0 & age == "4wk")
@@ -4862,8 +4862,8 @@ saveRDS(data, file = '../preprocessed_data/data144_spatial_endothelial.rds')
 
 ### data145 (MERFISH, cortical layer VI, neuron, slice0)
 sub_meta <- meta_data %>% 
-  filter(tissue == "cortical layer VI" & cell_type == "neuron" & slice == 0)
-data <- counts[, rownames(sub_meta)]
+  filter(tissue == "cortical layer VI" & cell_type == "neuron" & slice == 0& age == "24wk")
+data <- counts[, rownames(sub_meta)] %>% as.matrix()
 table(colSums(data) == 0)
 ## location
 location <- sub_meta %>% 
