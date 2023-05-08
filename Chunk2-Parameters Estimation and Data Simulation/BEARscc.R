@@ -60,8 +60,7 @@ for(i in 1:length(data_list)){
       method = method,
       other_prior = other_prior_est,
       seed = 1,
-      verbose = TRUE,
-      use_docker = FALSE),
+      verbose = TRUE),
     silent = FALSE,
     outFile = paste0("../error_text/", save_name, "_", "estimation_error.txt"))
   
@@ -82,8 +81,7 @@ for(i in 1:length(data_list)){
       n = 1,
       seed = 1,
       return_format = "list",
-      verbose = TRUE,
-      use_docker = FALSE),
+      verbose = TRUE),
     silent = FALSE,
     outFile = paste0("../error_text/", save_name, "_", "simulation_error.txt"))
   
