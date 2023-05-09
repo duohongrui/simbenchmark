@@ -37,16 +37,40 @@ for(i in data_list){
     }
     
     message("3-Calculating silhouette...")
-    silhouette <- simutils::calculate_silhouette(dist, cluster_info = data$sim_data$col_meta$group)
+    error <- try(
+      silhouette <- simutils::calculate_silhouette(dist, cluster_info = data$sim_data$col_meta$group),
+      silent = TRUE
+    )
+    if("try-error" %in% class(error)){
+      silhouette <- NA
+    }
     
     message("4-Calculating dunn...")
-    dunn <- simutils::calculate_dunn(dist, cluster_info = data$sim_data$col_meta$group)
+    error <- try(
+      dunn <- simutils::calculate_dunn(dist, cluster_info = data$sim_data$col_meta$group),
+      silent = TRUE
+    )
+    if("try-error" %in% class(error)){
+      dunn <- NA
+    }
     
     message("5-Calculating connectivity...")
-    connectivity <- simutils::calculate_connectivity(dist, cluster_info = data$sim_data$col_meta$group)
+    error <- try(
+      connectivity <- simutils::calculate_connectivity(dist, cluster_info = data$sim_data$col_meta$group),
+      silent = TRUE
+    )
+    if("try-error" %in% class(error)){
+      connectivity <- NA
+    }
     
     message("6-Calculating DB index...")
-    DB_index <- simutils::calculate_DB_index(as.matrix(data$sim_data$count_data), cluster_info = data$sim_data$col_meta$group)
+    error <- try(
+      DB_index <- simutils::calculate_DB_index(as.matrix(data$sim_data$count_data), cluster_info = data$sim_data$col_meta$group),
+      silent = TRUE
+    )
+    if("try-error" %in% class(error)){
+      DB_index <- NA
+    }
     
     group_metrics <- dplyr::lst(CDI,
                                 ROUGE,
