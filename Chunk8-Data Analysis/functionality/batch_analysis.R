@@ -41,16 +41,11 @@ batch_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   )
 
 ### normalize some values
-#### LISI
-batch_data <- batch_data %>% 
-  mutate(
-    across(LISI, ~ .x/2)
-  )
-#### MM
+#### MM and LISI
 batch_data <- batch_data %>% 
   group_by(Data) %>% 
   mutate(
-    across(mm, ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+    across(all_of(c("mm", "LISI")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
 #### AWS_batch
@@ -67,10 +62,10 @@ batch_data <- batch_data %>%
   )
 
 ### NA and NaN
-batch_data <- batch_data %>% 
-  mutate(
-    across(3:ncol(.), ~ replace_na(.x, 0))
-  )
+# batch_data <- batch_data %>% 
+#   mutate(
+#     across(3:ncol(.), ~ replace_na(.x, 0))
+#   )
 saveRDS(batch_data, file = "Chunk8-Data Analysis/functionality/batch_data.rds")
 ### turn to long table
 batch_long_data <- batch_data %>% 

@@ -65,7 +65,7 @@ accuracy_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   c(method_name, data_name, result)
 }) %>% 
   mutate(
-    across(metrics_property, as.numeric)
+    across(all_of(metrics_property), as.numeric)
   )
 
 
@@ -83,7 +83,7 @@ normalized_columes <- c("MAD_LS", "MAD_TMM", "MAD_ELS",
 accuracy_data <- accuracy_data %>% 
   group_by(Data) %>% 
   mutate(
-    across(normalized_columes, ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+    across(all_of(normalized_columes), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
 

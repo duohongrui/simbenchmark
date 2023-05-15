@@ -37,7 +37,7 @@ usability_long_data <- usability_data %>%
                      rep("Documentation", 5),
                      rep("Paper", 4)), 42)
   )
-
+saveRDS(usability_long_data, file = "Chunk8-Data Analysis/usability/usability_long_data.rds")
 rect_width <- 0.5
 big_space <- 1
 tiny_space <- 0.2

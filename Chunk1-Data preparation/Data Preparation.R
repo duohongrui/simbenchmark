@@ -5492,6 +5492,47 @@ for(i in data_list){
 
 
 
+
+### perform trajectory inference on FILTERED spatial data
+data_list <- list.files("../preprocessed_data/", pattern = "(spatial)")
+
+for(i in data_list){
+  data <- readRDS(paste0("../preprocessed_data/", i))
+  if(is.null(data$data_info$start_cell)){
+    next
+  }
+  message(i)
+  counts <- t(as.matrix(data$data$counts))
+  cat(paste0("Raw gene number: ", nrow(counts), "\n"))
+  ### gene filter
+  index <- rowSums(counts) == 0
+  counts <- counts[!index, ]
+  cat(paste0("Retained gene number: ", nrow(counts), "\n"))
+  
+  ### save
+  data$data <- counts
+  data$data_info$gene_num <- nrow(counts)
+  
+  ### Trajectory inference
+  cat(paste0("Trajectory inference... ", "\n"))
+  ref_data <- dynwrap::wrap_expression(counts = t(data$data),
+                                       expression = log2(t(data$data) + 1))
+  ref_data <- dynwrap::add_grouping(dataset = ref_data,
+                                    grouping = data$data_info$cluster_info)
+  ref_model <- dynwrap::infer_trajectory(dataset = ref_data,
+                                         method = tislingshot::ti_slingshot(),
+                                         parameters = NULL,
+                                         give_priors = NULL,
+                                         seed = 111,
+                                         verbose = FALSE)
+  ref_model <- dynwrap::add_expression(dataset = ref_model,
+                                       counts = ref_data$counts,
+                                       expression = ref_data$expression)
+  data$data <- ref_model
+  saveRDS(data, file = paste0("../filter_preprocessed_data/", i))
+}
+
+
 ggplot(location, aes(x = x, y = y))+
   geom_point()+
   theme(panel.grid = element_blank(),
@@ -5512,7 +5553,7 @@ data <- data[index, ]
 traj <- dynwrap::wrap_expression(counts = t(as.matrix(data)),
                                  expression = log2(t(as.matrix(data)) + 1))
 groups <- data.frame("cell_id" = colnames(data),
-                     "group_id" = meta_data$cell_type)
+                     "group_id" = cluster)
 traj <- dynwrap::add_grouping(traj, grouping = groups)
 traj <- dynwrap::add_prior_information(traj, start_id = start_id)
 model <- dynwrap::infer_trajectory(traj,
@@ -5528,6 +5569,4 @@ dynplot::plot_dimred(
   expression_source = dataset$expression, 
   grouping = traj$grouping,
   size_cells = 2,
-  size_milestones = 1,
-  arrow = grid::arrow(length = unit(0.1, "inches"))
-)
+  size_milestones = 1)

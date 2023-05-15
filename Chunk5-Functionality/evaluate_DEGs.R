@@ -3,7 +3,8 @@ data_list <- list.files("../simulation_data/", pattern = "^scDesign2")
 
 for(i in data_list){
   data <- readRDS(file.path("../simulation_data/", i))
-  if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta)){
+  if(data$sim_data_info$group >= 2 & "de_gene" %in% colnames(data$sim_data$row_meta) |
+     data$sim_data_info$group >= 2 & "DEstatus" %in% colnames(data$sim_data$row_meta)){
     message(i)
     sim_data <- as.matrix(data$sim_data$count_data)
     group <- as.character(data$sim_data$col_meta$group)
@@ -12,7 +13,12 @@ for(i in data_list){
       data[["sim_data"]][["col_meta"]][["group"]] <- group
     }
     group_combn <- utils::combn(unique(group), 2)
-    de_genes <- rownames(sim_data)[which(data[["sim_data"]][["row_meta"]][["de_gene"]] == "yes")]
+    if(stringr::str_starts(i, pattern = "^scDD_")){
+      de_genes_index <- stringr::str_starts(data[["sim_data"]][["row_meta"]][["DEstatus"]], pattern = "^D")
+      de_genes <- rownames(sim_data)[de_genes_index]
+    }else{
+      de_genes <- rownames(sim_data)[which(data[["sim_data"]][["row_meta"]][["de_gene"]] == "yes")]
+    }
     sim_DEGs <- list()
     valid_DEGs_distribution <- list()
     distribution_score <- c()
@@ -22,6 +28,7 @@ for(i in data_list){
       conb2 <- group_combn[2, conb]
       conb_name <- paste0(group_combn[, conb], collapse = "vs")
       message(conb_name)
+      ### Splat, SCRIP, Lun, ESCO (every pair of groups has its own DEGs)
       if(stringr::str_starts(i, pattern = "Splat") |
          stringr::str_starts(i, pattern = "SCRIP") |
          stringr::str_starts(i, pattern = "(Lun_)") |
@@ -31,8 +38,8 @@ for(i in data_list){
         index <- fac1 != fac2
         DEGs <- rownames(data$sim_data$count_data)[index]
       }
+      ### powsimR, muscat, scDesign, SPARSim, SPsimSeq, Lun2 (every pair of groups dose not have its own DEGs)
       if(stringr::str_starts(i, pattern = "powsimR") |
-         stringr::str_starts(i, pattern = "scDD") | 
          stringr::str_starts(i, pattern = "muscat") |
          stringr::str_starts(i, pattern = "scDesign") |
          stringr::str_starts(i, pattern = "SPARSim") |
@@ -45,6 +52,11 @@ for(i in data_list){
           DEGs <- de_genes
           index <- rep(FALSE, nrow(sim_data))
         }
+      }
+      ### scDD (DEGs contains different types)
+      if(stringr::str_starts(i, pattern = "scDD")){
+        DEGs <- de_genes
+        index <- rownames(sim_data) %in% de_genes
       }
       sim_DEGs[[conb_name]] <- DEGs
       

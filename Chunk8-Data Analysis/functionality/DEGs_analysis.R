@@ -22,6 +22,9 @@ for (i in data_list) {
 ### turn to a tibble
 DEGs_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   result <- as.numeric(all_result[[index]])
+  if(length(result) == 6){
+    result <- c(result, NA)
+  }
   names(result) <- metric_name
   data_name <- names(all_result)[index]
   split_names <- str_split(data_name, pattern = "_", simplify = TRUE)
@@ -40,10 +43,10 @@ DEGs_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   )
 
 ### NA and NaN
-DEGs_data <- DEGs_data %>% 
-  mutate(
-    across(3:ncol(.), ~ replace_na(.x, 0))
-  )
+# DEGs_data <- DEGs_data %>% 
+#   mutate(
+#     across(3:ncol(.), ~ replace_na(.x, 0))
+#   )
 saveRDS(DEGs_data, file = "Chunk8-Data Analysis/functionality/DEGs_data.rds")
 ### turn to long table
 DEGs_long_data <- DEGs_data %>% 

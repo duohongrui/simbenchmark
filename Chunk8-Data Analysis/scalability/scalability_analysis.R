@@ -19,6 +19,56 @@ scalability_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   all_result[[index]]
 })
 
+### scalability score
+
+#### aggregate by repeat time
+score_data <- scalability_data %>% 
+  group_by(method, cell_num, gene_num) %>% 
+  summarise(
+    estimation_time = mean(estimation_time, na.rm = TRUE),
+    estimation_memory = mean(estimation_memory, na.rm = TRUE),
+    simulation_time = mean(simulation_time, na.rm = TRUE),
+    simulation_memory = mean(simulation_memory, na.rm = TRUE)
+  ) %>% 
+  ungroup()
+  
+#### aggregate by dataset
+score_data <- score_data %>% 
+  group_by(cell_num, gene_num) %>% 
+  mutate(
+    across(all_of(c("estimation_time",
+                    "estimation_memory",
+                    "simulation_time",
+                    "simulation_memory")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+  ) %>% 
+  ungroup()
+
+#### aggregate by method
+score_data <- score_data %>% 
+  group_by(method) %>% 
+  summarise(
+    estimation_time = mean(estimation_time, na.rm = TRUE),
+    estimation_memory = mean(estimation_memory, na.rm = TRUE),
+    simulation_time = mean(simulation_time, na.rm = TRUE),
+    simulation_memory = mean(simulation_memory, na.rm = TRUE)
+  ) %>% 
+  mutate(
+    across(all_of(c("estimation_time",
+                    "estimation_memory",
+                    "simulation_time",
+                    "simulation_memory")), ~ 1 - .x)
+  ) %>% 
+  ungroup()
+
+### time and memory score
+score_data <- score_data %>% 
+  mutate(
+    time_score = apply(.[, -1], MARGIN = 1, function(x){mean(c(x[1], x[3]), na.rm = TRUE)}),
+    memory_score = apply(.[, -1], MARGIN = 1, function(x){mean(c(x[2], x[4]), na.rm = TRUE)}),
+    scalability_score = apply(.[, -1], MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
+  )
+saveRDS(score_data, file = "Chunk8-Data Analysis/scalability/score_data.rds")
+
 ### Shape Constrained Addictive Model for every method
 classification_shape <- function(
   data,
