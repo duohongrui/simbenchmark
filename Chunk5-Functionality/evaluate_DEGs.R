@@ -8,7 +8,8 @@ for(i in data_list){
     sim_data <- as.matrix(data$sim_data$count_data)
     group <- as.character(data$sim_data$col_meta$group)
     if(rlang::is_empty(group)){
-      group <- paste0("Group", as.numeric(data$sim_data$col_meta$plate))
+      group <- as.character(data$sim_data$col_meta$plate)
+      data[["sim_data"]][["col_meta"]][["group"]] <- group
     }
     group_combn <- utils::combn(unique(group), 2)
     de_genes <- rownames(sim_data)[which(data[["sim_data"]][["row_meta"]][["de_gene"]] == "yes")]
@@ -23,25 +24,27 @@ for(i in data_list){
       message(conb_name)
       if(stringr::str_starts(i, pattern = "Splat") |
          stringr::str_starts(i, pattern = "SCRIP") |
-         stringr::str_starts(i, pattern = "Lun")){
+         stringr::str_starts(i, pattern = "(Lun_)") |
+         stringr::str_starts(i, pattern = "ESCO")){
         fac1 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb1)]
         fac2 <- data[["sim_data"]][["row_meta"]][, stringr::str_ends(colnames(data[["sim_data"]][["row_meta"]]), pattern = conb2)]
         index <- fac1 != fac2
         DEGs <- rownames(data$sim_data$count_data)[index]
       }
       if(stringr::str_starts(i, pattern = "powsimR") |
-         stringr::str_starts(i, pattern = "POWSC") |
          stringr::str_starts(i, pattern = "scDD") | 
          stringr::str_starts(i, pattern = "muscat") |
-         stringr::str_starts(i, pattern = "hierarchicell")){
-        DEGs <- de_genes
-        index <- rownames(data[["sim_data"]][["count_data"]]) %in% de_genes
-      }
-      if(stringr::str_starts(i, pattern = "scDesign") |
-         stringr::str_starts(i, pattern = "zinbwaveZinger") |
-         stringr::str_starts(i, pattern = "SPARSim")){
-        DEGs <- de_genes
-        index <- 1:nrow(data$sim_data$count_data)
+         stringr::str_starts(i, pattern = "scDesign") |
+         stringr::str_starts(i, pattern = "SPARSim") |
+         stringr::str_starts(i, pattern = "SPsimSeq")|
+         stringr::str_starts(i, pattern = "Lun2_")){
+        if(ncol(group_combn) == 1){
+          DEGs <- de_genes
+          index <- rownames(sim_data) %in% de_genes
+        }else{
+          DEGs <- de_genes
+          index <- rep(FALSE, nrow(sim_data))
+        }
       }
       sim_DEGs[[conb_name]] <- DEGs
       

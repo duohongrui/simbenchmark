@@ -3,9 +3,7 @@ sim_data_list <- list.files("../simulation_data/", pattern = "^PROSSTT")
 
 for(i in sim_data_list){
   print(i)
-  if(stringr::str_detect(i, pattern = "data145")){
-    next
-  }
+
   message("Read simulated data...")
   sim_result <- readRDS(file.path("../simulation_data", i))
   sim_data <- as.data.frame(sim_result$sim_data$count_data)
