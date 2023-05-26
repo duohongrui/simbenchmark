@@ -20,9 +20,9 @@ for(i in 1:length(data_list)){
   data <- readRDS(file.path("../preprocessed_data", file_name))
   data_info <- data$data_info
   if(dynwrap::is_wrapper_with_expression(data$data)){
-    counts <- t(data$data[["counts"]])
+    counts <- t(as.matrix(data$data[["counts"]]))
   }else{
-    counts <- data$data
+    counts <- as.matrix(data$data)
   }
   ## data meta info
   data_id <- data_info$id
@@ -44,6 +44,17 @@ for(i in 1:length(data_list)){
   ## 2) batch
   if(!is.null(batch_info)){
     batch_info <- as.numeric(factor(batch_info))
+  }
+  
+  ## other prior
+  if(!is.null(data_info[["spatial_coordinate"]])){
+    other_prior = list(group.condition = group,
+                       batch.condition = batch_info,
+                       spatial.x = data_info[["spatial_coordinate"]]$x,
+                       spatial.y = data_info[["spatial_coordinate"]]$y)
+  }else{
+    other_prior = list(group.condition = group,
+                       batch.condition = batch_info)
   }
   
   ## data save file
