@@ -11,24 +11,34 @@ for(i in ref_data_list){
   data_list <- list.files("../simulation_data/", pattern = data_name)
   
   for(w in data_list){
+    if(!stringr::str_starts(w,
+                            pattern = "PROSSTT|TedSim|dyntoy|dyngen|SymSim|VeloSim|MFA|Splat-paths|SplatPop-paths|phenopath|ESCO-traj|ESCO-tree|SCRIP-paths")){
+      next
+    }
     message(paste0("--------", w, "", "--------"))
     sim_data <- readRDS(file.path("../simulation_data", w))
     
-    if(data$sim_data_info$group >= 2 & "group" %in% colnames(data$sim_data$col_meta)){
-      sim_data_grouping <- data$sim_data$col_meta$group
+    if(sim_data$sim_data_info$group >= 2 & "group" %in% colnames(sim_data$sim_data$col_meta)){
+      sim_data_grouping <- sim_data$sim_data$col_meta$group
     }else{
       sim_data_grouping <- NULL
     }
     ### calculate trajectory metrics
-    traj_result <- simutils::calculate_trajectory_properties(
-      ref_data = ref_data,
-      sim_data = sim_data$sim_data$count_data,
-      sim_data_grouping = sim_data_grouping,
-      seed = 666,
-      verbose = TRUE
+    error <- try(
+      traj_result <- simutils::calculate_trajectory_properties(
+        ref_data = ref_data$data,
+        sim_data = sim_data$sim_data$count_data,
+        sim_data_grouping = sim_data_grouping,
+        seed = 666,
+        verbose = TRUE
+      ),
+      silent = TRUE
     )
+    if(is(error, "try-error")){
+      next
+    }
     ### save results
-    saveRDS(traj_result, file = paste0("../trajectory/", i))
+    saveRDS(traj_result, file = paste0("../trajectory/", w))
     
     saveRDS(dplyr::lst(
       HIM = traj_result$HIM,
@@ -36,7 +46,7 @@ for(i in ref_data_list){
       F1_milestones = traj_result$F1_milestones,
       Cor_dist = traj_result$Cor_dist$cor_dist$cor_dist
     ),
-      file = paste0("../trajectory_evaluation/", i))
+      file = paste0("../trajectory_evaluation/", w))
   }
 }
 
