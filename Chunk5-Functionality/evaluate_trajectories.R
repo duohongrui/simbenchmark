@@ -55,7 +55,8 @@ for(i in ref_data_list){
         seed = 666,
         verbose = TRUE
       ),
-      silent = TRUE
+      silent = TRUE,
+      outFile = paste0("../trajectory_error/", w, "_traj_error.txt")
     )
     if(is(error, "try-error")){
       next
