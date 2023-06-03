@@ -27,7 +27,7 @@ for(i in ref_data_list){
     error <- try(
       traj_result <- simutils::calculate_trajectory_properties(
         ref_data = ref_data$data,
-        sim_data = sim_data$sim_data$count_data,
+        sim_data = as.matrix(sim_data$sim_data$count_data),
         sim_data_grouping = sim_data_grouping,
         seed = 666,
         verbose = TRUE
