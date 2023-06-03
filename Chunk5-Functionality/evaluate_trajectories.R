@@ -12,8 +12,15 @@ for(i in ref_data_list){
   
   for(w in data_list){
     message(paste0("--------", w, "", "--------"))
+    ## ref_data synthesize cells for TedSim
+    if(stringr::str_detect(w, pattern = "TedSim")){
+      ref_data <- simutils::synthesize_cells(ref_data,
+                                             group = group,
+                                             seed = seed,
+                                             verbose = verbose)
+    }
+  
     sim_data <- readRDS(file.path("../simulation_data", w))
-    
     if(data$sim_data_info$group >= 2 & "group" %in% colnames(data$sim_data$col_meta)){
       sim_data_grouping <- data$sim_data$col_meta$group
     }else{
