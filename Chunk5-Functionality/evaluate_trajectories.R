@@ -25,7 +25,7 @@ for(i in ref_data_list){
     if(stringr::str_detect(w, pattern = "TedSim")){
       message("The number of cells is not the power of 2, and we will synthesize some extra cells base on your data...")
       ref_data <- simutils::synthesize_cells(t(as.matrix(ref_data$data$counts)),
-                                             group = ref_data$data$grouping,
+                                             group = ref_data$data_info$cluster_info,
                                              seed = 1,
                                              verbose = TRUE)
       message("Performing trajectory inference by Slingshot for reference data...")
