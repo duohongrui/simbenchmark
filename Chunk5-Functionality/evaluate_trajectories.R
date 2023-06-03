@@ -11,12 +11,35 @@ for(i in ref_data_list){
   data_list <- list.files("../simulation_data/", pattern = data_name)
   
   for(w in data_list){
+    if(file.exists(paste0("../trajectory_evaluation/", w))){
+      next
+    }
     if(!stringr::str_starts(w,
                             pattern = "PROSSTT|TedSim|dyntoy|dyngen|SymSim|VeloSim|MFA|Splat-paths|SplatPop-paths|phenopath|ESCO-traj|ESCO-tree|SCRIP-paths")){
       next
     }
     message(paste0("--------", w, "", "--------"))
     sim_data <- readRDS(file.path("../simulation_data", w))
+    
+    ### add fake cells for TedSim
+    if(stringr::str_detect(w, pattern = "TedSim")){
+      message("The number of cells is not the power of 2, and we will synthesize some extra cells base on your data...")
+      ref_data <- simutils::synthesize_cells(t(as.matrix(ref_data$data$counts)),
+                                             group = ref_data$data$grouping,
+                                             seed = 1,
+                                             verbose = TRUE)
+      message("Performing trajectory inference by Slingshot for reference data...")
+      ref_model <- dynwrap::infer_trajectory(dataset = ref_data,
+                                             method = tislingshot::ti_slingshot(),
+                                             parameters = NULL,
+                                             give_priors = NULL,
+                                             seed = 1,
+                                             verbose = TRUE)
+      ref_model <- dynwrap::add_expression(ref_model,
+                                           counts = ref_data$counts,
+                                           expression = ref_data$expression)
+      ref_data <- list(data = ref_model)
+    }
     
     if(sim_data$sim_data_info$group >= 2 & "group" %in% colnames(sim_data$sim_data$col_meta)){
       sim_data_grouping <- sim_data$sim_data$col_meta$group
