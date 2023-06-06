@@ -36,8 +36,8 @@ for(i in ref_data_list){
                                              seed = 1,
                                              verbose = TRUE)
       ref_model <- dynwrap::add_expression(ref_model,
-                                           counts = ref_data$counts,
-                                           expression = ref_data$expression)
+                                           counts = as(ref_data$counts, "dgCMatrix"),
+                                           expression = as(ref_data$expression, "dgCMatrix"))
       ref_data <- list(data = ref_model)
     }
     
