@@ -119,10 +119,16 @@ for(i in data_list){
         Precision <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Precision"])
         Recall <- unname(SVM_result[["conf_matrix"]][["byClass"]]["Recall"])
         F1 <- unname(SVM_result[["conf_matrix"]][["byClass"]]["F1"])
+        micro_Precision <- NULL
+        micro_Recall <- NULL
+        micro_F1 <- NULL
       }else{
         Precision <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Precision"], na.rm = TRUE)
         Recall <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "Recall"], na.rm = TRUE)
         F1 <- mean(SVM_result[["conf_matrix"]][["byClass"]][, "F1"], na.rm = TRUE)
+        micro_Precision <- NULL
+        micro_Recall <- NULL
+        micro_F1 <- NULL
       }
     }
     
@@ -132,7 +138,10 @@ for(i in data_list){
                        Precision,
                        Recall,
                        F1,
-                       AUC),
+                       AUC,
+                       micro_Precision,
+                       micro_Recall,
+                       micro_F1),
             file.path("../DEGs_evaluation", i))
     
   }else{
