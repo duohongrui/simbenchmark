@@ -98,8 +98,7 @@ for(i in 1:20){
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = c("SCRIP"),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -222,8 +221,7 @@ for(i in 1:20){
                                             method = method,
                                             other_prior = list(group.condition = group),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -287,8 +285,7 @@ for(i in 1:20){
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = method,
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -365,8 +362,7 @@ for(i in 1:20){
                                             other_prior = list(group.condition = group,
                                                                nclusters = 2),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -438,8 +434,7 @@ for(i in 1:20){
                                             other_prior = list(dilution.factor = 50000,
                                                                volume = 0.03),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -511,8 +506,7 @@ for(i in 1:20){
                                             method = method,
                                             other_prior = list(group.condition = group),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -584,8 +578,7 @@ for(i in 1:20){
                                             other_prior = list(batch.condition = batch,
                                                                n = 6000),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -648,8 +641,7 @@ for(i in 1:20){
                                             method = method,
                                             other_prior = list(group.condition = group),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -727,8 +719,7 @@ for(i in 10:20){
                                             method = method,
                                             other_prior = list(group.condition = group),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -821,8 +812,7 @@ for(i in 1:20){
                                                 method = sub_method,
                                                 other_prior = list(group.condition = group),
                                                 seed = 111,
-                                                verbose = TRUE,
-                                                use_docker = FALSE)
+                                                verbose = TRUE)
             time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
             method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
             est_time <- as.numeric(time)
@@ -854,8 +844,7 @@ for(i in 1:20){
                                               method = sub_method,
                                               other_prior = list(group.condition = group),
                                               seed = 111,
-                                              verbose = TRUE,
-                                              use_docker = FALSE)
+                                              verbose = TRUE)
           time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
           method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
           est_time <- as.numeric(time)
@@ -953,8 +942,7 @@ for(i in 1:20){
                                             method = sub_method,
                                             other_prior = est_prior,
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -1026,8 +1014,7 @@ for(i in 1:20){
                                             method = method,
                                             other_prior = list(group.condition = group),
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -1096,8 +1083,7 @@ for(i in 1:20){
         est <- simpipe::estimate_parameters(ref_data = sub_data,
                                             method = method,
                                             seed = 111,
-                                            verbose = TRUE,
-                                            use_docker = FALSE)
+                                            verbose = TRUE)
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
