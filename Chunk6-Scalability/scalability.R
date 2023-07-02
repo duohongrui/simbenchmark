@@ -5,7 +5,8 @@ group_condition <- example_data$data_info$group_condition
 
 gradient_num <- data.frame("cell" = c(100, 200, 500, 800, 1000, 2000, 3000, 5000, 8000, 10000, rep(1000, 10)),
                            "gene" = c(rep(1000, 10), 500, 800, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000))
-
+gradient_num <- data.frame("cell" = c(150, 300, 400, 600, 700, 900, 1500, 4000, 6000, 7000, 9000, rep(1000, 9)),
+                           "gene" = c(rep(1000, 11), 1000, 1500, 3500, 4500, 5500, 6500, 7500, 8500, 9500))
 ## First class of methods which users can custom cell and gene number
 method <- c("Simple",
             "Kersplat",

@@ -7,7 +7,7 @@ library(ggplot2)
 ### usability data
 usability_data <- openxlsx::read.xlsx("Chunk7-Usability/method_scoring.xlsx", rowNames = TRUE)
 colnames(usability_data) <- gsub(x = colnames(usability_data), pattern = "[.]", replacement = " ")
-cite_score <- 1 - seq(0, 1, 1/42)
+cite_score <- 1 - seq(0, 1, 1/45)
 cite_score <- cite_score[order(usability_data$Cite, decreasing = TRUE)]
 usability_data$Cite <- cite_score
 
@@ -35,7 +35,7 @@ usability_long_data <- usability_data %>%
                      rep("Evaluation", 4),
                      rep("Maintenance", 5),
                      rep("Documentation", 5),
-                     rep("Paper", 4)), 42)
+                     rep("Paper", 4)), 45)
   )
 saveRDS(usability_long_data, file = "Chunk8-Data Analysis/usability/usability_long_data.rds")
 rect_width <- 0.5
@@ -44,7 +44,7 @@ tiny_space <- 0.2
 
 usability_long_data <- usability_long_data %>% 
   mutate(
-    x = rep(cumsum(rep(rect_width, 42)), each = 34),
+    x = rep(cumsum(rep(rect_width, 45)), each = 34),
     xmin = x - rect_width/2,
     xmax = x + rect_width/2,
     spacing = c(0, diff(as.numeric(factor(category)))) != 0,
@@ -52,7 +52,7 @@ usability_long_data <- usability_long_data %>%
       spacing ~ big_space,
       TRUE ~ tiny_space
     ),
-    ymax = rep(c(1:34) * rect_width + cumsum(width[1:34]), 42),
+    ymax = rep(c(1:34) * rect_width + cumsum(width[1:34]), 45),
     ymin = ymax - 0.5,
     y = ymin + 0.25,
   )
@@ -66,14 +66,14 @@ text_data <- tibble(
   x = c(unique(usability_long_data$x),
         rep(-0.1, 34),
         rep(-6, 6)),
-  y = c(rep(-0.5, 42),
+  y = c(rep(-0.5, 45),
         unique(usability_long_data$y),
         c(2.55, 9.0, 14, 18.3, 22.55, 26.3)),
-  angle = c(rep(45, 42),
+  angle = c(rep(45, 45),
             rep(0, 34),
             rep(90, 6)),
   # size = c(rep(5, 42), rep(10, 6)),
-  hjust = c(rep("right", 42),
+  hjust = c(rep("right", 45),
             rep("right", 34),
             rep("middle", 6))
 )
@@ -81,8 +81,8 @@ text_data <- tibble(
 ### method segment
 segment_data <- tibble('x' = c(unique(usability_long_data$x), rep(-5, 6)),
                        'xend' = c(unique(usability_long_data$x), rep(-5, 6)),
-                       'y' = c(rep(-0.01, 42), unique(usability_long_data$ymax)[c(8, 16, 20, 25, 30, 34)]),
-                       'yend' = c(rep(-0.40, 42), unique(usability_long_data$ymin)[c(1, 9, 17, 21, 26, 31)]))
+                       'y' = c(rep(-0.01, 45), unique(usability_long_data$ymax)[c(8, 16, 20, 25, 30, 34)]),
+                       'yend' = c(rep(-0.40, 45), unique(usability_long_data$ymin)[c(1, 9, 17, 21, 26, 31)]))
 
 
 g <- ggplot()+

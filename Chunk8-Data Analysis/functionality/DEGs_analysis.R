@@ -25,6 +25,9 @@ DEGs_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   if(length(result) == 6){
     result <- c(result, NA)
   }
+  if(length(result) > 7){
+    result <- result[1:7]
+  }
   names(result) <- metric_name
   data_name <- names(all_result)[index]
   split_names <- str_split(data_name, pattern = "_", simplify = TRUE)

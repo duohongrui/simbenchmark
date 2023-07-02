@@ -14,7 +14,7 @@ all_result <- list()
 for (i in data_list) {
   result <- readRDS(file.path("../batch_evaluation", i))
   name <- names(result)[-8]
-  result <- map(1:7, .f = function(x){
+  result <- map(c(1:7, 9), .f = function(x){
     mean(result[[x]])
   }) %>% setNames(name)
   all_result[[i]] <- result
@@ -41,11 +41,11 @@ batch_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   )
 
 ### normalize some values
-#### MM and LISI
+#### cms, MM, LISI, ISI, pcr
 batch_data <- batch_data %>% 
   group_by(Data) %>% 
   mutate(
-    across(all_of(c("mm", "LISI")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+    across(all_of(c("cms", "mm", "LISI", "ISI", "pcr")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
 #### AWS_batch
@@ -55,7 +55,7 @@ batch_data <- batch_data %>%
   )
 
 ### Subtract values by 1
-colume_name <- c("cms", "LISI", "shannon_entropy", "pcr")
+colume_name <- c("cms", "LISI", "shannon_entropy")
 batch_data <- batch_data %>% 
   mutate(
     across(all_of(colume_name), ~ 1 - .x)

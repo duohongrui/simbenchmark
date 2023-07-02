@@ -3,13 +3,15 @@ library(purrr)
 library(dplyr)
 library(tidyr)
 group_data <- readRDS("Chunk8-Data Analysis/functionality/group_data.rds")
-batch_data <- readRDS("Chunk8-Data Analysis/functionality/batch_data.rds")
 DEGs_data <- readRDS("Chunk8-Data Analysis/functionality/DEGs_data.rds")
+batch_data <- readRDS("Chunk8-Data Analysis/functionality/batch_data.rds")
+trajectory_data <- readRDS("Chunk8-Data Analysis/functionality/trajectory_data.rds")
 
 
 functionality_data <- group_data %>% 
+  full_join(., DEGs_data, by = c("Method", "Data")) %>% 
   full_join(., batch_data, by = c("Method", "Data")) %>% 
-  full_join(., DEGs_data, by = c("Method", "Data"))
+  full_join(., trajectory_data, by = c("Method", "Data"))
 
 # ### Fill NA and NaN with 0
 # functionality_data <- functionality_data %>% 

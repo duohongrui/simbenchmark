@@ -7,7 +7,7 @@ library(tidyr)
 data_list <- list.files("../group_evaluation/")
 a <- readRDS("../group_evaluation/Lun2_data100_stimulated-dendritic-cells-PAM_shalek.rds.rds")
 metric_name <- names(a)
-
+rm(a)
 
 ### read data into a list
 all_result <- list()
@@ -44,7 +44,7 @@ saveRDS(inf_data, file = "Chunk8-Data Analysis/functionality/inf_data_group.rds"
 ### normalize some values
 group_data <- group_data %>% 
   mutate(
-    across(all_of("CDI"), ~ replace(.x, .x == "Inf",values = NA))
+    across(all_of("CDI"), ~ replace(.x, .x == "Inf", values = NA))
   ) %>% 
   group_by(Data) %>% 
   mutate(
