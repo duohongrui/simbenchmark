@@ -1054,8 +1054,6 @@ for(i in 1:20){
 
 
 ## Fifteenth class of methods (CancerInSilico)
-data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
-data <- t(data$data$counts)
 
 fifteenth_class <- c("CancerInSilico")
 for(i in 1:20){

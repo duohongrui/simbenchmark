@@ -58,6 +58,11 @@ group_data <- group_data %>%
   mutate(
     across(all_of(colume_name), ~ 1 - .x)
   )
+### scale for every metric [0, 1]
+group_data <- group_data %>% 
+  mutate(
+    across(all_of(colnames(group_data)[3:8]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
+  )
 
 ### NA and NaN
 # group_data <- group_data %>% 
@@ -69,5 +74,17 @@ saveRDS(group_data, file = "Chunk8-Data Analysis/functionality/group_data.rds")
 group_long_data <- group_data %>% 
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
 saveRDS(group_long_data, file = "Chunk8-Data Analysis/functionality/group_long_data.rds")
+
+
+###################### Deeply digging
+source("./Chunk8-Data Analysis/functionality/utils_functions.R")
+group_long_data <- readRDS("Chunk8-Data Analysis/functionality/group_long_data.rds")
+
+function_metric_for_datasets(function_data = group_long_data,
+                             functionality = "Group",
+                             bar_plot_name = "Fig5-a.pdf",
+                             cor_plot_name = "Fig5-b.pdf",
+                             technique_bar_name = "Fig5-S.pdf")
+
 
 

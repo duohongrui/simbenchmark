@@ -179,11 +179,19 @@ colnames(scalability) <- c("Method",
                            "simulation memory",
                            "time",
                            "memory",
-                           "scalability")
+                           "scalability",
+                           "Cor(time_estimation)",
+                           "Cor(memory_estimation)",
+                           "Cor(time_simulation)",
+                           "Cor(memory_simulation)")
 scalability_plot <- readRDS("./Chunk8-Data Analysis/scalability/scalability_plot_data.rds")
 colnames(scalability_plot)[1] <- "Method"
 scalability <- scalability %>% 
   full_join(scalability_plot, by = "Method")
+scalability$`Cor(time_estimation)` <- as.character(scalability$`Cor(time_estimation)`)
+scalability$`Cor(memory_estimation)` <- as.character(scalability$`Cor(memory_estimation)`)
+scalability$`Cor(time_simulation)` <- as.character(scalability$`Cor(time_simulation)`)
+scalability$`Cor(memory_simulation)` <- as.character(scalability$`Cor(memory_simulation)`)
 
 ### usability
 usability <- usability %>% 
@@ -252,7 +260,7 @@ arrange_by_group <- function(tibble){
 }
 
 overall_data <- arrange_by_group(tibble = overall_data)
-
+saveRDS(overall_data, file = "./Chunk8-Data Analysis/overall_data.rds")
 ###--------------------------------------------------------------------------###
 ###                            Method Summary 1
 ###--------------------------------------------------------------------------###
@@ -429,9 +437,13 @@ column_info <- column_info <- tribble(
   "F1_milestones",                          "trajectory",       "F1_milestones",           "funkyrect", "palette3",       NULL,
   "Cor_dist",                               "trajectory",       "Cor_dist",                "funkyrect", "palette3",       NULL,
   "estimation time",                        "scala",            "Estimation Time",         "funkyrect", "palette5",       NULL,
+  "Cor(time_estimation)",                   "scala",            "Cor(estimation time)",    "text",      NA,               list(hjust = 0, width = 1, size = 3),
   "estimation memory",                      "scala",            "Estimation Memory",       "funkyrect", "palette5",       NULL,
+  "Cor(memory_estimation)",                 "scala",            "Cor(estimation memory)",  "text",      NA,               list(hjust = 0, width = 1, size = 3),
   "simulation time",                        "scala",            "Simulation Time",         "funkyrect", "palette5",       NULL,
+  "Cor(time_simulation)",                   "scala",            "Cor(simulation time)",    "text",      NA,               list(hjust = 0, width = 1, size = 3),
   "simulation memory",                      "scala",            "Simulation Memory",       "funkyrect", "palette5",       NULL,
+  "Cor(memory_simulation)",                 "scala",            "Cor(simulation memory)",  "text",      NA,               list(hjust = 0, width = 1, size = 3),
   "time",                                   "scala",            "Time",                    "funkyrect", "palette5",       NULL,
   "memory",                                 "scala",            "Memory",                  "funkyrect", "palette5",       NULL,
   "scalability_100_1000_estimation_score",  "scala_rect",       "100x1000",                "rect",      "scala_rect",     NULL,
@@ -515,7 +527,7 @@ detailed_plot <- funky_heatmap(data = data2,
                                row_groups = row_groups,
                                palettes = palettes,
                                scale_column = FALSE,
-                               expand = c(xmin = 1, xmax = 4, ymin = 1, ymax = 1))
+                               expand = c(xmin = 1, xmax = 4, ymin = 1, ymax = 1), col_annot_offset = 4)
 
 ggsave(detailed_plot,
        filename = "Chunk8-Data Analysis/main_figure/detailed_plot.pdf",

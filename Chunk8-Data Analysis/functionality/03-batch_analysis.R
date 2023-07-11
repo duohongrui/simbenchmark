@@ -60,7 +60,11 @@ batch_data <- batch_data %>%
   mutate(
     across(all_of(colume_name), ~ 1 - .x)
   )
-
+### scale for every metric [0, 1]
+batch_data <- batch_data %>% 
+  mutate(
+    across(all_of(colnames(batch_data)[3:10]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
+  )
 ### NA and NaN
 # batch_data <- batch_data %>% 
 #   mutate(
@@ -72,3 +76,13 @@ batch_long_data <- batch_data %>%
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
 saveRDS(batch_long_data, file = "Chunk8-Data Analysis/functionality/batch_long_data.rds")
 
+
+###################### Deeply digging
+source("./Chunk8-Data Analysis/functionality/utils_functions.R")
+batch_long_data <- readRDS("Chunk8-Data Analysis/functionality/batch_long_data.rds")
+
+function_metric_for_datasets(function_data = batch_long_data,
+                             functionality = "Batch",
+                             bar_plot_name = "Fig5-e.pdf",
+                             cor_plot_name = "Fig5-f.pdf",
+                             technique_bar_name = "Fig5-S3.pdf")
