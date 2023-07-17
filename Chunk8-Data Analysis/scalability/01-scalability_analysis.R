@@ -5,12 +5,12 @@ library(tidyr)
 library(ggplot2)
 library(patchwork)
 
-data_list <- list.files("../scalability/")
+data_list <- list.files("../scalability2")
 
 ### read data into a list
 all_result <- list()
 for (i in data_list) {
-  result <- readRDS(file.path("../scalability", i))
+  result <- readRDS(file.path("../scalability2", i))
   all_result[[i]] <- result
 }
 
@@ -18,7 +18,12 @@ for (i in data_list) {
 scalability_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   all_result[[index]]
 })
-
+scalability_data2 <- purrr::map_dfr(1:length(all_result), .f = function(index){
+  all_result[[index]]
+})
+scalability_data <- rbind(scalability_data, scalability_data2)
+rm(scalability_data2)
+saveRDS(scalability_data, file = "./Chunk8-Data Analysis/scalability/scalability_data.rds")
 ### scalability score
 
 #### aggregate by repeat time
@@ -30,18 +35,21 @@ score_data <- scalability_data %>%
     simulation_time = mean(simulation_time, na.rm = TRUE),
     simulation_memory = mean(simulation_memory, na.rm = TRUE)
   ) %>% 
-  ungroup()
-  
-#### aggregate by dataset
-score_data <- score_data %>% 
+  ungroup() %>% 
   group_by(cell_num, gene_num) %>% 
   mutate(
     across(all_of(c("estimation_time",
                     "estimation_memory",
                     "simulation_time",
-                    "simulation_memory")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+                    "simulation_memory")), ~ 1 - pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
+  
+### scale for every metric [0, 1]
+score_data <- score_data %>% 
+  mutate(
+    across(all_of(colnames(score_data)[4:7]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
+  )
 
 #### aggregate by method
 score_data <- score_data %>% 
@@ -51,12 +59,6 @@ score_data <- score_data %>%
     estimation_memory = mean(estimation_memory, na.rm = TRUE),
     simulation_time = mean(simulation_time, na.rm = TRUE),
     simulation_memory = mean(simulation_memory, na.rm = TRUE)
-  ) %>% 
-  mutate(
-    across(all_of(c("estimation_time",
-                    "estimation_memory",
-                    "simulation_time",
-                    "simulation_memory")), ~ 1 - .x)
   ) %>% 
   ungroup()
 score_data[42, c(3,5)] <- NaN
@@ -69,7 +71,7 @@ score_data <- score_data %>%
   )
 
 ### correlation values derived from "Shape constrained additive models and Random Forest" section
-scam_model <- readRDS("./Chunk8-Data Analysis/scalability/scam_model2.rds")
+scam_model <- readRDS("./Chunk8-Data Analysis/scalability/scam_model.rds")
 all_methods_cor <- map_dfc(scam_model, .f = function(x){
   id_name <- names(x)[1]
   step <- str_split(id_name, "_", simplify = TRUE)[1]
@@ -110,19 +112,7 @@ saveRDS(score_data, file = "Chunk8-Data Analysis/scalability/score_data.rds")
 ################################################################################
 #######################            Plot Rect Data      #########################
 ################################################################################
-data_list <- list.files("../scalability/")
-
-### read data into a list
-all_result <- list()
-for (i in data_list) {
-  result <- readRDS(file.path("../scalability", i))
-  all_result[[i]] <- result
-}
-
-### turn to a tibble
-scalability_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
-  all_result[[index]]
-})
+scalability_data <- readRDS("./Chunk8-Data Analysis/scalability/scalability_data.rds")
 
 ### scalability score
 

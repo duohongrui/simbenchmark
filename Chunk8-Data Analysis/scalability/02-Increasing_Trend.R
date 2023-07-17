@@ -1,6 +1,7 @@
 ################################################################################
 #######################                Model           #########################
 ################################################################################
+scalability_data <- readRDS("./Chunk8-Data Analysis/scalability/scalability_data.rds")
 classification_shape <- function(
     data,
     method_name,

@@ -11,10 +11,11 @@ library(funkyheatmap)
 #######################   Figure 2 --- detail heatmap  #########################
 ################################################################################
 accuracy <- readRDS("Chunk8-Data Analysis/accuracy/accuracy_long_data.rds")
-functionality <- readRDS("Chunk8-Data Analysis/functionality/functionality_data.rds")
+functionality <- readRDS("Chunk8-Data Analysis/functionality/functionality_long_data.rds")
 scalability <- readRDS("Chunk8-Data Analysis/scalability/score_data.rds")
 usability <- readRDS("Chunk8-Data Analysis/usability/usability_long_data.rds")
-method <- openxlsx::read.xlsx("Chunk1-Data preparation/methods.xlsx", sheet = 1, colNames = TRUE)
+method <- openxlsx::read.xlsx("Chunk1-Data preparation/methods.xlsx", sheet = 1, colNames = TRUE) %>% 
+  select(c(-2, -5))
 colnames(method) <- c("Method",
                       "Category",
                       "Platform",
@@ -24,30 +25,79 @@ colnames(method) <- c("Method",
                       "Simulate Batches",
                       "Simulate Trajectory")
 method_names <- method$Method
+data_info <- openxlsx::read.xlsx("./Chunk1-Data preparation/evaluation_datasets.xlsx", rowNames = TRUE) %>% 
+  mutate(
+    Data = str_split(Dataset.ID, "_", simplify = TRUE)[, 1]
+  ) %>% 
+  select(Data, Platform)
 
-### summarize accuracy score per metric
+accuracy <- accuracy %>% 
+  full_join(data_info, by = "Data") %>% 
+  relocate(Platform, .after = "Data") %>% 
+  mutate(
+    Platform = case_when(
+      Platform == "Smart-seq2\r\n10X Genomics" ~ "Mix sources1",
+      Platform == "CEL-seq\r\nCEL-seq2" ~ "Mix sources2",
+      TRUE ~ Platform
+    ),
+    Type = case_when(
+      Data %in% paste0("data", 1:101) ~ "scRNA-seq data",
+      Data %in% paste0("data", 101:152) ~ "spatial transcriptome data"
+    )
+  ) %>% 
+  relocate(Type, .after = "Platform")
+
+### summarize accuracy score for property
 accuracy_summary_per_metric <- accuracy %>% 
-  group_by(Method, metric) %>% 
+  group_by(Method, metric, Platform, Type, Data) %>% 
   summarise(
     value = mean(value, na.rm = TRUE)
-  ) %>%
-  pivot_wider(., names_from = metric, values_from = value)
-  
-### summarize accuracy score
-accuracy_score <- accuracy %>% 
+  ) %>% 
+  ungroup()
+
+### summarize accuracy score for platfrom
+accuracy_summary_per_metric <- accuracy_summary_per_metric %>% 
+  group_by(Method, metric, Type) %>% 
+  summarise(
+    value = mean(value, na.rm = TRUE)
+  ) %>% 
+  ungroup()
+
+### summarize accuracy score for techniques
+accuracy_summary_per_metric <- accuracy_summary_per_metric %>% 
   group_by(Method, metric) %>% 
   summarise(
     value = mean(value, na.rm = TRUE)
   ) %>% 
-  ungroup() %>% 
+  ungroup()
+
+### summarize accuracy score
+accuracy_score <- accuracy_summary_per_metric %>% 
   group_by(Method) %>% 
   summarise(
     accuracy = mean(value, na.rm = TRUE)
+  ) %>% 
+  ungroup()
+
+### accuracy_summary_per_property
+accuracy_summary_per_property <- accuracy %>% 
+  group_by(Method, property, Platform, Type, Data) %>% 
+  summarise(
+    value = mean(value, na.rm = TRUE)
+  ) %>% 
+  group_by(Method, property, Type) %>% 
+  summarise(
+    value = mean(value, na.rm = TRUE)
+  ) %>% 
+  group_by(Method, property) %>% 
+  summarise(
+    value = mean(value, na.rm = TRUE)
   )
 
-### add accuracy score to the metric result
+### add accuracy score
 accuracy_plot <- accuracy_score %>% 
-  full_join(., accuracy_summary_per_metric, by = "Method") %>% 
+  full_join(., accuracy_summary_per_metric %>% pivot_wider(names_from = "metric", values_from = "value"), by = "Method") %>% 
+  full_join(., accuracy_summary_per_property %>% pivot_wider(names_from = "property", values_from = "value"), by = "Method") %>% 
   arrange(desc(accuracy))
 
 ### errors
@@ -94,11 +144,10 @@ methods_error_table <- full_join(succeed_methods, method_error_count, by = "Meth
 ### proportion of errors per category
 error_proportion_category <- method_error %>% 
   group_by(method) %>% 
-  summarise(
+  reframe(
     error_proportion_category = count/sum(count),
     category = category
-  ) %>% 
-  ungroup()
+  )
 category <- unique(error_proportion_category$category)
 error_proportion_category <- map(methods_error_table$Method, .f = function(x){
   values <- error_proportion_category %>% 
@@ -137,32 +186,49 @@ accuracy_plot <- accuracy_plot %>%
 
 ### summarize functionality score per metric
 functionality_summary_per_metric <- functionality %>% 
-  pivot_longer(cols = 3:ncol(.), names_to = "metric", values_to = "value") %>% 
-  group_by(Method, metric) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>%
-  pivot_wider(., names_from = metric, values_from = value)
-
-functionality_summary_per_metric <- functionality_summary_per_metric[, c("Method", colnames(functionality[c(-1, -2)]))]
-
-### summarize functionality score
-functionality_score <- functionality %>% 
-  pivot_longer(cols = 3:ncol(.), names_to = "metric", values_to = "value") %>% 
-  group_by(Method, metric) %>% 
+  full_join(data_info, by = "Data") %>% 
+  relocate(Platform, .after = "Data") %>% 
+  mutate(
+    Platform = case_when(
+      Platform == "Smart-seq2\r\n10X Genomics" ~ "Mix sources1",
+      Platform == "CEL-seq\r\nCEL-seq2" ~ "Mix sources2",
+      TRUE ~ Platform
+    ),
+    Type = case_when(
+      Data %in% paste0("data", 1:101) ~ "scRNA-seq data",
+      Data %in% paste0("data", 101:152) ~ "spatial transcriptome data"
+    )
+  ) %>% 
+  relocate(Type, .after = "Platform") %>% 
+  group_by(Method, metric, Type) %>% 
   summarise(
     value = mean(value, na.rm = TRUE)
   ) %>% 
   ungroup() %>% 
+  group_by(Method, metric) %>% 
+  summarise(
+    value = mean(value, na.rm = TRUE)
+  ) %>% 
+  ungroup()
+
+
+### summarize functionality score
+functionality_score <- functionality_summary_per_metric %>% 
   group_by(Method) %>% 
   summarise(
     functionality = mean(value, na.rm = TRUE)
   )
 
 ### add functionality score to the metric result
+functionality_summary_per_metric <- functionality_summary_per_metric %>% 
+  pivot_wider(names_from = "metric", values_from = "value")
+col_names <- colnames(readRDS("./Chunk8-Data Analysis/functionality/functionality_data.rds"))[c(-1, -2)]
+functionality_summary_per_metric <- functionality_summary_per_metric[, c("Method", col_names)]
+
 functionality_plot <- functionality_score %>% 
   full_join(., functionality_summary_per_metric, by = "Method") %>% 
   arrange(desc(functionality))
+
 functionality_plot <- functionality_plot %>% 
   mutate(
     Group_score = apply(X = functionality_plot %>% select(3:8), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
@@ -221,7 +287,7 @@ overall_data <- method %>%
   relocate("scalability", .after = functionality) %>% 
   relocate("usability", .after = scalability)
 
-overall_data <- overall_data%>% 
+overall_data <- overall_data %>% 
   mutate(
     overall = apply(overall_data %>% select(9:12), MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
   ) %>% 
@@ -246,7 +312,6 @@ overall_data <- overall_data %>%
   as_tibble()
 
 ### arrange method
-
 arrange_by_group <- function(tibble){
   groups <- unique(tibble %>% pull("Category"))
   result <- tibble()

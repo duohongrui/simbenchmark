@@ -69,16 +69,16 @@ accuracy_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
     across(all_of(metrics_property), as.numeric)
   )
 
-accuracy_data <- tibble(
-  Method = c(rep("Method1", 3), rep("Method2", 3), rep("Method3", 3)),
-  Data = rep(c("Data1", "Data2", "Data3"), 3),
-  a = c(4434, 2780, 6105, 15164, 12340, 12205, 23245, 19652, 11423),
-  b = c(0.044, 0.173, 0.157, 0.215, 0.138, 0.556, 0.316, 0.098, 0.152),
-  c = c(4006, 4966, 13740, 61163, 15811, 12343, 8549, 4652, 1854),
-  d = c(0.92, 0.96, 0.81, 1, 1, 1, 0.86, 0.75, 0.94),
-  e = c(0.23, 0.22, 0.40, 1, 1, 0.46, 0.48, 0.42, 0.84),
-  f = c(0.88, 0.59, 0.02, 0.96, 0.82, 0.85, 0.74, 0.59, 0.37)
-)
+# accuracy_data <- tibble(
+#   Method = c(rep("Method1", 3), rep("Method2", 3), rep("Method3", 3)),
+#   Data = rep(c("Data1", "Data2", "Data3"), 3),
+#   a = c(4434, 2780, 6105, 15164, 12340, 12205, 23245, 19652, 11423),
+#   b = c(0.044, 0.173, 0.157, 0.215, 0.138, 0.556, 0.316, 0.098, 0.152),
+#   c = c(4006, 4966, 13740, 61163, 15811, 12343, 8549, 4652, 1854),
+#   d = c(0.92, 0.96, 0.81, 1, 1, 1, 0.86, 0.75, 0.94),
+#   e = c(0.23, 0.22, 0.40, 1, 1, 0.46, 0.48, 0.42, 0.84),
+#   f = c(0.88, 0.59, 0.02, 0.96, 0.82, 0.85, 0.74, 0.59, 0.37)
+# )
 normalized_columes <- c("a", "b", "c")
 ### normalize values which are not in [0, 1] for every dataset
 check_range <- purrr::map_dfr(.x = metrics_property, .f = function(x){
