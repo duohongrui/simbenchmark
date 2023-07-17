@@ -579,6 +579,7 @@ for(i in 1:20){
                                                                n = 6000),
                                             seed = 111,
                                             verbose = TRUE)
+        saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -589,7 +590,7 @@ for(i in 1:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
-        
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -642,6 +643,7 @@ for(i in 1:20){
                                             other_prior = list(group.condition = group),
                                             seed = 111,
                                             verbose = TRUE)
+        saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -652,7 +654,7 @@ for(i in 1:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
-        
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -720,6 +722,7 @@ for(i in 10:20){
                                             other_prior = list(group.condition = group),
                                             seed = 111,
                                             verbose = TRUE)
+        saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -732,7 +735,7 @@ for(i in 10:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
-        
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -813,6 +816,7 @@ for(i in 1:20){
                                                 other_prior = list(group.condition = group),
                                                 seed = 111,
                                                 verbose = TRUE)
+            saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
             time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
             method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
             est_time <- as.numeric(time)
@@ -825,7 +829,7 @@ for(i in 1:20){
                                               seed = 111,
                                               return_format = "list",
                                               verbose = TRUE)
-            
+            saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
             sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
             sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
             
@@ -845,6 +849,7 @@ for(i in 1:20){
                                               other_prior = list(group.condition = group),
                                               seed = 111,
                                               verbose = TRUE)
+          saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
           time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
           method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
           est_time <- as.numeric(time)
@@ -857,7 +862,7 @@ for(i in 1:20){
                                             seed = 111,
                                             return_format = "list",
                                             verbose = TRUE)
-          
+          saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
           sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
           sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
           
@@ -943,6 +948,7 @@ for(i in 1:20){
                                             other_prior = est_prior,
                                             seed = 111,
                                             verbose = TRUE)
+        saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -954,7 +960,7 @@ for(i in 1:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
-        
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -1015,6 +1021,7 @@ for(i in 1:20){
                                             other_prior = list(group.condition = group),
                                             seed = 111,
                                             verbose = TRUE)
+        saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -1027,7 +1034,7 @@ for(i in 1:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
-        
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -1082,6 +1089,7 @@ for(i in 1:20){
                                             method = method,
                                             seed = 111,
                                             verbose = TRUE)
+        saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
         method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
         est_time <- as.numeric(time)
@@ -1093,7 +1101,7 @@ for(i in 1:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
-        
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -1144,6 +1152,7 @@ for(i in 1:20){
                                           seed = 111,
                                           return_format = "list",
                                           verbose = TRUE)
+        saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
         sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
         sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
         
@@ -1193,6 +1202,7 @@ for(i in 1:20){
                                         method = method,
                                         seed = 111,
                                         verbose = TRUE)
+    saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
     time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
     method_name <- stringr::str_split(names(time), "_", simplify = TRUE)[, 2]
     est_time <- as.numeric(time)
@@ -1203,6 +1213,7 @@ for(i in 1:20){
                                       seed = 111,
                                       return_format = "list",
                                       verbose = TRUE)
+    saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
     sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
     sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
     
