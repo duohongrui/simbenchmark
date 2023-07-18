@@ -147,8 +147,46 @@ platform_p4s_data <- platform_data %>%
     platform_score = mean(value, na.rm = TRUE)
   )%>%
   ungroup() %>% 
-  full_join(methods %>% select(1:2), by = "Method")
+  left_join(methods %>% select(c(1,3)), by = "Method")
 platform_p4s_data$Method <- factor(platform_p4s_data$Method, levels = overall_data$id)
+
+### top 5 method be labelled
+top_5_methods <- platform_p4s_data %>% 
+  group_by(Platform) %>% 
+  top_n(., 5, platform_score) %>% 
+  arrange(desc(platform_score)) %>% 
+  mutate(
+    n = 1:n()
+  ) %>% 
+  ungroup() %>% 
+  mutate(
+    n = case_when(
+      n == 6 ~ 5,
+      TRUE ~ n
+    )
+  )
+
+### bottom 5 method be labelled
+bottom_5_methods <- platform_p4s_data %>% 
+  mutate(
+    platform_score = 1 - platform_score
+  ) %>% 
+  group_by(Platform) %>% 
+  top_n(., 5, platform_score) %>% 
+  arrange(desc(platform_score)) %>% 
+  mutate(
+    n = 1:n()
+  ) %>% 
+  ungroup() %>% 
+  mutate(
+    n = case_when(
+      n == 6 ~ 5,
+      TRUE ~ n
+    ),
+    n = -n
+  )
+
+
 P4_s <- ggbarplot(data = platform_p4s_data,
                   x = "Method",
                   y = "platform_score",
@@ -157,6 +195,10 @@ P4_s <- ggbarplot(data = platform_p4s_data,
                   ggtheme = theme_pubr(),
                   size = 1,
                   alpha = 0.6)+
+  geom_text(data = top_5_methods,
+            mapping = aes(x = Method, y = platform_score, label = n), nudge_y = -0.29) +
+  geom_text(data = bottom_5_methods,
+            mapping = aes(x = Method, y = platform_score, label = n), nudge_y = -0.4) +
   ylab("Metric values") +
   scale_color_manual(values = method_class_colors) +
   scale_fill_manual(values = colors) +
@@ -171,8 +213,7 @@ P4_s <- ggbarplot(data = platform_p4s_data,
         legend.background = element_blank(),
         axis.title.x = element_blank(),
         strip.background = element_rect(fill = NA, color = "black"),
-        strip.text = element_text(size = 8, angle = 45)) +
-  expand_limits(x = c(0, 48))
+        strip.text.y = element_text(size = 8, angle = 0))
 
 ggsave(plot = P4_s, filename = "../sim-article/figures/Fig4-S.pdf", width = 15, height = 14, units = "in")
 
