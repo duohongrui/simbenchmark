@@ -68,7 +68,10 @@ accuracy_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   mutate(
     across(all_of(metrics_property), as.numeric)
   )
-
+### Delete DIS
+DIS_col <- grep("DIS", colnames(accuracy_data))
+accuracy_data <- accuracy_data[, -DIS_col]
+metrics_property <- metrics_property[-(DIS_col-2)]
 # accuracy_data <- tibble(
 #   Method = c(rep("Method1", 3), rep("Method2", 3), rep("Method3", 3)),
 #   Data = rep(c("Data1", "Data2", "Data3"), 3),
@@ -79,7 +82,7 @@ accuracy_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
 #   e = c(0.23, 0.22, 0.40, 1, 1, 0.46, 0.48, 0.42, 0.84),
 #   f = c(0.88, 0.59, 0.02, 0.96, 0.82, 0.85, 0.74, 0.59, 0.37)
 # )
-normalized_columes <- c("a", "b", "c")
+# normalized_columes <- c("a", "b", "c")
 ### normalize values which are not in [0, 1] for every dataset
 check_range <- purrr::map_dfr(.x = metrics_property, .f = function(x){
   range_check <- as.numeric(range(accuracy_data %>% pull(x), na.rm = TRUE))
@@ -107,7 +110,7 @@ accuracy_data <- accuracy_data %>%
   ungroup()
 
 ### Subtract values by 1
-subtract_columes_prefix <- c("MAD", "KS", "MAE", "RMSE", "bhattacharyya", "multiKS")
+subtract_columes_prefix <- c("MAD", "KS", "MAE", "RMSE", "bhattacharyya", "multiKS", "KDE")
 subtract_columes <- colnames(accuracy_data)[which(str_split(colnames(accuracy_data),
                                                             pattern = "_", simplify = T)[,1] %in% subtract_columes_prefix)]
 accuracy_data <- accuracy_data %>% 
@@ -118,7 +121,7 @@ accuracy_data <- accuracy_data %>%
 ### scale for every metric [0, 1]
 accuracy_data <- accuracy_data %>% 
   mutate(
-    across(all_of(colnames(accuracy_data)[3:76]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
+    across(all_of(colnames(accuracy_data)[3:70]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
   )
 # ### NA and NaN
 # accuracy_data <- accuracy_data %>% 

@@ -1,5 +1,12 @@
 source("./Chunk8-Data Analysis/functionality/utils_functions.R")
-function_data <- readRDS("./Chunk8-Data Analysis/functionality/functionality_long_data.rds")
+
+overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds")
+
+function_data <- overall_data %>% 
+  select(c(1:3, 69:121)) %>% 
+  slice(1:43)
+colnames(function_data)[32:56] <- str_split(colnames(function_data)[32:56], "_", simplify = TRUE)[, 2]
+
 data_info <- openxlsx::read.xlsx("./Chunk1-Data preparation/evaluation_datasets.xlsx", rowNames = TRUE) %>% 
   mutate(
     Data = str_split(Dataset.ID, "_", simplify = TRUE)[, 1]
@@ -28,72 +35,38 @@ platforms <- c("MARS-Seq",
                "sci-Space",
                "MERFISH",
                "Stereo-Seq")
-### add platform and type to accuracy table
-function_data <- function_data %>% 
-  full_join(data_info, by = "Data") %>% 
-  relocate(Platform, .after = "Data") %>% 
-  mutate(
-    Platform = case_when(
-      Platform == "Smart-seq2\r\n10X Genomics" ~ "Mix sources1",
-      Platform == "CEL-seq\r\nCEL-seq2" ~ "Mix sources2",
-      TRUE ~ Platform
-    ),
-    Type = case_when(
-      Data %in% paste0("data", 1:101) ~ "scRNA-seq data",
-      Data %in% paste0("data", 101:152) ~ "spatial transcriptome data"
-    )
-  ) %>% 
-  relocate(Type, .after = "Platform")
 
 ####################### Platform
 color <- c("#F1947C", "#6CB9B0")
 method_class_colors <- c("#F97369", "#69ACD1", "#F9A24B", "#ADDD52", "#F9B4DA")
 
-platform_data <- function_data %>% 
-  group_by(Platform, metric, Method) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
-
-### per_platform_score
-per_platform_score <- platform_data %>% 
-  group_by(Platform, Method) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup() %>% 
-  pivot_wider(id_cols = everything(), names_from = "Platform", values_from = "value") %>% 
-  column_to_rownames(var = "Method")
-per_platform_score <- per_platform_score[, platforms]
+per_platform_score <- function_data[, c("id", platforms)] %>% 
+  column_to_rownames("id")
 
 #### heatmap
 library(ComplexHeatmap)
-overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds")
-per_platform_score <- per_platform_score[overall_data$id[1:39], ]
-rownames(per_platform_score) <- overall_data$id[1:39]
 
 ### colume metadata
 meta_data <- data.frame(
-  `Technique Platform` = c(rep("scRNA-seq", 12), rep("spatial transcriptomics technique", 11))
+  `Technique Platform` = c(rep("scRNA-seq", 12), rep("ST technology", 11))
 )
 rownames(meta_data) <- colnames(per_platform_score)
 
 ### row metadata
 row_meta <- data.frame(
   `class` = c(rep("class1", 10),
-              rep("class2", 13),
-              rep("class3", 9),
-              rep("class4", 7)),
+              rep("class2", 15),
+              rep("class3", 10),
+              rep("class4", 8)),
   `color` = c(rep(method_class_colors[1], 10),
-              rep(method_class_colors[2], 13),
-              rep(method_class_colors[3], 9),
-              rep(method_class_colors[4], 7))
+              rep(method_class_colors[2], 15),
+              rep(method_class_colors[3], 10),
+              rep(method_class_colors[4], 8))
 )
 rownames(row_meta) <- rownames(per_platform_score)
 
 col <- list(Technique.Platform = c(`scRNA-seq` = color[1],
-                                   `spatial transcriptomics technique` = color[2]),
+                                   `ST technology` = color[2]),
             class = c(class1 = method_class_colors[1],
                       class2 = method_class_colors[2],
                       class3 = method_class_colors[3],
@@ -114,10 +87,11 @@ p5_a <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  gaps_row = c(10, 23, 32, 39), 
                                  color = c(colorRampPalette(c("#19547b","#ffd89b"))(40)),
                                  na_col = "grey80",
-                                 right_annotation = rowAnnotation(bar1 = anno_barplot(apply(per_platform_score[, 1:12], 1, mean, na.rm = TRUE),
+                                 right_annotation = rowAnnotation(bar1 = anno_barplot(function_data$`scRNA-seq data`[1:43],
                                                                                       gp = gpar(fill = row_meta$color)),
-                                                                  bar2 = anno_barplot(apply(per_platform_score[, 13:23], 1, mean, na.rm = TRUE),
-                                                                                      gp = gpar(fill = row_meta$color))))
+                                                                  bar2 = anno_barplot(function_data$`spatial transcriptome data`[1:43],
+                                                                                      gp = gpar(fill = row_meta$color)))
+                                 )
 print(p5_a)
 dev.off()
 
@@ -127,13 +101,11 @@ dev.off()
 methods <- openxlsx::read.xlsx("./Chunk1-Data preparation/methods.xlsx")
 
 ### normalize every metrics to [0, 1]
-platform_p5s_data <- platform_data %>% 
-  group_by(Platform, Method) %>% 
-  summarise(
-    platform_score = mean(value, na.rm = TRUE)
-  )%>%
-  ungroup() %>% 
-  left_join(methods %>% select(c(1,3)), by = "Method")
+platform_p5s_data <- function_data %>% 
+  rename(., Method = id) %>% 
+  select(c(1:2, 34:56)) %>% 
+  pivot_longer(cols = 3:25, names_to = "Platform", values_to = "platform_score")
+  
 platform_p5s_data$Method <- factor(platform_p5s_data$Method, levels = overall_data$id)
 platform_p5s_data$Category <- factor(platform_p5s_data$Category, levels = paste0("Class ", 1:5))
 P5_b <- ggboxplot(data = platform_p5s_data,

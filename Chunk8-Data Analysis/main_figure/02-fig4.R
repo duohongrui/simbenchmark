@@ -10,13 +10,9 @@ library(ggpubr)
 ################################################################################
 ############   Figure 4 --- Accuracy Scores in Diff Data Types  ################
 ################################################################################
-overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds")
-acc_data <- readRDS("./Chunk8-Data Analysis/accuracy/accuracy_long_data.rds")
-data_info <- openxlsx::read.xlsx("./Chunk1-Data preparation/evaluation_datasets.xlsx", rowNames = TRUE) %>% 
-  mutate(
-    Data = str_split(Dataset.ID, "_", simplify = TRUE)[, 1]
-  ) %>% 
-  select(Data, Platform)
+overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds") %>% 
+  select(1:62)
+colnames(overall_data)[38:62] <- str_split(colnames(overall_data)[38:62], "_", simplify = TRUE)[, 2]
 platforms <- c("MARS-Seq",
                "10X Genomics",
                "Smart-seq2",
@@ -40,81 +36,51 @@ platforms <- c("MARS-Seq",
                "sci-Space",
                "MERFISH",
                "Stereo-Seq")
-### add platform and type to accuracy table
-acc_data <- acc_data %>% 
-  full_join(data_info, by = "Data") %>% 
-  relocate(Platform, .after = "Data") %>% 
-  mutate(
-    Platform = case_when(
-      Platform == "Smart-seq2\r\n10X Genomics" ~ "Mix sources1",
-      Platform == "CEL-seq\r\nCEL-seq2" ~ "Mix sources2",
-      TRUE ~ Platform
-    ),
-    Type = case_when(
-      Data %in% paste0("data", 1:101) ~ "scRNA-seq data",
-      Data %in% paste0("data", 101:152) ~ "spatial transcriptome data"
-    )
-  ) %>% 
-  relocate(Type, .after = "Platform")
-
-####################### Platform
+###--------------------------------------------------------------------------###
+###                                    Fig4c
+###--------------------------------------------------------------------------###
 technique_colors <- RColorBrewer::brewer.pal(8, "Set2")[1:2]
-method_class_colors <- c("#F97369", "#69ACD1", "#F9A24B", "#ADDD52", "#F9B4DA")
+technique_colors <- c("#86b3d3", "#f5926e")
+method_class_colors <- c("#F97369", "#b4b9f9", "#fec79c", "#92C694", "#F9B4DA")
+method_class_colors <- RColorBrewer::brewer.pal(12, "Set3")[4:8]
 
-platform_data <- acc_data %>% 
-  group_by(Platform, metric, Method) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
-
-### per_platform_score
-per_platform_score <- platform_data %>% 
-  group_by(Platform, Method) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup() %>% 
-  pivot_wider(id_cols = everything(), names_from = "Platform", values_from = "value") %>% 
-  column_to_rownames(var = "Method")
-per_platform_score <- per_platform_score[, platforms]
+platform_data <- overall_data %>% 
+  select(all_of(c("id", "Category", platforms)))
 
 #### heatmap
 library(ComplexHeatmap)
-library(pheatmap)
-per_platform_score <- per_platform_score[overall_data$id, ]
 
 ### colume metadata
 meta_data <- data.frame(
-  `Technique Platform` = c(rep("scRNA-seq", 12), rep("spatial transcriptomics technique", 11))
+  `Technique Platform` = c(rep("scRNA-seq", 12), rep("ST technology", 11))
 )
-rownames(meta_data) <- colnames(per_platform_score)
+rownames(meta_data) <- colnames(platform_data)[3:ncol(platform_data)]
 
 ### row metadata
 row_meta <- data.frame(
   `class` = c(rep("class1", 10),
-              rep("class2", 13),
-              rep("class3", 9),
-              rep("class4", 7),
+              rep("class2", 15),
+              rep("class3", 10),
+              rep("class4", 8),
               rep("class5", 6)),
   `color` = c(rep(method_class_colors[1], 10),
-              rep(method_class_colors[2], 13),
-              rep(method_class_colors[3], 9),
-              rep(method_class_colors[4], 7),
+              rep(method_class_colors[2], 15),
+              rep(method_class_colors[3], 10),
+              rep(method_class_colors[4], 8),
               rep(method_class_colors[5], 6))
 )
-rownames(row_meta) <- rownames(per_platform_score)
+rownames(row_meta) <- rownames(platform_data)
 
 col <- list(Technique.Platform = c(`scRNA-seq` = technique_colors[1],
-                                   `spatial transcriptomics technique` = technique_colors[2]),
+                                   `ST technology` = technique_colors[2]),
             class = c(class1 = method_class_colors[1],
                       class2 = method_class_colors[2],
                       class3 = method_class_colors[3],
                       class4 = method_class_colors[4],
                       class5 = method_class_colors[5]))
 
-pdf(file = "../sim-article/figures/Fig4-a.pdf", width = 8, height = 8)
-p4_a <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
+pdf(file = "../sim-article/figures/Fig4c.pdf", width = 7, height = 7)
+p4_c <- ComplexHeatmap::pheatmap(platform_data %>% column_to_rownames("id") %>% select(-1) %>% as.matrix(),
                                  show_colnames = TRUE,
                                  show_rownames = TRUE,
                                  scale = "none",
@@ -125,31 +91,132 @@ p4_a <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  annotation_row = row_meta %>% select(1),
                                  treeheight_row = 20,
                                  border_color = "white",
-                                 gaps_row = c(10, 23, 32, 39), 
-                                 color = c(colorRampPalette(c("#19547b","#ffd89b"))(40)),
-                                 na_col = "grey80",
-                                 right_annotation = rowAnnotation(bar1 = anno_barplot(apply(per_platform_score[, 1:12], 1, mean, na.rm = TRUE),
+                                 gaps_row = c(10, 25, 35, 43), 
+                                 color = c(colorRampPalette(c("#0f86a9", "white", "#ed8b10"))(40)),
+                                 na_col = "gray80",
+                                 right_annotation = rowAnnotation(bar1 = anno_barplot(overall_data$`scRNA-seq data`,
                                                                                       gp = gpar(fill = row_meta$color)),
-                                                                  bar2 = anno_barplot(apply(per_platform_score[, 13:23], 1, mean, na.rm = TRUE),
+                                                                  bar2 = anno_barplot(overall_data$`spatial transcriptome data`,
                                                                                       gp = gpar(fill = row_meta$color))))
-print(p4_a)
+print(p4_c)
 dev.off()
 
+
+
+
+###--------------------------------------------------------------------------###
+###                                    Fig4a
+###--------------------------------------------------------------------------###
+fig4a <- overall_data %>% 
+  select(c(1,2, 15:22)) %>% 
+  pivot_longer(cols = 3:ncol(.), names_to = "metric", values_to = "value")
+fig4a$Category <- factor(fig4a$Category, levels = paste0("Class ", 1:5))
+fig4a$metric <- factor(fig4a$metric, levels = c("MAD", "MAE", "RMSE", "KS", "OV", "bhattacharyya", "KDE", "multiKS"))
+p4_a <- ggboxplot(data = fig4a,
+                  x = "Category",
+                  y = "value",
+                  color = "Category",
+                  ggtheme = theme_pubr(),
+                  size = 0.2,
+                  alpha = 0.6,
+                  width = 0.8,
+                  bxp.errorbar = FALSE,
+                  outlier.size = 0,
+                  add = "jitter",
+                  add.params = list(size = 0.05))+
+  ylab("Metric values") +
+  scale_color_manual(values = method_class_colors) +
+  scale_fill_manual(values = method_class_colors) +
+  facet_wrap(.~ metric, ncol = 4, strip.position = "top") +
+  theme(axis.text = element_text(size = 4),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.title = element_text(size = 5),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks = element_line(linewidth = 0.1),
+        axis.ticks.length = unit(0.05, 'cm'),
+        axis.line = element_line(linewidth = 0.2),
+        legend.text = element_text(size = 4),
+        legend.position = c(0.5, 1.14),
+        legend.direction = "horizontal",
+        legend.background = element_blank(),
+        legend.title = element_text(size = 4),
+        legend.key.size = unit(0.5, 'cm'),
+        strip.background = element_rect(fill = "white", color = "white"),
+        strip.text = element_text(size = 4),
+        strip.text.x = element_text(margin = margin(-0.01,0,-0.01,0, "cm")),
+        plot.margin = unit(c(0.5,0.1,0.1,0.1), 'cm')) +
+  ylim(0, 1) +
+  scale_y_continuous(labels = c("0", "0.8"), breaks = c(0, 0.8))
+
+ggsave(plot = p4_a,
+       filename = "../sim-article/figures/Fig4a.pdf",
+       width = 8,
+       height = 3.5,
+       units = "cm")
+
+
+###--------------------------------------------------------------------------###
+###                                    Fig4b
+###--------------------------------------------------------------------------###
+fig4b <- overall_data %>% 
+  select(c(1,2, 23:37)) %>% 
+  pivot_longer(cols = 3:ncol(.), names_to = "property", values_to = "value")
+fig4b$Category <- factor(fig4b$Category, levels = paste0("Class ", 1:5))
+fig4b$property <- factor(fig4b$property)
+p4_b <- ggboxplot(data = fig4b,
+                  x = "Category",
+                  y = "value",
+                  color = "Category",
+                  ggtheme = theme_pubr(),
+                  size = 0.2,
+                  alpha = 0.6,
+                  width = 0.8,
+                  bxp.errorbar = FALSE,
+                  outlier.size = 0,
+                  add = "jitter",
+                  add.params = list(size = 0.05))+
+  ylab("Metric values") +
+  scale_color_manual(values = method_class_colors) +
+  scale_fill_manual(values = method_class_colors) +
+  facet_wrap(.~ property, ncol = 4, strip.position = "top") +
+  theme(axis.text = element_text(size = 4),
+        axis.text.x = element_text(angle = 30, hjust = 1),
+        axis.title = element_text(size = 5),
+        axis.title.x = element_blank(),
+        axis.ticks = element_line(linewidth = 0.1),
+        axis.ticks.length = unit(0.05, 'cm'),
+        axis.line = element_line(linewidth = 0.2),
+        legend.position = "none",
+        strip.background = element_rect(fill = "white", color = "white"),
+        strip.text = element_text(size = 4),
+        strip.text.x = element_text(margin = margin(-0.01,0,-0.01,0, "cm")),
+        plot.margin = unit(c(0.1,0.1,0.1,0.1), 'cm')) +
+  ylim(0, 1) +
+  scale_y_continuous(labels = c("0", "0.8"), breaks = c(0, 0.8))
+
+ggsave(plot = p4_a / p4_b,
+       filename = "../sim-article/figures/Fig4b.pdf",
+       width = 8,
+       height = 9,
+       units = "cm")
+
+ggsave(plot = p4_a / p4_b + plot_layout(height = c(1,2)),
+       filename = "../sim-article/figures/Fig4ab.pdf",
+       width = 9,
+       height = 12.5,
+       units = "cm")
 
 #### Fig4-S
 colors <- RColorBrewer::brewer.pal(12, "Set3")[4:8]
 methods <- openxlsx::read.xlsx("./Chunk1-Data preparation/methods.xlsx")
 
-### normalize every metrics to [0, 1]
 platform_p4s_data <- platform_data %>% 
-  group_by(Platform, Method) %>% 
-  summarise(
-    platform_score = mean(value, na.rm = TRUE)
-  )%>%
-  ungroup() %>% 
-  left_join(methods %>% select(c(1,3)), by = "Method")
-platform_p4s_data$Method <- factor(platform_p4s_data$Method, levels = overall_data$id)
+  pivot_longer(cols = 3:ncol(.), names_to = "Platform", values_to = "platform_score") %>% 
+  rename(., Method = id)
 
+platform_p4s_data$Method <- factor(platform_p4s_data$Method, levels = overall_data$id)
 ### top 5 method be labelled
 top_5_methods <- platform_p4s_data %>% 
   group_by(Platform) %>% 
@@ -259,7 +326,7 @@ Fig4c_data <- platform_p4s_data %>%
       Platform %in% platforms[13:23] ~ "ST technology"
     )
   )
-odds <- seq(1, 45, 1)
+odds <- seq(1, 49, 1)
 rect <- Fig4c_data[odds, ]
 fig4c <- ggplot(Fig4c_data, aes(x = Method, y= platform_score, fill = technology))+
   geom_rect(data = rect,
@@ -304,23 +371,25 @@ ggsave(plot = fig4c, filename = "../sim-article/figures/Fig4-c.pdf", width = 18,
 
 ### fig4d
 library(ggrepel)
-fig4d_data <- Fig4c_data %>% 
-  group_by(Method, technology) %>% 
-  summarise(
-    technology_score = mean(platform_score, na.rm = TRUE)
-  ) %>% 
-  ungroup() %>% 
-  pivot_wider(id_cols = everything(),
-              names_from = technology,
-              values_from = technology_score) %>% 
-  right_join(methods %>% select(1:2), by = "Method") %>% 
+library(ggpmisc)
+fig4d_data <- overall_data %>% 
+  select(all_of(c("id", "scRNA-seq data", "spatial transcriptome data", "Category"))) %>% 
+  rename(., `ST technology` = `spatial transcriptome data`) %>% 
+  rename(., `scRNA-seq` = `scRNA-seq data`) %>% 
+  rename(., Method = id) %>% 
   drop_na()
 
 cor_value <- sprintf("%0.2f", cor(fig4d_data$`ST technology`, fig4d_data$`scRNA-seq`))
 
 fig4d <- ggplot(fig4d_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
+  geom_smooth(method = 'lm', linewidth = 1, color = "red") +
   geom_point(size = 3) +
-  geom_abline(intercept = 0, slope = 1, color = "red") +
+  stat_poly_eq(use_label(c("eq", "adj.R2", "p.value.label"), sep = "*\", \"*"),
+               formula = y ~ x,
+               parse = TRUE,
+               size = 4.5,
+               label.x = 0.1,
+               label.y = 0.96) +
   geom_label_repel(aes(label = Method,
                        fill = Category),
                    color = "white",
@@ -335,7 +404,7 @@ fig4d <- ggplot(fig4d_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
            label = paste0("Cor: ", cor_value),
            size = 5) +
   theme_bw() +
-  theme(legend.position = c(0.1, 0.8),
+  theme(legend.position = c(0.1, 0.7),
         axis.text = element_text(size = 10),
         axis.title = element_text(size = 14),
         legend.title = element_text(size = 14),

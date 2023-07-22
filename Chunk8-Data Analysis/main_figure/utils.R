@@ -1,79 +1,163 @@
-GeomSplitViolin <- ggplot2::ggproto(
-  "GeomSplitViolin",
-  ggplot2::GeomViolin,
-  draw_group = function(self,
-                        data,
-                        ...,
-                        # add the nudge here
-                        nudge = 0,
-                        draw_quantiles = NULL) {
-    data <- transform(data,
-                      xminv = x - violinwidth * (x - xmin),
-                      xmaxv = x + violinwidth * (xmax - x))
-    grp <- data[1, "group"]
-    newdata <- plyr::arrange(transform(data,
-                                       x = if (grp %% 2 == 1) xminv else xmaxv),
-                             if (grp %% 2 == 1) y else -y)
-    newdata <- rbind(newdata[1, ],
-                     newdata,
-                     newdata[nrow(newdata), ],
-                     newdata[1, ])
-    newdata[c(1, nrow(newdata)-1, nrow(newdata)), "x"] <- round(newdata[1, "x"])
-    
-    # now nudge them apart
-    newdata$x <- ifelse(newdata$group %% 2 == 1,
-                        newdata$x - nudge,
-                        newdata$x + nudge)
-    
-    if (length(draw_quantiles) > 0 & !scales::zero_range(range(data$y))) {
-      
-      stopifnot(all(draw_quantiles >= 0), all(draw_quantiles <= 1))
-      
-      quantiles <- ggplot2:::create_quantile_segment_frame(data,
-                                                           draw_quantiles)
-      aesthetics <- data[rep(1, nrow(quantiles)),
-                         setdiff(names(data), c("x", "y")),
-                         drop = FALSE]
-      aesthetics$alpha <- rep(1, nrow(quantiles))
-      both <- cbind(quantiles, aesthetics)
-      quantile_grob <- ggplot2::GeomPath$draw_panel(both, ...)
-      ggplot2:::ggname("geom_split_violin",
-                       grid::grobTree(ggplot2::GeomPolygon$draw_panel(newdata, ...),
-                                      quantile_grob))
-    }
-    else {
-      ggplot2:::ggname("geom_split_violin",
-                       ggplot2::GeomPolygon$draw_panel(newdata, ...))
-    }
-  }
-)
-
-geom_split_violin <- function(mapping = NULL,
-                              data = NULL,
-                              stat = "ydensity",
-                              position = "identity",
-                              # nudge param here
-                              nudge = 0,
-                              ...,
-                              draw_quantiles = NULL,
-                              trim = TRUE,
-                              scale = "area",
-                              na.rm = FALSE,
-                              show.legend = NA,
-                              inherit.aes = TRUE) {
+accuracy_process_function <- function(accuracy){
+  ### summarize accuracy score for property
+  accuracy_summary_per_metric <- accuracy %>% 
+    group_by(Method, metric, Platform, Type, Data) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE),
+    ) %>% 
+    ungroup()
   
-  ggplot2::layer(data = data,
-                 mapping = mapping,
-                 stat = stat,
-                 geom = GeomSplitViolin,
-                 position = position,
-                 show.legend = show.legend,
-                 inherit.aes = inherit.aes,
-                 params = list(trim = trim,
-                               scale = scale,
-                               # don't forget the nudge
-                               nudge = nudge,
-                               draw_quantiles = draw_quantiles,
-                               na.rm = na.rm,
-                               ...))
+  ### summarize accuracy score for platform
+  accuracy_summary_per_platform <- accuracy_summary_per_metric %>% 
+    group_by(Method, metric, Platform) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    group_by(Method, Platform) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    mutate(
+      Platform = paste0("acc_", Platform)
+    )
+  
+  ### summarize accuracy score for techniques
+  accuracy_summary_per_technique <- accuracy_summary_per_metric %>% 
+    group_by(Method, metric, Type) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    group_by(Method, Type) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    mutate(
+      Type = paste0("acc_", Type)
+    )
+  
+  ### summarize accuracy score for metrics
+  accuracy_summary_per_metric <- accuracy_summary_per_metric %>% 
+    group_by(Method, metric) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup()
+  
+  ### summarize accuracy score
+  accuracy_score <- accuracy_summary_per_metric %>% 
+    group_by(Method) %>% 
+    summarise(
+      accuracy = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup()
+  
+  ### accuracy_summary_per_property
+  accuracy_summary_per_property <- accuracy %>% 
+    group_by(Method, property, Data) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    group_by(Method, property) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    )
+  
+  ### add accuracy score
+  accuracy_plot <- accuracy_score %>% 
+    full_join(., accuracy_summary_per_metric %>% pivot_wider(names_from = "metric", values_from = "value"), by = "Method") %>% 
+    full_join(., accuracy_summary_per_property %>% pivot_wider(names_from = "property", values_from = "value"), by = "Method") %>% 
+    full_join(., accuracy_summary_per_platform %>% pivot_wider(names_from = "Platform", values_from = "value"), by = "Method") %>% 
+    full_join(., accuracy_summary_per_technique %>% pivot_wider(names_from = "Type", values_from = "value"), by = "Method") %>% 
+    arrange(desc(accuracy))
+  
+  return(accuracy_plot)
+}
+
+
+
+functionality_process_function <- function(functionality){
+  
+  ### summarize accuracy score for metrics
+  functionality_summary_per_metric <- functionality %>% 
+    group_by(Method, Platform, Type, metric) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup()
+  
+  ### summarize accuracy score for techniques
+  functionality_summary_per_technique <- functionality_summary_per_metric %>% 
+    group_by(Method, metric, Platform) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    group_by(Method, Platform) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    mutate(
+      Platform = paste0("func_", Platform)
+    )
+  
+  ### summarize accuracy score for platforms
+  functionality_summary_per_platform <- functionality_summary_per_metric %>% 
+    group_by(Method, metric, Type) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    group_by(Method, Type) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    ungroup() %>% 
+    mutate(
+      Type = paste0("func_", Type)
+    )
+  
+  
+  ### summarize functionality score
+  functionality_score <- functionality_summary_per_metric %>% 
+    group_by(Method, metric) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    group_by(Method) %>% 
+    summarise(
+      functionality = mean(value, na.rm = TRUE)
+    )
+  
+  ### add functionality score to the metric result
+  functionality_summary_per_metric <- functionality_summary_per_metric %>% 
+    group_by(Method, metric) %>% 
+    summarise(
+      value = mean(value, na.rm = TRUE)
+    ) %>% 
+    pivot_wider(names_from = "metric", values_from = "value")
+  col_names <- colnames(readRDS("./Chunk8-Data Analysis/functionality/functionality_data.rds"))[c(-1, -2)]
+  functionality_summary_per_metric <- functionality_summary_per_metric[, c("Method", col_names)]
+  
+  functionality_plot <- functionality_score %>% 
+    full_join(., functionality_summary_per_metric, by = "Method") %>% 
+    full_join(., functionality_summary_per_platform %>% pivot_wider(names_from = "Type", values_from = "value"), by = "Method") %>% 
+    full_join(., functionality_summary_per_technique %>% pivot_wider(names_from = "Platform", values_from = "value"), by = "Method") %>% 
+    arrange(desc(functionality))
+  
+  functionality_plot <- functionality_plot %>% 
+    mutate(
+      Group_score = apply(X = functionality_plot %>% select(3:8), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
+      DEGs_score = apply(X = functionality_plot %>% select(9:15), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
+      Batch_score = apply(X = functionality_plot %>% select(16:22), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
+      Trajectory_score = apply(X = functionality_plot %>% select(23:26), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)})
+    ) %>% 
+    relocate(Group_score, .before = "CDI") %>% 
+    relocate(DEGs_score, .before = "distribution_score") %>% 
+    relocate(Batch_score, .before = "cms") %>% 
+    relocate(Trajectory_score, .before = "HIM")
+  return(functionality_plot)
 }

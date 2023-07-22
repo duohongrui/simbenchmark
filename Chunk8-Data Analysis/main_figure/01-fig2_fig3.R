@@ -10,15 +10,17 @@ library(funkyheatmap)
 ################################################################################
 #######################   Figure 2 --- detail heatmap  #########################
 ################################################################################
+source("Chunk8-Data Analysis/main_figure/utils.R")
 accuracy <- readRDS("Chunk8-Data Analysis/accuracy/accuracy_long_data.rds")
 functionality <- readRDS("Chunk8-Data Analysis/functionality/functionality_long_data.rds")
 scalability <- readRDS("Chunk8-Data Analysis/scalability/score_data.rds")
 usability <- readRDS("Chunk8-Data Analysis/usability/usability_long_data.rds")
 method <- openxlsx::read.xlsx("Chunk1-Data preparation/methods.xlsx", sheet = 1, colNames = TRUE) %>% 
-  select(c(-2, -5))
+  select(-2)
 colnames(method) <- c("Method",
                       "Category",
                       "Platform",
+                      "Model",
                       "Prior Information",
                       "Simulate Groups",
                       "Simulate DEGs",
@@ -47,60 +49,10 @@ accuracy <- accuracy %>%
   ) %>% 
   relocate(Type, .after = "Platform")
 
-### summarize accuracy score for property
-accuracy_summary_per_metric <- accuracy %>% 
-  group_by(Method, metric, Platform, Type, Data) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
+accuracy_plot <- accuracy_process_function(accuracy)
 
-### summarize accuracy score for platfrom
-accuracy_summary_per_metric <- accuracy_summary_per_metric %>% 
-  group_by(Method, metric, Type) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
 
-### summarize accuracy score for techniques
-accuracy_summary_per_metric <- accuracy_summary_per_metric %>% 
-  group_by(Method, metric) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
-
-### summarize accuracy score
-accuracy_score <- accuracy_summary_per_metric %>% 
-  group_by(Method) %>% 
-  summarise(
-    accuracy = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
-
-### accuracy_summary_per_property
-accuracy_summary_per_property <- accuracy %>% 
-  group_by(Method, property, Platform, Type, Data) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  group_by(Method, property, Type) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  group_by(Method, property) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  )
-
-### add accuracy score
-accuracy_plot <- accuracy_score %>% 
-  full_join(., accuracy_summary_per_metric %>% pivot_wider(names_from = "metric", values_from = "value"), by = "Method") %>% 
-  full_join(., accuracy_summary_per_property %>% pivot_wider(names_from = "property", values_from = "value"), by = "Method") %>% 
-  arrange(desc(accuracy))
-
-### errors
+############################# errors
 errors <- openxlsx::read.xlsx(xlsxFile = "./Chunk8-Data Analysis/error_reason/error.xlsx", sheet = 1)
 errors <- errors %>% 
   mutate(
@@ -126,6 +78,9 @@ saveRDS(method_error, file = "./Chunk8-Data Analysis/error_reason/method_error.r
 ### proportion of errors
 simulated_list <- list.files("/Volumes/Elements/sim_bench/simulation_data/")
 succeed_methods <- table(str_split(simulated_list, pattern = "_", simplify = TRUE)[, 1]) %>% as.data.frame()
+succeed_methods <- succeed_methods %>% 
+  rbind(data.frame("Var1" = c("scMultiSim", "scMultiSim-tree", "scDesign3-traj", "SRTsim"),
+                   "Freq" = c(10, 10, 10, 10)))
 colnames(succeed_methods) <- c("Method", "Succeed")
 method_error_count <- method_error %>% 
   group_by(method) %>% 
@@ -185,7 +140,7 @@ accuracy_plot <- accuracy_plot %>%
 
 
 ### summarize functionality score per metric
-functionality_summary_per_metric <- functionality %>% 
+functionality <- functionality %>% 
   full_join(data_info, by = "Data") %>% 
   relocate(Platform, .after = "Data") %>% 
   mutate(
@@ -199,43 +154,9 @@ functionality_summary_per_metric <- functionality %>%
       Data %in% paste0("data", 101:152) ~ "spatial transcriptome data"
     )
   ) %>% 
-  relocate(Type, .after = "Platform") %>% 
-  group_by(Method, metric, Type) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup() %>% 
-  group_by(Method, metric) %>% 
-  summarise(
-    value = mean(value, na.rm = TRUE)
-  ) %>% 
-  ungroup()
+  relocate(Type, .after = "Platform")
 
-
-### summarize functionality score
-functionality_score <- functionality_summary_per_metric %>% 
-  group_by(Method) %>% 
-  summarise(
-    functionality = mean(value, na.rm = TRUE)
-  )
-
-### add functionality score to the metric result
-functionality_summary_per_metric <- functionality_summary_per_metric %>% 
-  pivot_wider(names_from = "metric", values_from = "value")
-col_names <- colnames(readRDS("./Chunk8-Data Analysis/functionality/functionality_data.rds"))[c(-1, -2)]
-functionality_summary_per_metric <- functionality_summary_per_metric[, c("Method", col_names)]
-
-functionality_plot <- functionality_score %>% 
-  full_join(., functionality_summary_per_metric, by = "Method") %>% 
-  arrange(desc(functionality))
-
-functionality_plot <- functionality_plot %>% 
-  mutate(
-    Group_score = apply(X = functionality_plot %>% select(3:8), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
-    DEGs_score = apply(X = functionality_plot %>% select(9:15), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
-    Batch_score = apply(X = functionality_plot %>% select(16:23), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)}),
-    Trajectory_score = apply(X = functionality_plot %>% select(24:27), MARGIN = 1, FUN = function(x){mean(x, na.rm = TRUE)})
-  )
+functionality_plot <- functionality_process_function(functionality)
 
 ### scalability score
 colnames(scalability) <- c("Method",
@@ -278,10 +199,10 @@ colnames(usability)[1] <- "Method"
 
 ### overall data
 overall_data <- method %>% 
-  full_join(., accuracy_plot, by = "Method") %>% 
-  full_join(., functionality_plot, by = "Method") %>% 
-  full_join(., scalability, by = "Method") %>% 
-  full_join(., usability, by = "Method") %>% 
+  left_join(., accuracy_plot, by = "Method") %>% 
+  left_join(., functionality_plot, by = "Method") %>% 
+  left_join(., scalability, by = "Method") %>% 
+  left_join(., usability, by = "Method") %>% 
   relocate("accuracy", .after = `Simulate Trajectory`) %>% 
   relocate("functionality", .after = accuracy) %>% 
   relocate("scalability", .after = functionality) %>% 
@@ -289,7 +210,7 @@ overall_data <- method %>%
 
 overall_data <- overall_data %>% 
   mutate(
-    overall = apply(overall_data %>% select(9:12), MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
+    overall = apply(overall_data %>% select(10:13), MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
   ) %>% 
   relocate(overall, .after = `Simulate Trajectory`)
 
@@ -303,7 +224,8 @@ overall_data <- overall_data%>%
 
 overall_data <- overall_data %>% 
   mutate(
-    across(all_of(c("Prior Information",
+    across(all_of(c("Model",
+                    "Prior Information",
                     "Simulate Groups",
                     "Simulate DEGs",
                     "Simulate Batches",
@@ -327,7 +249,7 @@ arrange_by_group <- function(tibble){
 overall_data <- arrange_by_group(tibble = overall_data)
 saveRDS(overall_data, file = "./Chunk8-Data Analysis/overall_data.rds")
 ###--------------------------------------------------------------------------###
-###                            Method Summary 1
+###                            Fig2. Summary
 ###--------------------------------------------------------------------------###
 
 ### define column information
@@ -335,6 +257,7 @@ column_info <- tribble(
   ~ id,                    ~group,             ~name,                     ~geom,       ~palette,    ~options,
   "id",                    "method",           "",                        "text",      NA,          list(hjust = 0, width = 5),
   "Platform",              "method_info",      "Platform",                "text",      NA,          list(width = 1.5),
+  "Model",                 "method_info",      "Model",                   "text",      NA,          list(width = 8),
   "Prior Information",     "method_info",      "Prior Information",       "text",      NA,          list(width = 8),
   "Simulate Groups",       "function",         "Groups",                  "text",      NA,          list(width = 1),
   "Simulate DEGs",         "function",         "DEGs",                    "text",      NA,          list(width = 1),
@@ -361,12 +284,12 @@ column_groups <- tribble(
 row_info <- tribble(
    ~group,         ~ id,                   
    "Class 1",      "SPARSim",
-   "Class 1",      "SCRIP-BP",
    "Class 1",      "Splat",
-   "Class 1",      "SCRIP-GP-trendedBCV",
+   "Class 1",      "SCRIP-BP",
    "Class 1",      "SCRIP-GP-commonBCV",
-   "Class 1",      "SCRIP-BGP-trendedBCV",
    "Class 1",      "SCRIP-BGP-commonBCV",
+   "Class 1",      "SCRIP-GP-trendedBCV",
+   "Class 1",      "SCRIP-BGP-trendedBCV",
    "Class 1",      "powsimR",
    "Class 1",      "SplatPop",
    "Class 1",      "SPsimSeq",
@@ -376,33 +299,37 @@ row_info <- tribble(
    "Class 2",      "ESCO-tree",
    "Class 2",      "SplatPop-paths",
    "Class 2",      "ESCO-traj",
-   "Class 2",      "TedSim",
    "Class 2",      "phenopath",
+   "Class 2",      "TedSim",
    "Class 2",      "MFA",
    "Class 2",      "SymSim",
    "Class 2",      "dyngen",
    "Class 2",      "VeloSim",
    "Class 2",      "dyntoy",
-   "Class 3",      "Lun",
+   "Class 2",      "scMultiSim-tree",
+   "Class 2",      "scDesign3-traj",
    "Class 3",      "scDesign",
-   "Class 3",      "Lun2",
+   "Class 3",      "Lun",
    "Class 3",      "muscat",
+   "Class 3",      "Lun2",
    "Class 3",      "ESCO",
    "Class 3",      "scDD",
    "Class 3",      "scDesign3",
    "Class 3",      "zingeR",
    "Class 3",      "zinbwaveZinger",
+   "Class 4",      "scMultiSim",
    "Class 4",      "scDesign2",
    "Class 4",      "hierarchicell",
-   "Class 4",      "scGAN",
    "Class 4",      "POWSC",
    "Class 4",      "SparseDC",
-   "Class 4",      "SimBPDD",
+   "Class 4",      "scGAN",
    "Class 4",      "BASiCS",
+   "Class 4",      "SimBPDD",
+   "Class 4",      "SRTsim",
    "Class 5",      "Simple",
    "Class 5",      "Kersplat",
-   "Class 5",      "zinbwave",
    "Class 5",      "BEARscc",
+   "Class 5",      "zinbwave",
    "Class 5",      "dropsim",
    "Class 5",      "CancerInSilico"
 )
@@ -429,39 +356,34 @@ palettes <- tribble(
   "palette5",           grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, "Greens")[-9]))(101)
 )
 
-data <- overall_data %>% 
-  select(-2) %>% 
-  select(1:12)
-
-detailed_plot <- funky_heatmap(data = data,
-                               column_info = column_info,
-                               column_groups = column_groups,
-                               row_info = row_info,
-                               row_groups = row_groups,
-                               palettes = palettes,
-                               scale_column = FALSE,
-                               expand = c(xmin = 1, xmax = 2, ymin = 1, ymax = 1))
+summary_plot <- funky_heatmap(data = overall_data,
+                              column_info = column_info,
+                              column_groups = column_groups,
+                              row_info = row_info,
+                              row_groups = row_groups,
+                              palettes = palettes,
+                              scale_column = FALSE,
+                              expand = c(xmin = 1, xmax = 2, ymin = 1, ymax = 1))
 
 library(Cairo)
-ggsave(detailed_plot,
-       filename = "Chunk8-Data Analysis/main_figure/detailed_plot1.pdf",
+ggsave(summary_plot,
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig2.pdf",
        units = "in",
-       width = 16,
+       width = 17,
        height = 24,
        device = cairo_pdf)
 
-
 ###--------------------------------------------------------------------------###
-###                            Method Summary 2
+###                              Supplementary Fig.1
 ###--------------------------------------------------------------------------###
-
-data2 <- overall_data %>% 
-  select(-c(2:13))
 
 ### define column information
 column_info <- column_info <- tribble(
   ~ id,                                     ~group,             ~name,                     ~geom,       ~palette,         ~options,
-  "id",                                     "method",           "",                        "text",      NA,               list(hjust = 0, width = 7, size = 4),
+  "id",                                     "method",           "",                        "text",      NA,               list(hjust = 0,
+                                                                                                                               width = 4.5,
+                                                                                                                               size = 4,
+                                                                                                                               legend = FALSE),
   "KDE",                                    "property",         "KDE",                     "funkyrect", "palette2",       NULL,
   "KS",                                     "property",         "KS",                      "funkyrect", "palette2",       NULL,
   "MAD",                                    "property",         "MAD",                     "funkyrect", "palette2",       NULL,
@@ -470,8 +392,8 @@ column_info <- column_info <- tribble(
   "RMSE",                                   "property",         "RMSE",                    "funkyrect", "palette2",       NULL,
   "bhattacharyya",                          "property",         "bhattacharyya",           "funkyrect", "palette2",       NULL,
   "multiKS",                                "property",         "multiKS",                 "funkyrect", "palette2",       NULL,
-  "error",                                  "error",            "Proportion of errors",    "text",      NA,               list(hjust = 0, width = 2, size = 4),
-  "Reason",                                 "error",            "Reasons",                 "pie",       "error_reasons",  NULL,
+  "acc_scRNA-seq data",                     "technique",        "scRNA-seq",               "funkyrect", "palette2",       NULL,
+  "acc_spatial transcriptome data",         "technique",        "ST technology",           "funkyrect", "palette2",       NULL,
   "Group_score",                            "group",            "Group Score",             "funkyrect", "palette3",       NULL,
   "CDI",                                    "group",            "CDI",                     "funkyrect", "palette3",       NULL,
   "ROUGE",                                  "group",            "ROUGE",                   "funkyrect", "palette3",       NULL,
@@ -495,12 +417,13 @@ column_info <- column_info <- tribble(
   "kBET",                                   "batch",            "kBET",                    "funkyrect", "palette3",       NULL,
   "AWS_batch",                              "batch",            "AWS_batch",               "funkyrect", "palette3",       NULL,
   "pcr",                                    "batch",            "pcr",                     "funkyrect", "palette3",       NULL,
-  "ISI",                                    "batch",            "ISI",                     "funkyrect", "palette3",       NULL,
   "Trajectory_score",                       "trajectory",       "Trajectory Score",        "funkyrect", "palette3",       NULL,
   "HIM",                                    "trajectory",       "HIM",                     "funkyrect", "palette3",       NULL,
   "F1_branches",                            "trajectory",       "F1_branches",             "funkyrect", "palette3",       NULL,
   "F1_milestones",                          "trajectory",       "F1_milestones",           "funkyrect", "palette3",       NULL,
   "Cor_dist",                               "trajectory",       "Cor_dist",                "funkyrect", "palette3",       NULL,
+  "func_scRNA-seq data",                    "func_technique",   "scRNA-seq",               "funkyrect", "palette3",       NULL,
+  "func_spatial transcriptome data",        "func_technique",   "ST technology",           "funkyrect", "palette3",       NULL,
   "estimation time",                        "scala",            "Estimation Time",         "funkyrect", "palette5",       NULL,
   "Cor(time_estimation)",                   "scala",            "Cor(estimation time)",    "text",      NA,               list(hjust = 0, width = 1, size = 3),
   "estimation memory",                      "scala",            "Estimation Memory",       "funkyrect", "palette5",       NULL,
@@ -548,29 +471,36 @@ column_info <- column_info <- tribble(
   "Documentation",                          "usability",        "Documentation",           "funkyrect", "palette4",       NULL,
   "Evaluation",                             "usability",        "Evaluation",              "funkyrect", "palette4",       NULL,
   "Maintenance",                            "usability",        "Maintenance",             "funkyrect", "palette4",       NULL,
-  "Paper",                                  "usability",        "Paper Quality",           "funkyrect", "palette4",       NULL
+  "Paper",                                  "usability",        "Paper Quality",           "funkyrect", "palette4",       NULL,
+  "error",                                  "error",            "Proportion of errors",    "text",      NA,               list(hjust = 0, width = 2, size = 4),
+  "Reason",                                 "error",            "Reasons",                 "pie",       "error_reasons",  NULL
 )
 
 ### column grouping
 
 column_groups <- tribble(
-  ~ Experiment,     ~Category,                                       ~group,         ~palette,
-  "Method",         "",                                              "method",       "palette1",
-  "Accuracy",       "Per metric",                                    "property",     "palette2",
-  "Accuracy",       "Error",                                         "error",        "palette2",
-  "Functionality",  "Group",                                         "group",        "palette3",
-  "Functionality",  "DEGs",                                          "DEGs",         "palette3",
-  "Functionality",  "Batch",                                         "batch",        "palette3",
-  "Functionality",  "trajectory",                                    "trajectory",   "palette3",
-  "Scalability",    "Scores of time consuming \nand memory usage",   "scala",        "palette5",
-  "Scalability",    "Estimation \n(cell x gene)",                    "scala_rect",   "palette5",
-  "Scalability",    "Simulation \n(cell x gene)",                    "scala_rect2",  "palette5",
-  "Usability",      "The quality of the codes \nand softwares",      "usability",    "palette4"
+  ~ Experiment,     ~Category,                                       ~group,           ~palette,
+  "Method",         "",                                              "method",         "palette1",
+  "Accuracy",       "Per metric",                                    "property",       "palette2",
+  "Accuracy",       "Per technique",                                 "technique",      "palette2",
+  "Functionality",  "Group",                                         "group",          "palette3",
+  "Functionality",  "DEGs",                                          "DEGs",           "palette3",
+  "Functionality",  "Batch",                                         "batch",          "palette3",
+  "Functionality",  "trajectory",                                    "trajectory",     "palette3",
+  "Functionality",  "Per technique",                                 "func_technique", "palette3",
+  "Scalability",    "Scores of time consuming \nand memory usage",   "scala",          "palette5",
+  "Scalability",    "Estimation \n(cell x gene)",                    "scala_rect",     "palette5",
+  "Scalability",    "Simulation \n(cell x gene)",                    "scala_rect2",    "palette5",
+  "Usability",      "The quality of the codes \nand softwares",      "usability",      "palette4",
+  "Usability",      "Error",                                         "error",          "palette4",
 )
 
 
 ### determine palettes
 error_reasons_palettes <- RColorBrewer::brewer.pal(11, "Paired")
+a <- overall_data[1, ] %>% pull("Reason")
+category <- names(a[[1]])
+rm(a)
 names(error_reasons_palettes) <- category
 
 palettes <- tribble(
@@ -585,20 +515,295 @@ palettes <- tribble(
   "white6black4",       c("white","white","white","black","black","black","black","black","black","black")
 )
 
-detailed_plot <- funky_heatmap(data = data2,
+detailed_plot <- funky_heatmap(data = overall_data,
                                column_info = column_info,
                                column_groups = column_groups,
                                row_info = row_info,
                                row_groups = row_groups,
                                palettes = palettes,
                                scale_column = FALSE,
-                               expand = c(xmin = 1, xmax = 4, ymin = 1, ymax = 1), col_annot_offset = 4)
+                               expand = c(xmin = 1, xmax = 3.5, ymin = 0.5, ymax = 0.5),
+                               col_annot_offset = 4.5,
+                               removed_entries = c("SPsimseq"))
 
 ggsave(detailed_plot,
-       filename = "Chunk8-Data Analysis/main_figure/detailed_plot.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig1.pdf",
        units = "in",
-       width = 24,
-       height = 28,
+       width = 20,
+       height = 16,
        device = cairo_pdf)
 
 
+###--------------------------------------------------------------------------###
+###                             Fig.3
+###--------------------------------------------------------------------------###
+
+### define column information
+column_info <- column_info <- tribble(
+  ~ id,                                     ~group,             ~name,                     ~geom,       ~palette,         ~options,
+  "id",                                     "method",           "",                        "text",      NA,               list(hjust = 0,
+                                                                                                                               width = 4,
+                                                                                                                               size = 4, 
+                                                                                                                               egend = FALSE),
+  "KDE",                                    "property",         "KDE",                     "funkyrect", "palette2",       NULL,
+  "KS",                                     "property",         "KS",                      "funkyrect", "palette2",       NULL,
+  "MAD",                                    "property",         "MAD",                     "funkyrect", "palette2",       NULL,
+  "MAE",                                    "property",         "MAE",                     "funkyrect", "palette2",       NULL,
+  "OV",                                     "property",         "Overlapping",             "funkyrect", "palette2",       NULL,
+  "RMSE",                                   "property",         "RMSE",                    "funkyrect", "palette2",       NULL,
+  "bhattacharyya",                          "property",         "bhattacharyya",           "funkyrect", "palette2",       NULL,
+  "multiKS",                                "property",         "multiKS",                 "funkyrect", "palette2",       NULL,
+  "Group_score",                            "group",            "Group Score",             "funkyrect", "palette3",       NULL,
+  "CDI",                                    "group",            "CDI",                     "funkyrect", "palette3",       NULL,
+  "ROUGE",                                  "group",            "ROUGE",                   "funkyrect", "palette3",       NULL,
+  "silhouette",                             "group",            "silhouette",              "funkyrect", "palette3",       NULL,
+  "dunn",                                   "group",            "dunn",                    "funkyrect", "palette3",       NULL,
+  "connectivity",                           "group",            "connectivity",            "funkyrect", "palette3",       NULL,
+  "DB_index",                               "group",            "DB Index",                "funkyrect", "palette3",       NULL,
+  "DEGs_score",                             "DEGs",             "DEGs Score",              "funkyrect", "palette3",       NULL,
+  "distribution_score",                     "DEGs",             "Distribution Score",      "funkyrect", "palette3",       NULL,
+  "true_proportion",                        "DEGs",             "True Proportion",         "funkyrect", "palette3",       NULL,
+  "Accuracy",                               "DEGs",             "Accuracy",                "funkyrect", "palette3",       NULL,
+  "Precision",                              "DEGs",             "Precision",               "funkyrect", "palette3",       NULL,
+  "Recall",                                 "DEGs",             "Recall",                  "funkyrect", "palette3",       NULL,
+  "F1",                                     "DEGs",             "F1 Score",                "funkyrect", "palette3",       NULL,
+  "AUC",                                    "DEGs",             "AUC",                     "funkyrect", "palette3",       NULL,
+  "Batch_score",                            "batch",            "Batch Score",             "funkyrect", "palette3",       NULL,
+  "cms",                                    "batch",            "cms",                     "funkyrect", "palette3",       NULL,
+  "LISI",                                   "batch",            "LISI",                    "funkyrect", "palette3",       NULL,
+  "mm",                                     "batch",            "mm",                      "funkyrect", "palette3",       NULL,
+  "shannon_entropy",                        "batch",            "Shannon Entropy",         "funkyrect", "palette3",       NULL,
+  "kBET",                                   "batch",            "kBET",                    "funkyrect", "palette3",       NULL,
+  "AWS_batch",                              "batch",            "AWS_batch",               "funkyrect", "palette3",       NULL,
+  "pcr",                                    "batch",            "pcr",                     "funkyrect", "palette3",       NULL,
+  "Trajectory_score",                       "trajectory",       "Trajectory Score",        "funkyrect", "palette3",       NULL,
+  "HIM",                                    "trajectory",       "HIM",                     "funkyrect", "palette3",       NULL,
+  "F1_branches",                            "trajectory",       "F1_branches",             "funkyrect", "palette3",       NULL,
+  "F1_milestones",                          "trajectory",       "F1_milestones",           "funkyrect", "palette3",       NULL,
+  "Cor_dist",                               "trajectory",       "Cor_dist",                "funkyrect", "palette3",       NULL,
+  "estimation time",                        "scala",            "Estimation Time",         "funkyrect", "palette5",       NULL,
+  "estimation memory",                      "scala",            "Estimation Memory",       "funkyrect", "palette5",       NULL,
+  "simulation time",                        "scala",            "Simulation Time",         "funkyrect", "palette5",       NULL,
+  "simulation memory",                      "scala",            "Simulation Memory",       "funkyrect", "palette5",       NULL,
+  "Avalability",                            "usability",        "Avalability",             "funkyrect", "palette4",       NULL,
+  "Code",                                   "usability",        "Code",                    "funkyrect", "palette4",       NULL,
+  "Documentation",                          "usability",        "Documentation",           "funkyrect", "palette4",       NULL,
+  "Evaluation",                             "usability",        "Self-evaluation",         "funkyrect", "palette4",       NULL,
+  "Maintenance",                            "usability",        "Maintenance",             "funkyrect", "palette4",       NULL,
+  "Paper",                                  "usability",        "Paper Quality",           "funkyrect", "palette4",       NULL,
+  "error",                                  "error",            "Proportion of errors",    "text",      NA,               list(hjust = 0, width = 2, size = 4),
+  "Reason",                                 "error",            "Reasons",                 "pie",       "error_reasons",  NULL
+)
+
+### column grouping
+
+column_groups <- tribble(
+  ~ Experiment,     ~Category,                                       ~group,           ~palette,
+  "Method",         "",                                              "method",         "palette1",
+  "Accuracy",       "Per metric",                                    "property",       "palette2",
+  "Functionality",  "Group",                                         "group",          "palette3",
+  "Functionality",  "DEGs",                                          "DEGs",           "palette3",
+  "Functionality",  "Batch",                                         "batch",          "palette3",
+  "Functionality",  "Trajectory",                                    "trajectory",     "palette3",
+  "Scalability",    "Time consuming \n memory usage",             "scala",          "palette5",
+  "Usability",      "Quality of the codes \nand softwares",          "usability",      "palette4",
+  "Usability",      "Error",                                         "error",          "palette4",
+)
+
+
+fig2_plot <- funky_heatmap(data = overall_data,
+                           column_info = column_info,
+                           column_groups = column_groups,
+                           row_info = row_info,
+                           row_groups = row_groups,
+                           palettes = palettes,
+                           scale_column = FALSE,
+                           expand = c(xmin = 1, xmax = 4, ymin = 0.5, ymax = 0.5),
+                           col_annot_offset = 4)
+
+ggsave(fig2_plot,
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig3.pdf",
+       units = "in",
+       width = 16,
+       height = 19)
+
+
+###--------------------------------------------------------------------------###
+###                       Supplementary Fig.2 (Accuracy)
+###--------------------------------------------------------------------------###
+
+### define column information
+column_info <- column_info <- tribble(
+  ~ id,                                     ~group,             ~name,                     ~geom,       ~palette,         ~options,
+  "id",                                     "method",           "",                        "text",      NA,               list(hjust = 0, width = 7, size = 4, legend = FALSE),
+  "KDE",                                    "metric",           "KDE",                     "funkyrect", "palette2",       NULL,
+  "KS",                                     "metric",           "KS",                      "funkyrect", "palette2",       NULL,
+  "MAD",                                    "metric",           "MAD",                     "funkyrect", "palette2",       NULL,
+  "MAE",                                    "metric",           "MAE",                     "funkyrect", "palette2",       NULL,
+  "OV",                                     "metric",           "Overlapping",             "funkyrect", "palette2",       NULL,
+  "RMSE",                                   "metric",           "RMSE",                    "funkyrect", "palette2",       NULL,
+  "bhattacharyya",                          "metric",           "bhattacharyya",           "funkyrect", "palette2",       NULL,
+  "multiKS",                                "metric",           "multiKS",                 "funkyrect", "palette2",       NULL,
+  "LS",                                     "property",         "LS",                      "funkyrect", "palette2",       NULL,
+  "FZC",                                    "property",         "FZC",                     "funkyrect", "palette2",       NULL,
+  "CCC",                                    "property",         "CCC",                     "funkyrect", "palette2",       NULL,
+  "TMM",                                    "property",         "TMM",                     "funkyrect", "palette2",       NULL,
+  "ELS",                                    "property",         "ELS",                     "funkyrect", "palette2",       NULL,
+  "FCO",                                    "property",         "FCO",                     "funkyrect", "palette2",       NULL,
+  "RLZ",                                    "property",         "RLZ",                     "funkyrect", "palette2",       NULL,
+  "ME",                                     "property",         "ME",                      "funkyrect", "palette2",       NULL,
+  "SD",                                     "property",         "SD",                      "funkyrect", "palette2",       NULL,
+  "CV",                                     "property",         "CV",                      "funkyrect", "palette2",       NULL,
+  "FZG",                                    "property",         "FZG",                     "funkyrect", "palette2",       NULL,
+  "FGO",                                    "property",         "FGO",                     "funkyrect", "palette2",       NULL,
+  "RMS",                                    "property",         "RMS",                     "funkyrect", "palette2",       NULL,
+  "RMZ",                                    "property",         "RMZ",                     "funkyrect", "palette2",       NULL,
+  "RDM",                                    "property",         "RDM",                     "funkyrect", "palette2",       NULL,
+  "acc_MARS-Seq",                           "platform",         "MARS-Seq",                "funkyrect", "palette2",       NULL,
+  "acc_10X Genomics",                       "platform",         "10X Genomics",            "funkyrect", "palette2",       NULL,
+  "acc_Smart-seq2",                         "platform",         "Smart-seq2",              "funkyrect", "palette2",       NULL,
+  "acc_Mix sources1",                       "platform",         "Mix sources1",            "funkyrect", "palette2",       NULL,
+  "acc_CEL-seq",                            "platform",         "CEL-seq",                 "funkyrect", "palette2",       NULL,
+  "acc_Fluidigm C1",                        "platform",         "Fluidigm C1",             "funkyrect", "palette2",       NULL,
+  "acc_CEL-seq2",                           "platform",         "CEL-seq2",                "funkyrect", "palette2",       NULL,
+  "acc_Mix sources2",                       "platform",         "Mix sources2",            "funkyrect", "palette2",       NULL,
+  "acc_Drop-seq",                           "platform",         "Drop-seq",                "funkyrect", "palette2",       NULL,
+  "acc_inDrop",                             "platform",         "inDrop",                  "funkyrect", "palette2",       NULL,
+  "acc_Microwell-seq",                      "platform",         "Microwell-seq",           "funkyrect", "palette2",       NULL,
+  "acc_Smart-seq",                          "platform",         "Smart-seq",               "funkyrect", "palette2",       NULL,
+  "acc_ST",                                 "platform",         "ST",                      "funkyrect", "palette2",       NULL,
+  "acc_HDST",                               "platform",         "HDST",                    "funkyrect", "palette2",       NULL,
+  "acc_10X Visium",                         "platform",         "10X Visium",              "funkyrect", "palette2",       NULL,
+  "acc_Slide-Seq",                          "platform",         "Slide-Seq",               "funkyrect", "palette2",       NULL,
+  "acc_Slide-SeqV2",                        "platform",         "Slide-SeqV2",             "funkyrect", "palette2",       NULL,
+  "acc_seqFISH",                            "platform",         "seqFISH",                 "funkyrect", "palette2",       NULL,
+  "acc_seqFISH+",                           "platform",         "seqFISH+",                "funkyrect", "palette2",       NULL,
+  "acc_osmFISH",                            "platform",         "osmFISH",                 "funkyrect", "palette2",       NULL,
+  "acc_sci-Space",                          "platform",         "sci-Space",               "funkyrect", "palette2",       NULL,
+  "acc_MERFISH",                            "platform",         "MERFISH",                 "funkyrect", "palette2",       NULL,
+  "acc_Stereo-Seq",                         "platform",         "Stereo-Seq",              "funkyrect", "palette2",       NULL,
+  "acc_scRNA-seq data",                     "technique",        "scRNA-seq",               "funkyrect", "palette2",       NULL,
+  "acc_spatial transcriptome data",         "technique",        "ST technology",           "funkyrect", "palette2",       NULL
+)
+
+### column grouping
+
+column_groups <- tribble(
+  ~ Experiment,     ~Category,                                       ~group,           ~palette,
+  "Method",         "",                                              "method",         "palette1",
+  "Accuracy",       "Per metric",                                    "metric",         "palette2",
+  "Accuracy",       "Per property",                                  "property",       "palette2",
+  "Accuracy",       "Per platform",                                  "platform",       "palette2",
+  "Accuracy",       "Per technique",                                 "technique",      "palette2"
+)
+
+
+accuracy_sup_plot <- funky_heatmap(data = overall_data,
+                                   column_info = column_info,
+                                   column_groups = column_groups,
+                                   row_info = row_info,
+                                   row_groups = row_groups,
+                                   palettes = palettes,
+                                   scale_column = FALSE,
+                                   expand = c(xmin = 1, xmax = 4, ymin = 0.5, ymax = 0.5),
+                                   col_annot_offset = 4)
+
+ggsave(accuracy_sup_plot,
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig2.pdf",
+       units = "in",
+       width = 16,
+       height = 19)
+
+
+###--------------------------------------------------------------------------###
+###                       Supplementary Fig.3 (Functionality)
+###--------------------------------------------------------------------------###
+
+### define column information
+column_info <- column_info <- tribble(
+  ~ id,                                     ~group,             ~name,                     ~geom,       ~palette,         ~options,
+  "id",                                     "method",           "",                        "text",      NA,               list(hjust = 0, width = 7, size = 4, legend = FALSE),
+  "Group_score",                            "group",            "Group Score",             "funkyrect", "palette3",       NULL,
+  "CDI",                                    "group",            "CDI",                     "funkyrect", "palette3",       NULL,
+  "ROUGE",                                  "group",            "ROUGE",                   "funkyrect", "palette3",       NULL,
+  "silhouette",                             "group",            "silhouette",              "funkyrect", "palette3",       NULL,
+  "dunn",                                   "group",            "dunn",                    "funkyrect", "palette3",       NULL,
+  "connectivity",                           "group",            "connectivity",            "funkyrect", "palette3",       NULL,
+  "DB_index",                               "group",            "DB Index",                "funkyrect", "palette3",       NULL,
+  "DEGs_score",                             "DEGs",             "DEGs Score",              "funkyrect", "palette3",       NULL,
+  "distribution_score",                     "DEGs",             "Distribution Score",      "funkyrect", "palette3",       NULL,
+  "true_proportion",                        "DEGs",             "True Proportion",         "funkyrect", "palette3",       NULL,
+  "Accuracy",                               "DEGs",             "Accuracy",                "funkyrect", "palette3",       NULL,
+  "Precision",                              "DEGs",             "Precision",               "funkyrect", "palette3",       NULL,
+  "Recall",                                 "DEGs",             "Recall",                  "funkyrect", "palette3",       NULL,
+  "F1",                                     "DEGs",             "F1 Score",                "funkyrect", "palette3",       NULL,
+  "AUC",                                    "DEGs",             "AUC",                     "funkyrect", "palette3",       NULL,
+  "Batch_score",                            "batch",            "Batch Score",             "funkyrect", "palette3",       NULL,
+  "cms",                                    "batch",            "cms",                     "funkyrect", "palette3",       NULL,
+  "LISI",                                   "batch",            "LISI",                    "funkyrect", "palette3",       NULL,
+  "mm",                                     "batch",            "mm",                      "funkyrect", "palette3",       NULL,
+  "shannon_entropy",                        "batch",            "Shannon Entropy",         "funkyrect", "palette3",       NULL,
+  "kBET",                                   "batch",            "kBET",                    "funkyrect", "palette3",       NULL,
+  "AWS_batch",                              "batch",            "AWS_batch",               "funkyrect", "palette3",       NULL,
+  "pcr",                                    "batch",            "pcr",                     "funkyrect", "palette3",       NULL,
+  "Trajectory_score",                       "trajectory",       "Trajectory Score",        "funkyrect", "palette3",       NULL,
+  "HIM",                                    "trajectory",       "HIM",                     "funkyrect", "palette3",       NULL,
+  "F1_branches",                            "trajectory",       "F1_branches",             "funkyrect", "palette3",       NULL,
+  "F1_milestones",                          "trajectory",       "F1_milestones",           "funkyrect", "palette3",       NULL,
+  "Cor_dist",                               "trajectory",       "Cor_dist",                "funkyrect", "palette3",       NULL,
+  "func_MARS-Seq",                          "platform",         "MARS-Seq",                "funkyrect", "palette3",       NULL,
+  "func_10X Genomics",                      "platform",         "10X Genomics",            "funkyrect", "palette3",       NULL,
+  "func_Smart-seq2",                        "platform",         "Smart-seq2",              "funkyrect", "palette3",       NULL,
+  "func_Mix sources1",                      "platform",         "Mix sources1",            "funkyrect", "palette3",       NULL,
+  "func_CEL-seq",                           "platform",         "CEL-seq",                 "funkyrect", "palette3",       NULL,
+  "func_Fluidigm C1",                       "platform",         "Fluidigm C1",             "funkyrect", "palette3",       NULL,
+  "func_CEL-seq2",                          "platform",         "CEL-seq2",                "funkyrect", "palette3",       NULL,
+  "func_Mix sources2",                      "platform",         "Mix sources2",            "funkyrect", "palette3",       NULL,
+  "func_Drop-seq",                          "platform",         "Drop-seq",                "funkyrect", "palette3",       NULL,
+  "func_inDrop",                            "platform",         "inDrop",                  "funkyrect", "palette3",       NULL,
+#  "func_Microwell-seq",                     "platform",         "Microwell-seq",           "funkyrect", "palette3",       NULL,
+  "func_Smart-seq",                         "platform",         "Smart-seq",               "funkyrect", "palette3",       NULL,
+  "func_ST",                                "platform",         "ST",                      "funkyrect", "palette3",       NULL,
+  "func_HDST",                              "platform",         "HDST",                    "funkyrect", "palette3",       NULL,
+  "func_10X Visium",                        "platform",         "10X Visium",              "funkyrect", "palette3",       NULL,
+  "func_Slide-Seq",                         "platform",         "Slide-Seq",               "funkyrect", "palette3",       NULL,
+  "func_Slide-SeqV2",                       "platform",         "Slide-SeqV2",             "funkyrect", "palette3",       NULL,
+  "func_seqFISH",                           "platform",         "seqFISH",                 "funkyrect", "palette3",       NULL,
+  "func_seqFISH+",                          "platform",         "seqFISH+",                "funkyrect", "palette3",       NULL,
+  "func_osmFISH",                           "platform",         "osmFISH",                 "funkyrect", "palette3",       NULL,
+  "func_sci-Space",                         "platform",         "sci-Space",               "funkyrect", "palette3",       NULL,
+  "func_MERFISH",                           "platform",         "MERFISH",                 "funkyrect", "palette3",       NULL,
+  "func_Stereo-Seq",                        "platform",         "Stereo-Seq",              "funkyrect", "palette3",       NULL,
+  "func_scRNA-seq data",                    "technique",        "scRNA-seq",               "funkyrect", "palette3",       NULL,
+  "func_spatial transcriptome data",        "technique",        "ST technology",           "funkyrect", "palette3",       NULL
+)
+
+### column grouping
+
+column_groups <- tribble(
+  ~ Experiment,     ~Category,            ~group,           ~palette,
+  "Method",         "",                   "method",         "palette1",
+  "Functionality",  "Group",              "group",          "palette3",
+  "Functionality",  "DEGs",               "DEGs",           "palette3",
+  "Functionality",  "Batch",              "batch",          "palette3",
+  "Functionality",  "Trajectory",         "trajectory",     "palette3",
+  "Functionality",  "Per platform",       "platform",       "palette3",
+  "Functionality",  "Per technique",      "technique",      "palette3"
+)
+
+
+functionality_sup_plot <- funky_heatmap(data = overall_data,
+                                        column_info = column_info,
+                                        column_groups = column_groups,
+                                        row_info = row_info,
+                                        row_groups = row_groups,
+                                        palettes = palettes,
+                                        scale_column = FALSE,
+                                        expand = c(xmin = 1, xmax = 4, ymin = 0.5, ymax = 0.5),
+                                        col_annot_offset = 4)
+
+ggsave(functionality_sup_plot,
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig3.pdf",
+       units = "in",
+       width = 18,
+       height = 19)

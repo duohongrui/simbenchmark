@@ -6,15 +6,15 @@ library(tidyr)
 
 data_list <- list.files("../batch_evaluation/")
 a <- readRDS("../batch_evaluation/SCRIP-BGP-commonBCV_data11_Figshare_Aorta.rds")
-metric_name <- names(a)[-8]
+metric_name <- names(a)[-c(8, 9)]
 
 
 ### read data into a list
 all_result <- list()
 for (i in data_list) {
   result <- readRDS(file.path("../batch_evaluation", i))
-  name <- names(result)[-8]
-  result <- map(c(1:7, 9), .f = function(x){
+  name <- names(result)[-c(8, 9)]
+  result <- map(c(1:7), .f = function(x){
     mean(result[[x]])
   }) %>% setNames(name)
   all_result[[i]] <- result
@@ -41,11 +41,11 @@ batch_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   )
 
 ### normalize some values
-#### cms, MM, LISI, ISI, pcr
+#### cms, MM, LISI, pcr
 batch_data <- batch_data %>% 
   group_by(Data) %>% 
   mutate(
-    across(all_of(c("cms", "mm", "LISI", "ISI", "pcr")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+    across(all_of(c("cms", "mm", "LISI", "pcr")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
 #### AWS_batch
@@ -63,7 +63,7 @@ batch_data <- batch_data %>%
 ### scale for every metric [0, 1]
 batch_data <- batch_data %>% 
   mutate(
-    across(all_of(colnames(batch_data)[3:10]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
+    across(all_of(colnames(batch_data)[3:9]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
   )
 ### NA and NaN
 # batch_data <- batch_data %>% 
