@@ -12,7 +12,7 @@ library(scMultiSim)
 data_list <- list.files("../preprocessed_data/")
 
 method <- "scMultiSim"
-
+data_name <- c(paste0("data", c(11:20, 46, 48:50)))
 for(i in 1:length(data_list)){
   file_name <- data_list[i]
   ## read data
