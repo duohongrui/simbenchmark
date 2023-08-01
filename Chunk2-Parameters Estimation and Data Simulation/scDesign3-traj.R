@@ -42,6 +42,21 @@ for(i in 1:length(data_list)){
     }
   }
   
+  ## 2) spatial coordinate
+  if(!is.null(data_info$spatial_coordinate)){
+    spatial.x <- data_info$spatial_coordinate$x
+    spatial.y <- data_info$spatial_coordinate$y
+    other_prior <- list(group.condition = group,
+                        spatial.x = spatial.x,
+                        spatial.y = spatial.y,
+                        traj = TRUE,
+                        dynwrap_data = data$data)
+  }else{
+    other_prior <- list(group.condition = group,
+                        traj = TRUE,
+                        dynwrap_data = data$data)
+  }
+  
   traj <- stringr::str_split(method, pattern = "-", simplify = TRUE)[2]
   method_id <- stringr::str_split(method, pattern = "-", simplify = TRUE)[1]
   
@@ -55,9 +70,7 @@ for(i in 1:length(data_list)){
     estimation_result <- simpipe::estimate_parameters(
       ref_data = counts,
       method = method_id,
-      other_prior = list(group.condition = group,
-                         traj = TRUE,
-                         dynwrap_data = data$data),
+      other_prior = other_prior,
       seed = 1,
       verbose = TRUE),
     silent = FALSE,
