@@ -686,7 +686,7 @@ data <- simmethods::data
 group_condition <- as.numeric(simmethods::group_condition)
 
 eleventh_class <- c("zingeR")
-for(i in 10:20){
+for(i in 1:20){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -1070,9 +1070,9 @@ for(i in 1:20){
   gene_num <- gradient_num[i, 2]
   print(gene_num)
   
-  set.seed(i * 10)
+  set.seed(i)
   sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
-  set.seed(i * 10)
+  set.seed(i)
   gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
   
   sub_data <- data[gene_index, sample_index]
