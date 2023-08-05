@@ -192,7 +192,7 @@ example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
 data <- example_data$data
 group_condition <- example_data$data_info$group_condition
 
-fouth_class <- c("SPARSim", "powsimR", "POWSC", "scDesign2", "muscat")
+fouth_class <- c("SPARSim", "powsimR", "POWSC", "scDesign2", "muscat", "scMultiSim")
 
 for(i in 1:20){
   
@@ -891,11 +891,12 @@ for(i in 1:20){
 
 
 ## Thirteenth class of methods 
+library(simmethods)
 data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
 group_condition <- data$data_info$cluster_info
 data <- t(data$data$counts)
 
-thirteenth_class <- c("Splat-paths", "SplatPop-paths", "ESCO-traj", "ESCO-tree")
+thirteenth_class <- c("Splat-paths", "SplatPop-paths", "ESCO-traj", "ESCO-tree", "scMultiSim-tree")
 for(i in 1:20){
   
   cell_num <- gradient_num[i, 1]
@@ -940,6 +941,11 @@ for(i in 1:20){
           est_prior <- list(tree = TRUE,
                             group.condition = group)
           sim_prior <- list(type = "tree")
+        }
+        if(method == "scMultiSim-tree"){
+          sub_method <- "scMultiSim"
+          est_prior <- list(group.condition = group)
+          sim_prior <- list(traj = TRUE)
         }
         
         ### estimation
@@ -1228,6 +1234,144 @@ for(i in 1:20){
     Sys.sleep(1)
     saveRDS(scala, file = paste0("../scalability/",
                                  "class17_",
+                                 cell_num,
+                                 "_",
+                                 gene_num,
+                                 "_", n,
+                                 ".rds"))
+  }
+}
+
+
+## eighteenth class of methods which users can custom cell and gene number
+data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
+group_condition <- data$data_info$cluster_info
+data <- t(data$data$counts)
+method <- c("scDesign3-tree")
+for(i in 1:20){
+  
+  cell_num <- gradient_num[i, 1]
+  print(cell_num)
+  gene_num <- gradient_num[i, 2]
+  print(gene_num)
+  
+  set.seed(i*10)
+  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
+  set.seed(i*10)
+  gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
+  
+  sub_data <- data[gene_index, sample_index]
+  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  
+  dyndata <- dynwrap::wrap_expression(counts = t(sub_data),
+                                      expression = log2(t(sub_data) + 1))
+  model <- dynwrap::infer_trajectory(dyndata, tislingshot::ti_slingshot())
+  model <- dynwrap::add_grouping(model, unname(group_condition[sample_index]))
+  
+  for(n in 1:3){
+    other_prior <- list(group.condition = as.numeric(factor(unname(group_condition[sample_index]))),
+                        traj = TRUE,
+                        dynwrap_data = model)
+    ### estimation
+    est <- simpipe::estimate_parameters(ref_data = sub_data,
+                                        method = "scDesign3",
+                                        other_prior = other_prior,
+                                        seed = 111,
+                                        verbose = TRUE)
+    saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
+    time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
+    method_name <- "scDesign3-tree"
+    est_time <- as.numeric(time)
+    est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
+    
+    ### simulation
+    sim <- simpipe::simulate_datasets(parameters = est,
+                                      seed = 111,
+                                      return_format = "list",
+                                      verbose = TRUE)
+    saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
+    sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
+    sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+    
+    scala <- tibble::tibble("method" = method_name,
+                            "cell_num" = cell_num,
+                            "gene_num" = gene_num,
+                            "repeat_time" = n,
+                            "estimation_time" = est_time,
+                            "estimation_memory" = est_memory,
+                            "simulation_time" = sim_time,
+                            "simulation_memory" = sim_memory)
+    Sys.sleep(1)
+    saveRDS(scala, file = paste0("../scalability/",
+                                 "class18_",
+                                 cell_num,
+                                 "_",
+                                 gene_num,
+                                 "_", n,
+                                 ".rds"))
+  }
+}
+
+
+## nineteenth class (SRTSim)
+example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
+data <- example_data$data
+group_condition <- example_data$data_info$group_condition
+for(i in 1:20){
+  
+  cell_num <- gradient_num[i, 1]
+  print(cell_num)
+  gene_num <- gradient_num[i, 2]
+  print(gene_num)
+  
+  set.seed(i*10)
+  sample_index <- sample(ncol(data), size = cell_num, replace = TRUE)
+  set.seed(i*10)
+  gene_index <- sample(nrow(data), size = gene_num, replace = TRUE)
+  
+  sub_data <- data[gene_index, sample_index]
+  rownames(sub_data) <- paste0("Gene", 1:nrow(sub_data))
+  colnames(sub_data) <- paste0("Cell", 1:ncol(sub_data))
+  
+  spatial.x <- seq(1:ncol(sub_data))
+  spatial.y <- seq(1:ncol(sub_data))
+  
+  for(n in 1:3){
+    other_prior <- list(spatial.x = spatial.x,
+                        spatial.y = spatial.y)
+    ### estimation
+    est <- simpipe::estimate_parameters(ref_data = sub_data,
+                                        method = "SRTsim",
+                                        other_prior = other_prior,
+                                        seed = 111,
+                                        verbose = TRUE)
+    saveRDS(est, file = paste0("../scalability_est_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
+    time <- lapply(est, function(x){x[["estimate_detection"]][1,2]})
+    method_name <- "SRTSim"
+    est_time <- as.numeric(time)
+    est_memory <- as.numeric(lapply(est, function(x){x[["estimate_detection"]][1,4]}))
+    
+    ### simulation
+    sim <- simpipe::simulate_datasets(parameters = est,
+                                      seed = 111,
+                                      return_format = "list",
+                                      verbose = TRUE)
+    saveRDS(sim, file = paste0("../scalability_sim_datasets/", method, "_", cell_num, "_", gene_num, "_", n, ".rds"))
+    sim_time <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,2]}))
+    sim_memory <- as.numeric(lapply(sim, function(x){x[["simulate_detection"]][1,4]}))
+    
+    scala <- tibble::tibble("method" = "SRTSim",
+                            "cell_num" = cell_num,
+                            "gene_num" = gene_num,
+                            "repeat_time" = n,
+                            "estimation_time" = est_time,
+                            "estimation_memory" = est_memory,
+                            "simulation_time" = sim_time,
+                            "simulation_memory" = sim_memory)
+    Sys.sleep(1)
+    saveRDS(scala, file = paste0("../scalability/",
+                                 "class19_",
                                  cell_num,
                                  "_",
                                  gene_num,
