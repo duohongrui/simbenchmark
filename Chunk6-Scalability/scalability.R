@@ -1318,7 +1318,8 @@ for(i in 1:20){
 example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
 data <- example_data$data
 group_condition <- example_data$data_info$group_condition
-for(i in 1:20){
+method <- "SRTsim"
+for(i in 1:39){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
