@@ -20,7 +20,7 @@ for(i in 1:length(data_list)){
   data <- readRDS(file.path("../preprocessed_data", file_name))
   data_info <- data$data_info
   if(dynwrap::is_wrapper_with_expression(data$data)){
-    counts <- t(data$data[["counts"]])
+    next
   }else{
     counts <- data$data
   }
