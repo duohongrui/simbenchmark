@@ -41,14 +41,3 @@ saveRDS(trajectory_data, file = "Chunk8-Data Analysis/functionality/trajectory_d
 trajectory_long_data <- trajectory_data %>% 
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
 saveRDS(trajectory_long_data, file = "Chunk8-Data Analysis/functionality/trajectory_long_data.rds")
-
-
-###################### Deeply digging
-source("./Chunk8-Data Analysis/functionality/utils_functions.R")
-trajectory_long_data <- readRDS("Chunk8-Data Analysis/functionality/trajectory_long_data.rds")
-
-function_metric_for_datasets(function_data = trajectory_long_data,
-                             functionality = "Trajectory",
-                             bar_plot_name = "Fig5-g.pdf",
-                             cor_plot_name = "Fig5-h.pdf",
-                             technique_bar_name = "Fig5-S4.pdf")

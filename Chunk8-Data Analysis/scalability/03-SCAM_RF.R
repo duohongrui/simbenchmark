@@ -84,7 +84,7 @@ execution_data[execution_data$method == "scGAN", "simulation_memory"] <- NA
 
 
 #### split data
-set.seed(50)
+set.seed(9)
 train_data <- execution_data %>% 
   group_by(method) %>% 
   sample_frac(0.8) %>% 
@@ -138,16 +138,17 @@ scam_model <- list("estimation_time_model" = list("estimation_time_model" = esti
                    "simulation_memory_model" = list("simulation_memory_model" = simulation_memory_model,
                                                     "sim_memory_table" = sim_memory_table,
                                                     "sim_memory_correlation" = sim_memory_correlation))
-saveRDS(scam_model, file = "./Chunk8-Data Analysis/scalability/scam_model.rds")
+# saveRDS(scam_model, file = "./Chunk8-Data Analysis/scalability/scam_model.rds")
 
-ggsave(plot = wrap_plots(map(scam_model, function(x){x[[3]][[2]]}), ncol = 2),
-       filename = "./Chunk8-Data Analysis/scalability/scam_model.pdf",
+ggsave(plot = wrap_plots(map(scam_model, function(x){x[[3]][[2]]}), ncol = 2, byrow = TRUE) + plot_annotation(tag_levels = "a"),
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_18.pdf",
        height = 8,
        width = 8,
        units = "in")
 
 ########################## RF
 #### time of estimation
+set.seed(666)
 estimation_time_model <- scam_function(step = "estimation",
                                        train_data = train_data,
                                        test_data = test_data,
@@ -157,6 +158,7 @@ est_time_table <- bind_prediction_result(estimation_time_model)
 est_time_correlation <- correlation_plot(est_time_table)
 est_time_correlation$correlation_plot
 #### memory of estimation
+set.seed(666)
 estimation_memory_model <- scam_function(step = "estimation",
                                          train_data = train_data,
                                          test_data = test_data,
@@ -166,6 +168,7 @@ est_memory_table <- bind_prediction_result(estimation_memory_model)
 est_memory_correlation <- correlation_plot(est_memory_table)
 est_memory_correlation$correlation_plot
 #### time of simulation
+set.seed(666)
 simulation_time_model <- scam_function(step = "simulation",
                                        train_data = train_data,
                                        test_data = test_data,
@@ -175,6 +178,7 @@ sim_time_table <- bind_prediction_result(simulation_time_model)
 sim_time_correlation <- correlation_plot(sim_time_table)
 sim_time_correlation$correlation_plot
 #### memory of simulation
+set.seed(666)
 simulation_memory_model <- scam_function(step = "simulation",
                                          train_data = train_data,
                                          test_data = test_data,
@@ -195,9 +199,44 @@ RF_model <- list("estimation_time_model" = list("estimation_time_model" = estima
                  "simulation_memory_model" = list("simulation_memory_model" = simulation_memory_model,
                                                   "sim_memory_table" = sim_memory_table,
                                                   "sim_memory_correlation" = sim_memory_correlation))
-saveRDS(RF_model, file = "./Chunk8-Data Analysis/scalability/RF_model.rds")
-ggsave(plot = wrap_plots(map(RF_model, function(x){x[[3]][[2]]}), ncol = 2),
-       filename = "./Chunk8-Data Analysis/scalability/RF_model.pdf",
+saveRDS(RF_model, file = "/Volumes/Elements/sim_bench/RF_model.rds")
+ggsave(plot = wrap_plots(map(RF_model, function(x){x[[3]][[2]]}), nrow = 2, byrow = TRUE) + plot_annotation(tag_levels = "a"),
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_19.pdf",
        height = 8,
        width = 8,
        units = "in")
+
+
+### save for prediction
+
+extract_model <- function(object){
+  method_names <- names(object)
+  models <- map(method_names, .f = function(x){
+    model <- object[[x]][["model"]]
+    if(is.null(model)){
+      model
+    }else{
+      model <- model[-c(1,3:6,8:12,14:18)]
+    }
+  }) %>% setNames(method_names)
+  
+  for(i in 1:length(models)){
+    if(is.null(models[[i]])){
+      next
+    }else{
+      class(models[[i]]) <- "randomForest"
+    }
+  }
+  
+  return(models)
+}
+est_time_model <- extract_model(estimation_time_model)
+est_memory_model <- extract_model(estimation_memory_model)
+sim_time_model <- extract_model(simulation_time_model)
+sim_memory_model <- extract_model(simulation_memory_model)
+
+prediction_model <- list(estimation_time = est_time_model,
+                         estimation_memory = est_memory_model,
+                         simulation_time = sim_time_model,
+                         simulation_memory = sim_memory_model)
+saveRDS(prediction_model, "../../Documents/prediction_model.rds")

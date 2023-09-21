@@ -3,12 +3,70 @@ library(tibble)
 library(ggrepel)
 library(ggpubr)
 library(patchwork)
+
+### plot trend
+plot_trend <- function(scalability_long_data,
+                       step2,
+                       feature2,
+                       dim,
+                       class_palette){
+  a <- map(unique(scalability_long_data$method), function(y){
+    tmp <- scalability_long_data %>% 
+      filter(`step` == step2, `feature` == feature2, get(dim) == 1000, `method` == y)
+    if(dim == "cell_num"){
+      tmp <- tmp %>% 
+        mutate(
+          coef = gene_coef,
+          trend_class = gene_trend_class,
+          x = gene_num
+        )
+    }else{
+      tmp <- tmp %>% 
+        mutate(
+          coef = cell_coef,
+          trend_class = cell_trend_class,
+          x = cell_num
+        )
+    }
+    if(y == "SCRIP-GP-commonBCV" |
+       y == "SCRIP-GP-trendedBCV" |
+       y == "SCRIP-BGP-commonBCV" |
+       y == "SCRIP-BGP-trendedBCV"){
+      y <- paste0(paste0(str_split(y, pattern = "-", simplify = TRUE)[1, ][1:2], collapse = "-"),
+                  "-\n",
+                  paste0(str_split(y, pattern = "-", simplify = TRUE)[1, ][3], collapse = "-"))
+    }
+    p <- tmp %>% 
+      ggplot(aes(x = x, y = value))+
+      geom_point(color = "white", size = 0.5)+
+      stat_function(fun = function(x){
+        tmp2 <- tmp %>% 
+          pull(coef)
+        tmp2 <- tmp2[[1]]
+        tmp2[1] + tmp2[2]*log(x) + tmp2[3]*sqrt(x) + tmp2[4]*x + tmp2[5]*x^2 + tmp2[6]*x^3
+      }, aes(color = trend_class)) +
+      theme(panel.background = element_rect(fill = "black", linewidth = 2),
+            panel.grid = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title = element_blank(),
+            axis.text = element_blank(),
+            legend.position = "none",
+            title = element_text(size = 8))+
+      scale_color_manual("", values = class_palette)+
+      ggtitle(label = y, subtitle = tmp$trend_class[1])
+    p
+  }) %>% setNames(unique(scalability_long_data$method))
+  return(a)
+}
+
+
 ### model function for every method
 scam_function <- function(step,
                           feature,
                           train_data,
                           test_data,
                           model_selected = "scam",
+                          return_model = TRUE,
                           ntree = 600,
                           verbose = TRUE){
   methods <- unique(train_data$method)
@@ -64,6 +122,7 @@ scam_function <- function(step,
           predict_result)
     }
   }) %>% setNames(unique(train_data$method))
+  
   return(predict_result)
 }
 
@@ -92,8 +151,7 @@ correlation_plot <- function(table){
   table$x <- log10(table$x)
   table$y <- log10(table$y)
   
-  ### correlation
-  cor_value <- round(cor(table$x, table$y), digits = 2)
+  cor_value <- cor(table$x, table$y, method = "pearson")
   
   if(feature == "time"){
     feature_id <- "execution time"
@@ -102,12 +160,16 @@ correlation_plot <- function(table){
   }
   
   p <- ggplot(table, aes(x = x, y = y)) +
-    geom_point() +
-    geom_abline(intercept = 0, slope = 1, color = "red") +
+    geom_point(size = 1) +
+    stat_smooth(method="lm", se = TRUE) +
+    stat_cor(method = "pearson") +
     theme_bw() +
+    theme(panel.grid = element_blank(),
+          axis.text = element_text(colour = "black"),
+          panel.border = element_rect(colour = "black"),
+          axis.ticks = element_line(colour = "black")) +
     xlab(paste0("Actual log10 ", feature_id, " in ", step)) +
-    ylab(paste0("Predicted log10 ", feature_id, " in ", step)) +
-    ggtitle(paste0("Correlation: ", cor_value))
+    ylab(paste0("Predicted log10 ", feature_id, " in ", step))
   
   #################### for every method
   
@@ -122,11 +184,15 @@ correlation_plot <- function(table){
     ### Plot
     p_method <- ggplot(tmp, aes(x = x, y = y)) +
       geom_point() +
-      geom_abline(intercept = 0, slope = 1, color = "red") +
+      stat_smooth(method="lm", se = TRUE) +
+      stat_cor(method = "pearson") +
       theme_bw() +
+      theme(panel.grid = element_blank(),
+            axis.text = element_text(colour = "black"),
+            panel.border = element_rect(colour = "black"),
+            axis.ticks = element_line(colour = "black")) +
       xlab(paste0("Actual log10 ", feature_id, " in ", step)) +
-      ylab(paste0("Predicted log10 ", feature_id, " in ", step)) +
-      ggtitle(paste0("Correlation: ", cor_value_method), subtitle = paste0("Method: ", z))
+      ylab(paste0("Predicted log10 ", feature_id, " in ", step))
     
     list(cor_value = cor_value_method,
          plot = p_method)

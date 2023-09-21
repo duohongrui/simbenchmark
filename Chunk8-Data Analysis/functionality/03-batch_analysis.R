@@ -75,14 +75,3 @@ saveRDS(batch_data, file = "Chunk8-Data Analysis/functionality/batch_data.rds")
 batch_long_data <- batch_data %>% 
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
 saveRDS(batch_long_data, file = "Chunk8-Data Analysis/functionality/batch_long_data.rds")
-
-
-###################### Deeply digging
-source("./Chunk8-Data Analysis/functionality/utils_functions.R")
-batch_long_data <- readRDS("Chunk8-Data Analysis/functionality/batch_long_data.rds")
-
-function_metric_for_datasets(function_data = batch_long_data,
-                             functionality = "Batch",
-                             bar_plot_name = "Fig5-e.pdf",
-                             cor_plot_name = "Fig5-f.pdf",
-                             technique_bar_name = "Fig5-S3.pdf")

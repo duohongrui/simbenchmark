@@ -8,7 +8,7 @@ property <- colnames(overall_data)[23:37]
 
 source("./Chunk8-Data Analysis/utils.plot.R")
 ###--------------------------------------------------------------------------###
-###             Supplementary Fig.5 (property linear regression)
+###             Supplementary Fig.7 (property linear regression)
 ###--------------------------------------------------------------------------###
 
 property_cor_plot <- cor_plot(data = overall_data,
@@ -20,13 +20,13 @@ property_cor_plot <- cor_plot(data = overall_data,
                               ncol = 4)
 
 ggsave(plot = property_cor_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig5.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig7.pdf",
        units = "cm",
        width = 18,
        height = 15)
 
 ###--------------------------------------------------------------------------###
-###             Supplementary Fig.6 (metrics linear regression)
+###             Supplementary Fig.8 (metrics linear regression)
 ###--------------------------------------------------------------------------###
 metric <- colnames(overall_data)[15:22]
 metric_cor_plot <- cor_plot(data = overall_data,
@@ -38,7 +38,7 @@ metric_cor_plot <- cor_plot(data = overall_data,
                             ncol = 4)
 
 ggsave(plot = metric_cor_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig6.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig8.pdf",
        units = "cm",
        width = 18,
        height = 9)

@@ -5,7 +5,7 @@ library(tidyr)
 
 
 data_list <- list.files("../group_evaluation/")
-a <- readRDS("../group_evaluation/Lun2_data100_stimulated-dendritic-cells-PAM_shalek.rds.rds")
+a <- readRDS("../group_evaluation/ESCO_data102_spatial_B1.rds")
 metric_name <- names(a)
 rm(a)
 
@@ -74,17 +74,4 @@ saveRDS(group_data, file = "Chunk8-Data Analysis/functionality/group_data.rds")
 group_long_data <- group_data %>% 
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
 saveRDS(group_long_data, file = "Chunk8-Data Analysis/functionality/group_long_data.rds")
-
-
-###################### Deeply digging
-source("./Chunk8-Data Analysis/functionality/utils_functions.R")
-group_long_data <- readRDS("Chunk8-Data Analysis/functionality/group_long_data.rds")
-
-function_metric_for_datasets(function_data = group_long_data,
-                             functionality = "Group",
-                             bar_plot_name = "Fig5-a.pdf",
-                             cor_plot_name = "Fig5-b.pdf",
-                             technique_bar_name = "Fig5-S.pdf")
-
-
 

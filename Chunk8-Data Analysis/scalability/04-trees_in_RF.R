@@ -41,14 +41,14 @@ methods <- unique(data$method)
 RF_gradient_result <- RF_gradient_function(ntree = ntrees, methods = methods)
 saveRDS(RF_gradient_result, "./Chunk8-Data Analysis/scalability/RF_gradient_result.rds")
 
-RF_gradient_result$tree <- factor(RF_gradient_result$tree, levels = c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 800, 1000, 3000, 4000, 5000))
+RF_gradient_result$tree <- factor(RF_gradient_result$tree,
+                                  levels = c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 800, 1000, 3000, 4000, 5000))
 
 
 
-
-
+#### Plot
 line_data <- RF_gradient_result %>% 
-  pivot_longer(cols = colnames(.)[5:50], names_to = "method", values_to = "correlation") %>% 
+  pivot_longer(cols = colnames(.)[5:55], names_to = "method", values_to = "correlation") %>% 
   group_by(step, feature, tree, method) %>% 
   summarise(
     mean_correlation = mean(correlation, na.rm = TRUE)
@@ -56,7 +56,7 @@ line_data <- RF_gradient_result %>%
 line_data$tree <- as.numeric(line_data$tree)
 
 ################################################################################
-##############################    FigS2-FigS5   ################################
+######################    Supp_Fig35-Supp_Fig38   ##############################
 ################################################################################
 
 ### estimation-time
@@ -69,7 +69,7 @@ ggsave(plot = wrap_plots(est_time_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Fig4-S2.pdf")
+       filename = "../sim-article/figures/Supp_Fig_21.pdf")
 
 ### estimation-memory
 est_memory_plots <- RF_tree_plot_function(Step = "estimation",
@@ -81,7 +81,7 @@ ggsave(plot = wrap_plots(est_memory_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Fig4-S3.pdf")
+       filename = "../sim-article/figures/Supp_Fig_22.pdf")
 
 ### simulation-time
 sim_time_plots <- RF_tree_plot_function(Step = "simulation",
@@ -93,7 +93,7 @@ ggsave(plot = wrap_plots(sim_time_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Fig4-S4.pdf")
+       filename = "../sim-article/figures/Supp_Fig_23.pdf")
 
 
 ### simulation-memory
@@ -106,4 +106,4 @@ ggsave(plot = wrap_plots(sim_memory_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Fig4-S5.pdf")
+       filename = "../sim-article/figures/Supp_Fig_24.pdf")

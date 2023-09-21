@@ -5,12 +5,12 @@ library(tidyr)
 library(ggplot2)
 library(patchwork)
 
-data_list <- list.files("../scalability2")
+data_list <- list.files("../scalability")
 
 ### read data into a list
 all_result <- list()
 for (i in data_list) {
-  result <- readRDS(file.path("../scalability2", i))
+  result <- readRDS(file.path("../scalability", i))
   all_result[[i]] <- result
 }
 
@@ -18,11 +18,7 @@ for (i in data_list) {
 scalability_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   all_result[[index]]
 })
-scalability_data2 <- purrr::map_dfr(1:length(all_result), .f = function(index){
-  all_result[[index]]
-})
-scalability_data <- rbind(scalability_data, scalability_data2)
-rm(scalability_data2)
+scalability_data$method[which(scalability_data$method == "SRTSim")] <- "SRTsim"
 saveRDS(scalability_data, file = "./Chunk8-Data Analysis/scalability/scalability_data.rds")
 ### scalability score
 
@@ -61,7 +57,7 @@ score_data <- score_data %>%
     simulation_memory = mean(simulation_memory, na.rm = TRUE)
   ) %>% 
   ungroup()
-score_data[42, c(3,5)] <- NaN
+score_data[44, c(3,5)] <- NaN
 ### time and memory score
 score_data <- score_data %>% 
   mutate(
@@ -71,8 +67,8 @@ score_data <- score_data %>%
   )
 
 ### correlation values derived from "Shape constrained additive models and Random Forest" section
-scam_model <- readRDS("./Chunk8-Data Analysis/scalability/scam_model.rds")
-all_methods_cor <- map_dfc(scam_model, .f = function(x){
+RF_model <- readRDS("/Volumes/Elements/sim_bench/RF_model.rds")
+all_methods_cor <- map_dfc(RF_model, .f = function(x){
   id_name <- names(x)[1]
   step <- str_split(id_name, "_", simplify = TRUE)[1]
   feature <- str_split(id_name, "_", simplify = TRUE)[2]
@@ -99,7 +95,7 @@ all_methods_cor <- map_dfc(scam_model, .f = function(x){
 })
 all_methods_cor <- all_methods_cor %>% 
   mutate(
-    method = names(scam_model[[1]][[1]])
+    method = names(RF_model[[1]][[1]])
   ) %>% 
   relocate(method, .before = estimation_time_cor)
 score_data <- score_data %>% 

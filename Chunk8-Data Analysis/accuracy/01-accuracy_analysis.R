@@ -68,6 +68,7 @@ accuracy_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   mutate(
     across(all_of(metrics_property), as.numeric)
   )
+
 ### Delete DIS
 DIS_col <- grep("DIS", colnames(accuracy_data))
 accuracy_data <- accuracy_data[, -DIS_col]

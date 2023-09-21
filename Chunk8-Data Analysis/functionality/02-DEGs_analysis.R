@@ -56,14 +56,3 @@ DEGs_long_data <- DEGs_data %>%
   pivot_longer(., cols = 3:ncol(.), names_to = "metric", values_to = "value")
 saveRDS(DEGs_long_data, file = "Chunk8-Data Analysis/functionality/DEGs_long_data.rds")
 
-
-###################### Deeply digging
-source("./Chunk8-Data Analysis/functionality/utils_functions.R")
-DEGs_long_data <- readRDS("Chunk8-Data Analysis/functionality/DEGs_long_data.rds")
-
-function_metric_for_datasets(function_data = DEGs_long_data,
-                             functionality = "DEGs",
-                             bar_plot_name = "Fig5-c.pdf",
-                             cor_plot_name = "Fig5-d.pdf",
-                             technique_bar_name = "Fig5-S2.pdf")
-

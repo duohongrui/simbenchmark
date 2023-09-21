@@ -5,17 +5,14 @@ library(tidyr)
 library(ggplot2)
 
 ### usability data
-usability_data <- openxlsx::read.xlsx("Chunk7-Usability/method_scoring.xlsx", rowNames = TRUE)
+usability_data <- openxlsx::read.xlsx("Chunk7-Usability/method_scoring2.xlsx", rowNames = TRUE)
 colnames(usability_data) <- gsub(x = colnames(usability_data), pattern = "[.]", replacement = " ")
-cite_score <- 1 - seq(0, 1, 1/45)
-cite_score <- cite_score[order(usability_data$Cite, decreasing = TRUE)]
-usability_data$Cite <- cite_score
 
 ### weight data
-weight_data <- openxlsx::read.xlsx("Chunk7-Usability/Usability-scoringsheet.xlsx")
+weight_data <- openxlsx::read.xlsx("Chunk7-Usability/Usability-scoringsheet2.xlsx")
 
 ### summarize usability score
-usability_score <- as.matrix(usability_data) %*% matrix(weight_data$Weight, ncol = 1)/100
+usability_score <- as.matrix(usability_data) %*% matrix(weight_data$Weight, ncol = 1)/sum(weight_data$Weight)
 
 usability <- tibble(method = rownames(usability_data),
                     usability_score = usability_score[,1])
@@ -30,12 +27,12 @@ usability_long_data <- usability_data %>%
   tibble::rownames_to_column(var = "method") %>% 
   pivot_longer(2:ncol(.), names_to = "content", values_to = "score") %>% 
   mutate(
-    category = rep(c(rep("Avalability", 8),
-                     rep("Code", 8),
-                     rep("Evaluation", 4),
-                     rep("Maintenance", 5),
+    category = rep(c(rep("Avalability", 7),
+                     rep("Code", 7),
+                     rep("Evaluation", 3),
+                     rep("Maintenance", 3),
                      rep("Documentation", 5),
-                     rep("Paper", 4)), 45)
+                     rep("Paper", 2)), 49)
   )
 saveRDS(usability_long_data, file = "Chunk8-Data Analysis/usability/usability_long_data.rds")
 rect_width <- 0.5
@@ -44,7 +41,7 @@ tiny_space <- 0.2
 
 usability_long_data <- usability_long_data %>% 
   mutate(
-    x = rep(cumsum(rep(rect_width, 45)), each = 34),
+    x = rep(cumsum(rep(rect_width, 49)), each = 27),
     xmin = x - rect_width/2,
     xmax = x + rect_width/2,
     spacing = c(0, diff(as.numeric(factor(category)))) != 0,
@@ -52,7 +49,7 @@ usability_long_data <- usability_long_data %>%
       spacing ~ big_space,
       TRUE ~ tiny_space
     ),
-    ymax = rep(c(1:34) * rect_width + cumsum(width[1:34]), 45),
+    ymax = rep(c(1:27) * rect_width + cumsum(width[1:27]), 49),
     ymin = ymax - 0.5,
     y = ymin + 0.25,
   )
@@ -64,25 +61,25 @@ text_data <- tibble(
            unique(usability_long_data$content),
            unique(usability_long_data$category)),
   x = c(unique(usability_long_data$x),
-        rep(-0.1, 34),
+        rep(-0.1, 27),
         rep(-6, 6)),
-  y = c(rep(-0.5, 45),
+  y = c(rep(-0.5, 49),
         unique(usability_long_data$y),
-        c(2.55, 9.0, 14, 18.3, 22.55, 26.3)),
-  angle = c(rep(45, 45),
-            rep(0, 34),
+        c(2.55, 8.25, 12.55, 15.45, 19.05, 22)),
+  angle = c(rep(45, 49),
+            rep(0, 27),
             rep(90, 6)),
   # size = c(rep(5, 42), rep(10, 6)),
-  hjust = c(rep("right", 45),
-            rep("right", 34),
+  hjust = c(rep("right", 49),
+            rep("right", 27),
             rep("middle", 6))
 )
 
 ### method segment
-segment_data <- tibble('x' = c(unique(usability_long_data$x), rep(-5, 6)),
-                       'xend' = c(unique(usability_long_data$x), rep(-5, 6)),
-                       'y' = c(rep(-0.01, 45), unique(usability_long_data$ymax)[c(8, 16, 20, 25, 30, 34)]),
-                       'yend' = c(rep(-0.40, 45), unique(usability_long_data$ymin)[c(1, 9, 17, 21, 26, 31)]))
+segment_data <- tibble('x' = c(unique(usability_long_data$x), rep(-5.5, 6)),
+                       'xend' = c(unique(usability_long_data$x), rep(-5.5, 6)),
+                       'y' = c(rep(-0.01, 49), unique(usability_long_data$ymax)[c(7, 14, 17, 20, 25, 27)]),
+                       'yend' = c(rep(-0.40, 49), unique(usability_long_data$ymin)[c(1, 8, 15, 18, 21, 26)]))
 
 
 g <- ggplot()+
@@ -139,7 +136,7 @@ barplot <- ggplot(usability_score_data, aes(x = reorder(method, -score), y = sco
 
 
 ########################   plot patch   ##################################
-
+library(patchwork)
 layout <- "
 #AAAAAAAAAAA#
 #BBBBBBBBBBBB
@@ -149,8 +146,8 @@ usability_plot <- wrap_plots(barplot, g,
                              ncol = 1,
                              heights = c(1,3),
                              design = layout)+
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'a')
 usability_plot
-ggsave(usability_plot, filename = "Chunk8-Data Analysis/usability/usability.pdf", width = 15, height = 15, units = "in")
+ggsave(usability_plot, filename = "../sim-article/figures/Supp_Fig_20.pdf", width = 15, height = 15, units = "in")
 
 
