@@ -1,13 +1,3 @@
-################################################################################
-#    &&&....&&&    % Project: A Systematic Evaluation of Single-Cell RNA-Seq   #
-#  &&&&&&..&&&&&&                       Data Simulation Methods                #
-#  &&&&&&..&&&&&&  % Chunk1: Data Preparation                                  #
-#  &&&&&&&&&&&&&&  % Author: Duo Hongrui                                       #
-#   &&&&&&&&&&&&   % Date: Oct. 26th, 2021                                     #
-#     &&&&&&&&     % Environment: R version 4.1.1 (2021-08-10);                #
-#       &&&&       % Platform: x86_64-w64-mingw32/x64 (64-bit)                 #
-#        &         %           Intel(R)Core(TM)i5-8250U CPU@1.60GHz 1.80 GHz   #                                                                                                       #
-################################################################################
 library(Seurat)
 library(SeuratDisk)
 library(rliger)

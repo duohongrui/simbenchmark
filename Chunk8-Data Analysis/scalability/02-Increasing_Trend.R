@@ -122,6 +122,10 @@ scalability_gene_model$SimBPDD$estimation <- NULL
 scalability_cell_model$SPsimSeq$estimation <- NULL
 scalability_cell_model$scDesign$estimation <- NULL
 scalability_cell_model$SimBPDD$estimation <- NULL
+scalability_gene_model$scGAN$estimation$memory <- NULL
+scalability_gene_model$scGAN$simulation$memory <- NULL
+scalability_cell_model$scGAN$estimation$memory <- NULL
+scalability_cell_model$scGAN$simulation$memory <- NULL
 saveRDS(scalability_gene_model, file = "Chunk8-Data Analysis/scalability/scalability_gene_model.rds")
 saveRDS(scalability_cell_model, file = "Chunk8-Data Analysis/scalability/scalability_cell_model.rds")
 

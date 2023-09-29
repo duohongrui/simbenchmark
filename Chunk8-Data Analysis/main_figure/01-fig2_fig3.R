@@ -187,11 +187,9 @@ usability <- usability %>%
   ungroup() %>% 
   pivot_wider(names_from = "category", values_from = score)
 
-usability <- usability %>% 
-  mutate(
-    usability = apply(.[-1], 1, mean)
-  )
-
+usability_score <- readRDS("./Chunk8-Data Analysis/usability/usability.rds")
+usability <- left_join(usability, usability_score, by = "method")
+colnames(usability)[8] <- "usability"
 colnames(usability)[1] <- "Method"
 
 
@@ -298,43 +296,43 @@ row_info <- tribble(
    "Class 1",      "powsimR",
    "Class 1",      "SPsimSeq",
    "Class 2",      "SCRIP-paths",
-   "Class 2",      "PROSSTT",
    "Class 2",      "scDesign3-tree",
    "Class 2",      "Splat-paths",
    "Class 2",      "ESCO-tree",
+   "Class 2",      "PROSSTT",
    "Class 2",      "SplatPop-paths",
    "Class 2",      "ESCO-traj",
-   "Class 2",      "TedSim",
    "Class 2",      "phenopath",
-   "Class 2",      "SymSim",
+   "Class 2",      "TedSim",
    "Class 2",      "MFA",
-   "Class 2",      "scMultiSim-tree",
-   "Class 2",      "dyngen",
    "Class 2",      "dyntoy",
+   "Class 2",      "scMultiSim-tree",
+   "Class 2",      "SymSim",
    "Class 2",      "VeloSim",
-   "Class 3",      "scDesign",
+   "Class 2",      "dyngen",
    "Class 3",      "Lun",
    "Class 3",      "muscat",
+   "Class 3",      "scDesign",
    "Class 3",      "ESCO",
-   "Class 3",      "scDesign3",
-   "Class 3",      "scDD",
    "Class 3",      "zingeR",
+   "Class 3",      "scDD",
+   "Class 3",      "scDesign3",
    "Class 3",      "scMultiSim",
    "Class 3",      "zinbwaveZinger",
    "Class 4",      "SRTsim",
-   "Class 4",      "scDesign2",
    "Class 4",      "Lun2",
-   "Class 4",      "POWSC",
+   "Class 4",      "scDesign2",
    "Class 4",      "BASiCS",
+   "Class 4",      "POWSC",
    "Class 4",      "hierarchicell",
-   "Class 4",      "scGAN",
    "Class 4",      "SparseDC",
+   "Class 4",      "scGAN",
    "Class 4",      "SimBPDD",
    "Class 5",      "Kersplat",
    "Class 5",      "zinbwave",
+   "Class 5",      "dropsim",
    "Class 5",      "Simple",
    "Class 5",      "BEARscc",
-   "Class 5",      "dropsim",
    "Class 5",      "CancerInSilico"
 )
 
@@ -646,14 +644,14 @@ column_info <- tribble(
                                                                                                                                width = 4,
                                                                                                                                size = 4,
                                                                                                                                legend = FALSE),
-  "KDE",                                    "property",         "Kernel Density",          "funkyrect", "palette2",       NULL,
-  "KS",                                     "property",         "KS Distance",             "funkyrect", "palette2",       NULL,
-  "MAD",                                    "property",         "MAD",                     "funkyrect", "palette2",       NULL,
-  "MAE",                                    "property",         "MAE",                     "funkyrect", "palette2",       NULL,
-  "OV",                                     "property",         "Overlapping Index",       "funkyrect", "palette2",       NULL,
-  "RMSE",                                   "property",         "RMSE",                    "funkyrect", "palette2",       NULL,
-  "bhattacharyya",                          "property",         "BH Distance",             "funkyrect", "palette2",       NULL,
-  "multiKS",                                "property",         "multiKS",                 "funkyrect", "palette2",       NULL,
+  "KDE",                                    "metric",           "Kernel Density",          "funkyrect", "palette2",       NULL,
+  "KS",                                     "metric",           "KS Distance",             "funkyrect", "palette2",       NULL,
+  "MAD",                                    "metric",           "MAD",                     "funkyrect", "palette2",       NULL,
+  "MAE",                                    "metric",           "MAE",                     "funkyrect", "palette2",       NULL,
+  "OV",                                     "metric",           "Overlapping Index",       "funkyrect", "palette2",       NULL,
+  "RMSE",                                   "metric",           "RMSE",                    "funkyrect", "palette2",       NULL,
+  "bhattacharyya",                          "metric",           "BH Distance",             "funkyrect", "palette2",       NULL,
+  "multiKS",                                "metric",           "multiKS",                 "funkyrect", "palette2",       NULL,
   "LS",                                     "property",         "LS",                      "funkyrect", "palette2",       NULL,
   "FZC",                                    "property",         "FZC",                     "funkyrect", "palette2",       NULL,
   "CCC",                                    "property",         "CCC",                     "funkyrect", "palette2",       NULL,
@@ -723,14 +721,14 @@ accuracy_sup_plot <- funky_heatmap(data = overall_data,
                                    col_annot_offset = 4)
 
 ggsave(accuracy_sup_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig2.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_2.pdf",
        units = "in",
        width = 16,
        height = 19)
 
 
 ###--------------------------------------------------------------------------###
-###                       Supplementary Fig.5 (Functionality)
+###                       Supplementary Fig.6 (Functionality)
 ###--------------------------------------------------------------------------###
 
 ### define column information

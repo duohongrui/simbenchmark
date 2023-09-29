@@ -67,7 +67,7 @@ scam_function <- function(step,
                           test_data,
                           model_selected = "scam",
                           return_model = TRUE,
-                          ntree = 600,
+                          ntree = 500,
                           verbose = TRUE){
   methods <- unique(train_data$method)
   id <- paste0(step, "_", feature)
