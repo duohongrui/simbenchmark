@@ -6,4 +6,4 @@ The **simbenchmark** repository includes the codes of evaluating the simulation 
 
 |Chunk id|                     Content                  |               Link            |
 |:------:|:--------------------------------------------:|:-----------------------------:|
-| Chunk1 |Preparation of datasets and simulation methods|[📋](./Chunk1-Data preparation)|
+| Chunk1 |Preparation of datasets and simulation methods|[📋](https://github.com/duohongrui/simbenchmark/tree/master/Chunk1-Data%20preparation)|
