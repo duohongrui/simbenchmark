@@ -1,5 +1,5 @@
 library(simpipe)
-sim_data_list <- list.files("../simulation_data/", pattern = "^PROSSTT")
+sim_data_list <- list.files("../simulation_data/")
 
 for(i in sim_data_list){
   print(i)
@@ -7,7 +7,7 @@ for(i in sim_data_list){
   message("Read simulated data...")
   sim_result <- readRDS(file.path("../simulation_data", i))
   sim_data <- as.data.frame(sim_result$sim_data$count_data)
-  if(any(colSums(sim_data, na.rm = TRUE)==0)){
+  if(any(colSums(sim_data, na.rm = TRUE) == 0)){
     next
   }
   message("Calculate cell properties...")

@@ -3,12 +3,18 @@ group_condition <- data[["data_info"]][["group_condition"]]
 data <- data$data
 save_path <- "./scGAN_preprocessed_data"
 
-gradient_num <- data.frame("cell" = c(100, 200, 500, 800, 1000, 2000, 3000, 5000, 8000, 10000, rep(1000, 10)),
-                           "gene" = c(rep(1000, 10), 500, 800, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000))
-gradient_num <- data.frame("cell" = c(150, 300, 400, 600, 700, 900, 1500, 4000, 6000, 7000, 9000, rep(1000, 9)),
-                           "gene" = c(rep(1000, 11), 1000, 1500, 3500, 4500, 5500, 6500, 7500, 8500, 9500))
+gradient_num <- data.frame("cell" = c(100, 150, 200, 300, 400,
+                                      500, 600, 700, 800, 900,
+                                      1000, 1500, 2000, 3000, 4000,
+                                      5000, 6000, 7000, 8000, 9000, 10000,
+                                      rep(1000, 19)),
+                           "gene" = c(rep(1000, 21),
+                                      500, 800, 1000, 1500, 2000,
+                                      3000, 3500, 4000, 4500, 5000,
+                                      5500, 6000, 6500, 7000, 7500,
+                                      8000, 8500, 9500, 10000))
 cluster_info <- list()
-for(i in 1:20){
+for(i in 1:nrow(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)

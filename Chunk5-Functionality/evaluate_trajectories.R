@@ -73,15 +73,3 @@ for(i in ref_data_list){
       file = paste0("../trajectory_evaluation/", w))
   }
 }
-
-# est <- simmethods::Splat_estimation(t(data$data$counts), seed = 111)
-# sim <- simmethods::Splat_simulation(est$estimate_result,
-#                                     return_format = "list",
-#                                     seed = 111, other_prior = list(paths = TRUE))
-# traj_result <- simutils::calculate_trajectory_properties(
-#   ref_data = data$data,
-#   sim_data = sim$simulate_result$count_data,
-#   sim_data_grouping = NULL,
-#   seed = 666,
-#   verbose = TRUE
-# )

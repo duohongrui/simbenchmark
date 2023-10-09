@@ -1,19 +1,23 @@
 example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
 data <- example_data$data
 group_condition <- example_data$data_info$group_condition
-
-
-gradient_num <- data.frame("cell" = c(100, 200, 500, 800, 1000, 2000, 3000, 5000, 8000, 10000, rep(1000, 10)),
-                           "gene" = c(rep(1000, 10), 500, 800, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 10000))
-gradient_num <- data.frame("cell" = c(150, 300, 400, 600, 700, 900, 1500, 4000, 6000, 7000, 9000, rep(1000, 9)),
-                           "gene" = c(rep(1000, 11), 1000, 1500, 3500, 4500, 5500, 6500, 7500, 8500, 9500))
+gradient_num <- data.frame("cell" = c(100, 150, 200, 300, 400,
+                                      500, 600, 700, 800, 900,
+                                      1000, 1500, 2000, 3000, 4000,
+                                      5000, 6000, 7000, 8000, 9000, 10000,
+                                      rep(1000, 19)),
+                           "gene" = c(rep(1000, 21),
+                                      500, 800, 1000, 1500, 2000,
+                                      3000, 3500, 4000, 4500, 5000,
+                                      5500, 6000, 6500, 7000, 7500,
+                                      8000, 8500, 9500, 10000))
 ## First class of methods which users can custom cell and gene number
 method <- c("Simple",
             "Kersplat",
             "Splat",
             "SplatPop",
             "Lun")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -73,7 +77,7 @@ for(i in 1:20){
 
 modes <- c("GP-trendedBCV", "GP-commonBCV", "BGP-commonBCV", "BP", "BGP-trendedBCV")
 
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -140,7 +144,7 @@ for(i in 1:20){
 
 third_class <- c("scDesign", "SPsimSeq")
 
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   cell_num <- gradient_num[i, 1]
   print(cell_num)
   gene_num <- gradient_num[i, 2]
@@ -194,7 +198,7 @@ group_condition <- example_data$data_info$group_condition
 
 fouth_class <- c("SPARSim", "powsimR", "POWSC", "scDesign2", "muscat", "scMultiSim")
 
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -257,13 +261,11 @@ for(i in 1:20){
 }
 
 
-
-
 ## Fifth class of methods
 library(ESCO)
 fifth_class <- c("ESCO", "zinbwave", "hierarchicell", "dropsim")
 
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -337,7 +339,7 @@ for(i in 1:20){
 ## Sixth class of methods
 sixth_class <- c("SparseDC", "zinbwaveZinger")
 library(simmethods)
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -408,7 +410,7 @@ data <- data[-grep(rownames(data), pattern = "^ERCC"), ]
 library(SingleCellExperiment)
 
 ninth_class <- c("BEARscc")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -479,7 +481,7 @@ data <- SingleCellExperiment::normcounts(scDatExSim)
 group_condition <- SingleCellExperiment::colData(scDatExSim)$condition
 
 eighth_class <- c("scDD")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -553,7 +555,7 @@ for(i in 1:20){
 
 ## Ninth class of methods (BACiCS)
 seventh_class <- c("BASiCS")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -618,7 +620,7 @@ for(i in 1:20){
 
 ## Tenth class of methods (Lun2)
 tenth_class <- c("Lun2")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -686,7 +688,7 @@ data <- simmethods::data
 group_condition <- as.numeric(simmethods::group_condition)
 
 eleventh_class <- c("zingeR")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -769,7 +771,7 @@ group_condition <- data$data_info$cluster_info
 data <- t(data$data$counts)
 
 twelfth_class <- c("SCRIP-paths", "PROSSTT", "TedSim", "dyntoy", "SymSim", "VeloSim", "MFA", "phenopath")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -897,7 +899,7 @@ group_condition <- data$data_info$cluster_info
 data <- t(data$data$counts)
 
 thirteenth_class <- c("Splat-paths", "SplatPop-paths", "ESCO-traj", "ESCO-tree", "scMultiSim-tree")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -999,7 +1001,7 @@ group_condition <- data$data_info$cluster_info
 data <- t(data$data$counts)
 
 fourteenth_class <- c("dyngen")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -1069,7 +1071,7 @@ for(i in 1:20){
 ## Fifteenth class of methods (CancerInSilico)
 
 fifteenth_class <- c("CancerInSilico")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -1135,8 +1137,7 @@ for(i in 1:20){
 
 ## Sixtheenth class of SimBPDD
 sixteenth_class <- c("SimBPDD")
-
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   cell_num <- gradient_num[i, 1]
   print(cell_num)
   gene_num <- gradient_num[i, 2]
@@ -1186,7 +1187,7 @@ for(i in 1:20){
 
 ## seventeenth class of methods which users can custom cell and gene number
 method <- c("scDesign3")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -1248,7 +1249,7 @@ data <- readRDS("../preprocessed_data/data85_cellbench-SC4_luyitian.rds")
 group_condition <- data$data_info$cluster_info
 data <- t(data$data$counts)
 method <- c("scDesign3-tree")
-for(i in 1:20){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
@@ -1319,7 +1320,7 @@ example_data <- readRDS("../preprocessed_data/data42_GSE65525_subset3.rds")
 data <- example_data$data
 group_condition <- example_data$data_info$group_condition
 method <- "SRTsim"
-for(i in 1:39){
+for(i in 1:length(gradient_num)){
   
   cell_num <- gradient_num[i, 1]
   print(cell_num)
