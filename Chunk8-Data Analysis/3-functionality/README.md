@@ -1,7 +1,7 @@
 ## The content table for evaluating method functionality
 
 |ID|                     Content                  |               Link            |
-|:------:|:--------------------------------------------:|:-----------------------------:|
+|:------:|:--------------------------------------------|:-----------------------------:|
 | 1 |Summarization of cell group functionality|[➡️️📂](https://github.com/duohongrui/simbenchmark/blob/master/Chunk8-Data%20Analysis/3-functionality/01-group_analysis.R)|
 | 2 |Summarization of DEGs functionality|️[➡️️📂](https://github.com/duohongrui/simbenchmark/blob/master/Chunk8-Data%20Analysis/3-functionality/02-DEGs_analysis.R)|
 | 3 |Summarization of cell batch functionality|[➡️📂](https://github.com/duohongrui/simbenchmark/blob/master/Chunk8-Data%20Analysis/3-functionality/03-batch_analysis.R)|
