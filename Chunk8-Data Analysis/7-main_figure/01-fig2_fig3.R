@@ -382,7 +382,7 @@ summary_plot <- funky_heatmap(data = overall_data %>%
 
 library(Cairo)
 ggsave(summary_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig2.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig2-revised.pdf",
        units = "in",
        width = 17,
        height = 24,

@@ -13,7 +13,7 @@ weight_data <- openxlsx::read.xlsx("Chunk7-Usability/Usability-scoringsheet.xlsx
 
 ### summarize usability score
 usability_score <- as.matrix(usability_data) %*% matrix(weight_data$Weight, ncol = 1)/sum(weight_data$Weight)
-
+usability_score <- pnorm((log2(usability_score) - mean(log2(usability_score))) / sd(log2(usability_score)))
 usability <- tibble(method = rownames(usability_data),
                     usability_score = usability_score[,1])
 saveRDS(usability, file = "Chunk8-Data Analysis/5-usability/usability.rds")

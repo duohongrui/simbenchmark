@@ -158,3 +158,107 @@ ggsave(
   width = 9,
   units = "in"
 )
+
+
+
+################################################################################
+##########################   Supplementary Figure xxx  ###########################
+################################################################################
+library(ggplot2)
+library(patchwork)
+data_files <- list.files("../preprocessed_data/", pattern = "data10[2-7]")
+
+plot_data <- list()
+
+for(i in data_files){
+  print(i)
+  name <- strsplit(i,"_")[[1]][1]
+  ref_data <- readRDS(file.path("../preprocessed_data", i))
+  location <- ref_data$data_info$spatial_coordinate
+  traj <- dynwrap::wrap_expression(counts = ref_data$data$counts,
+                                   expression = ref_data$data$expression)
+  groups <- data.frame("cell_id" = rownames(ref_data$data$counts),
+                       "group_id" = ref_data$data_info$cluster_info)
+  traj <- dynwrap::add_grouping(traj, grouping = groups)
+  model <- dynwrap::infer_trajectory(traj,
+                                     method = tislingshot::ti_slingshot(),
+                                     give_priors = NULL,
+                                     seed = 1,
+                                     verbose = TRUE,
+                                     parameters = NULL)
+  p <- dynplot::plot_dimred(
+    model,
+    dimred = location,
+    expression_source = dataset$expression, 
+    grouping = traj$grouping,
+    size_cells = 2,
+    size_milestones = 1) +
+    ggtitle(label = name, subtitle = paste(model$trajectory_type, "trajectory")) +
+    theme(
+      legend.title = element_blank()
+    )
+    # theme_linedraw() +
+    # theme(
+    #   legend.title = element_blank(),
+    #   legend.position = "bottom",
+    #   panel.grid = element_blank(),
+    #   axis.ticks = element_blank(),
+    #   axis.title = element_blank(),
+    #   axis.text = element_blank()
+    # )
+  plot_data[[name]] <- p
+}
+
+ggsave(filename = "../sim-article/figures/Supp_trajectory_1.pdf", plot = wrap_plots(plot_data))
+
+
+
+
+data_files <- list.files("../preprocessed_data/")[20:27][-5]
+plot_data <- list()
+for(i in data_files){
+  print(i)
+  name <- strsplit(i,"_")[[1]][1]
+  ref_data <- readRDS(file.path("../preprocessed_data", i))
+  location <- ref_data$data_info$spatial_coordinate
+  traj <- dynwrap::wrap_expression(counts = ref_data$data$counts,
+                                   expression = ref_data$data$expression)
+  groups <- data.frame("cell_id" = rownames(ref_data$data$counts),
+                       "group_id" = ref_data$data_info$cluster_info)
+  traj <- dynwrap::add_grouping(traj, grouping = groups)
+  model <- dynwrap::infer_trajectory(traj,
+                                     method = tislingshot::ti_slingshot(),
+                                     give_priors = NULL,
+                                     seed = 1,
+                                     verbose = TRUE,
+                                     parameters = NULL)
+  p <- dynplot::plot_dimred(
+    model,
+    dimred = location,
+    expression_source = dataset$expression, 
+    grouping = traj$grouping,
+    size_cells = 1,
+    size_milestones = 0.6) +
+    ggtitle(label = name, subtitle = paste(model$trajectory_type, "trajectory")) +
+    theme(
+      legend.title = element_blank()
+    )
+  # theme_linedraw() +
+  # theme(
+  #   legend.title = element_blank(),
+  #   legend.position = "bottom",
+  #   panel.grid = element_blank(),
+  #   axis.ticks = element_blank(),
+  #   axis.title = element_blank(),
+  #   axis.text = element_blank()
+  # )
+  plot_data[[name]] <- p
+}
+ggsave(filename = "../sim-article/figures/Supp_trajectory_2.pdf", plot = plot_data[[1]])
+ggsave(filename = "../sim-article/figures/Supp_trajectory_3.pdf", plot = plot_data[[2]])
+ggsave(filename = "../sim-article/figures/Supp_trajectory_4.pdf", plot = plot_data[[3]])
+ggsave(filename = "../sim-article/figures/Supp_trajectory_5.pdf", plot = plot_data[[4]])
+ggsave(filename = "../sim-article/figures/Supp_trajectory_6.pdf", plot = plot_data[[5]])
+ggsave(filename = "../sim-article/figures/Supp_trajectory_7.pdf", plot = plot_data[[6]])
+ggsave(filename = "../sim-article/figures/Supp_trajectory_8.pdf", plot = plot_data[[7]])
+saveRDS(plot_data, file = "../plot_data.rds")
