@@ -47,7 +47,7 @@ library(dplyr)
 sim_data_list <- list.files("../simulation_data/", pattern = "spatial")
 ref_data_list <- list.files("../preprocessed_data/", pattern = "spatial")
 
-for(ref_data_name in ref_data_list[27:28]){
+for(ref_data_name in ref_data_list){
   ### read reference data
   print(which(ref_data_list %in% ref_data_name))
   print(ref_data_name)
