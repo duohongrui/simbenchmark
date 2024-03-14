@@ -60,7 +60,6 @@ for(ref_data_name in ref_data_list){
   ref_spatial_data <- ref_data$data_info$spatial_coordinate %>% 
     tibble::rownames_to_column("reference")
   ref_data_cell_properties <- simutils::cell_properties(ref_count_data, verbose = TRUE)
-  # ref_data_gene_properties <- simutils::gene_properties(ref_count_data, verbose = TRUE)
   data_num <- stringr::str_split(ref_data_name, pattern = "_", simplify = TRUE)[1]
   
   sim_data_list <- list.files("../sim_data_properties/", pattern = data_num)
@@ -121,26 +120,6 @@ for(ref_data_name in ref_data_list){
     if(is(error, "try-error")){
       next
     }
-    
-    sim_property <- match_result %>% 
-      select(3,4)
-    libraryvscellzero_sim <- data.frame("library_size" = log10(sim_data_cell_properties$cell_properties$library_size)+1,
-                                        "zero_fraction" = sim_data_cell_properties$cell_properties$zero_fraction_cell)
-    sim_property <- cbind(sim_property, libraryvscellzero_sim)
-    real_property <- match_result %>% 
-      select(3,4)
-    libraryvscellzero_ref <- data.frame("library_size" = log10(ref_data_cell_properties$library_size[arrange_index])+1,
-                                        "zero_fraction" = ref_data_cell_properties$zero_fraction_cell[arrange_index])
-    real_property <- cbind(real_property, libraryvscellzero_sim)
-    spatial_multiKS <- fasano.franceschini.test::fasano.franceschini.test(real_property, sim_property)
-    spatial_data_cell_propety <- rbind(spatial_data_cell_propety,
-                                       tibble::tibble(
-                                         "Method" = method,
-                                         "Data" = data_num,
-                                         "data_property" = "libraryvscellzero",
-                                         "spatial_multiKS" = mean(spatial_multiKS$estimate),
-                                         "spatial_KDE" = NA,
-                                       ))
     saveRDS(spatial_data_cell_propety, file = paste0("../spatial_metrics_results/", method, "_", data_num, "_cell", ".rds"))
   }
 }

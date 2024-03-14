@@ -9,7 +9,7 @@ for(file_name in data_list){
   
   if(simulated_data$sim_data_info$group >= 2 & "de_gene" %in% colnames(simulated_data$sim_data$row_meta) |
      simulated_data$sim_data_info$group >= 2 & "DEstatus" %in% colnames(simulated_data$sim_data$row_meta)){
-    
+    message(file_name)
     data <- readRDS(paste0("../preprocessed_data/", list.files("../preprocessed_data/", pattern = data_name)))
     if(dynwrap::is_wrapper_with_expression(data$data)){
       ref_data <- t(as.matrix(data$data$counts))
@@ -18,17 +18,36 @@ for(file_name in data_list){
     }
     locations <- data$data_info$spatial_coordinate
     count_data <- simulated_data$sim_data$count_data %>% as.matrix()
+    if(ncol(count_data) != ncol(ref_data)){
+      next
+    }
     
     cat("Performing PCA...\n")
-    pca_ref <- prcomp(t(ref_data), rank. = 50)
-    # pca_ref <- gmodels::fast.prcomp(t(ref_data))
-    # pca_ref <- Morpho::prcompfast(t(ref_data))
-    pca_sim <- prcomp(t(count_data), rank. = 50)
+    error3 <- try(
+      pca_ref <- prcomp(t(ref_data), rank. = 50),
+      silent = TRUE
+    )
+    if(is(error3, "try-error")){
+      next
+    }
+    error1 <- try(
+      pca_sim <- prcomp(t(count_data), rank. = 50),
+      silent = TRUE
+    )
+    if(is(error1, "try-error")){
+      next
+    }
     cat("Performing Correlation...\n")
     cor_result <- WGCNA::cor(t(rbind(pca_ref$x, pca_sim$x)), method = 'spearman')
     index <- dim(cor_result)[1]/2
     cor_result <- cor_result[(index+1):(index*2), 1:index]
-    Hungarian_result <- RcppHungarian::HungarianSolver(-cor_result)
+    error2 <- try(
+      Hungarian_result <- RcppHungarian::HungarianSolver(-cor_result),
+      silent = TRUE
+    )
+    if(is(error2, "try-error")){
+      next
+    }
     match_value <- purrr::map(1:ncol(cor_result), .f = function(x){
       cor_result[Hungarian_result[["pairs"]][x, 1], Hungarian_result[["pairs"]][x, 2]]
     }) %>% unlist()
@@ -63,7 +82,8 @@ for(file_name in data_list){
       }
       moran_result <- moran_result %>% 
         rbind(tibble(
-          "data" = "data123",
+          "method" = method,
+          "data" = data_name,
           "gene" = rownames(count_data)[i],
           "Moran" = result$observed
         ))
@@ -73,11 +93,3 @@ for(file_name in data_list){
     next
   }
 }
-
-# ozone.dists <- as.matrix(dist(locations))
-# ozone.dists.inv <- 1/ozone.dists
-# diag(ozone.dists.inv) <- 0
-# ape::Moran.I(candicate_data$gene, ozone.dists.inv)
-# listw <- mat2listw(ozone.dists.inv, style = "W", zero.policy = TRUE)
-# moran(x = candicate_data$gene, listw = listw, n = ncol(count_data), S0 = Szero(listw), zero.policy = TRUE)
-# geary(x = candicate_data$gene, listw = listw, n = ncol(count_data), n1 = ncol(count_data) - 1, S0 = Szero(listw), zero.policy = TRUE)
