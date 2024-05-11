@@ -394,7 +394,7 @@ summary_plot <- funky_heatmap(data = overall_data %>%
 
 library(Cairo)
 ggsave(summary_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig2-revised.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig2.pdf",
        units = "in",
        width = 17,
        height = 24,
@@ -488,14 +488,14 @@ fig2_plot <- funky_heatmap(data = overall_data,
                            col_annot_offset = 4)
 
 ggsave(fig2_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig3_revised.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig3.pdf",
        units = "in",
        width = 16,
        height = 19)
 
 
 ###--------------------------------------------------------------------------###
-###                       Supplementary Fig.2 (Accuracy)
+###                       Supplementary Fig.3 (Accuracy)
 ###--------------------------------------------------------------------------###
 
 ### define column information
@@ -582,14 +582,14 @@ accuracy_sup_plot <- funky_heatmap(data = overall_data,
                                    col_annot_offset = 4)
 
 ggsave(accuracy_sup_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_2.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_3.pdf",
        units = "in",
        width = 16,
        height = 19)
 
 
 ###--------------------------------------------------------------------------###
-###                       Supplementary Fig.6 (Functionality)
+###                       Supplementary Fig.7 (Functionality)
 ###--------------------------------------------------------------------------###
 
 ### define column information
@@ -683,7 +683,7 @@ functionality_sup_plot <- funky_heatmap(data = overall_data,
                                         col_annot_offset = 3)
 
 ggsave(functionality_sup_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_6.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_7.pdf",
        units = "in",
        width = 18,
        height = 19)

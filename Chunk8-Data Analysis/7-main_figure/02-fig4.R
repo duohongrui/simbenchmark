@@ -41,25 +41,25 @@ platforms <- c("MARS-seq",
                "MERFISH",
                "Stereo-seq")
 ###--------------------------------------------------------------------------###
-###                                    Fig4a
+###                           Supplementary Figure 2
 ###--------------------------------------------------------------------------###
-fig4a <- overall_data %>% 
+supp_fig2a <- overall_data %>% 
   select(c(1,2, 17:24)) %>% 
   pivot_longer(cols = 3:ncol(.), names_to = "metric", values_to = "value")
-fig4a$Category <- factor(fig4a$Category, levels = paste0("Class ", 1:5))
-fig4a$metric <- factor(fig4a$metric, levels = c("MAD", "MAE", "RMSE", "KS", "OV", "bhattacharyya", "KDE", "multiKS"))
-p4_a <- ggboxplot(data = fig4a,
-                  x = "Category",
-                  y = "value",
-                  color = "Category",
-                  ggtheme = theme_pubr(),
-                  size = 0.2,
-                  alpha = 0.6,
-                  width = 0.8,
-                  bxp.errorbar = FALSE,
-                  outlier.size = 0,
-                  add = "jitter",
-                  add.params = list(size = 0.05))+
+supp_fig2a$Category <- factor(supp_fig2a$Category, levels = paste0("Class ", 1:5))
+supp_fig2a$metric <- factor(supp_fig2a$metric, levels = c("MAD", "MAE", "RMSE", "KS", "OV", "bhattacharyya", "KDE", "multiKS"))
+supp_f2a <- ggboxplot(data = supp_fig2a,
+                      x = "Category",
+                      y = "value",
+                      color = "Category",
+                      ggtheme = theme_pubr(),
+                      size = 0.2,
+                      alpha = 0.6,
+                      width = 0.8,
+                      bxp.errorbar = FALSE,
+                      outlier.size = 0,
+                      add = "jitter",
+                      add.params = list(size = 0.05))+
   ylab("Metric values") +
   scale_color_manual(values = method_class_colors) +
   scale_fill_manual(values = method_class_colors) +
@@ -89,15 +89,15 @@ p4_a <- ggboxplot(data = fig4a,
 
 
 ###--------------------------------------------------------------------------###
-###                                    Fig4b
+###                                    supp_fig2b
 ###--------------------------------------------------------------------------###
-fig4b <- overall_data %>% 
+supp_fig2b <- overall_data %>% 
   select(c(1,2, 25:39)) %>% 
   pivot_longer(cols = 3:ncol(.), names_to = "property", values_to = "value")
-fig4b$Category <- factor(fig4b$Category, levels = paste0("Class ", 1:5))
-fig4b$property <- factor(fig4b$property)
+supp_fig2b$Category <- factor(supp_fig2b$Category, levels = paste0("Class ", 1:5))
+supp_fig2b$property <- factor(supp_fig2b$property)
 
-p4_b <- ggboxplot(data = fig4b,
+supp_f2b <- ggboxplot(data = supp_fig2b,
                   x = "Category",
                   y = "value",
                   color = "Category",
@@ -129,20 +129,15 @@ p4_b <- ggboxplot(data = fig4b,
   ylim(0, 1) +
   scale_y_continuous(labels = c("0", "0.8"), breaks = c(0, 0.8))
 
-ggsave(plot = p4_a / p4_b + plot_layout(height = c(1,2)),
-       filename = "../sim-article/figures/Fig4ab.pdf",
+ggsave(plot = supp_f2a / supp_f2b + plot_layout(height = c(1,2)),
+       filename = "../sim-article/figures/Supp_Fig_2.pdf",
        width = 10,
        height = 10,
        units = "cm")
 
-###--------------------------------------------------------------------------###
-###                         Fig4c,d (03-accuracy_model.R)
-###--------------------------------------------------------------------------###
-
-
 
 ###--------------------------------------------------------------------------###
-###                                    Fig4e
+###                                    Fig4a
 ###--------------------------------------------------------------------------###
 technique_colors <- c("#7DAEF4", "#E0709E")
 method_class_colors <- c(RColorBrewer::brewer.pal(12, "Set3")[4],
@@ -196,8 +191,8 @@ col <- list(Technique.Platform = c(`scRNA-seq` = technique_colors[1],
                       class4 = method_class_colors[4],
                       class5 = method_class_colors[5]))
 
-pdf(file = "../sim-article/figures/Fig4e.pdf", width = 7, height = 8)
-p4_e <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
+pdf(file = "../sim-article/figures/Fig4a.pdf", width = 7, height = 8)
+p4_a <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  show_colnames = TRUE,
                                  show_rownames = TRUE,
                                  scale = "none",
@@ -211,24 +206,24 @@ p4_e <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  gaps_row = c(15, 25, 34, 43), 
                                  color = c(colorRampPalette(c("#0f86a9", "white", "#ed8b10"))(40)),
                                  na_col = "gray80")
-print(p4_e)
+print(p4_a)
 dev.off()
 
 
 ###--------------------------------------------------------------------------###
-###                                    Fig4f
+###                                    Fig4b
 ###--------------------------------------------------------------------------###
-### fig4f
+### fig4b
 library(ggrepel)
 library(ggpmisc)
-fig4f_data <- overall_data %>% 
+fig4b_data <- overall_data %>% 
   select(all_of(c("id", "scRNA-seq data", "spatial transcriptome data", "Category"))) %>% 
   rename(., `ST technology` = `spatial transcriptome data`) %>% 
   rename(., `scRNA-seq` = `scRNA-seq data`) %>% 
   rename(., Method = id) %>% 
   drop_na()
 
-fig4f <- ggplot(fig4f_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
+fig4b <- ggplot(fig4b_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
   geom_smooth(method = 'lm', linewidth = 0.6, color = "red") +
   geom_point(size = 0.8) +
   stat_cor(method = "pearson", size = 2) +
@@ -256,24 +251,24 @@ fig4f <- ggplot(fig4f_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
   ylab("Accuracy scores on the scRNA-seq datasets") +
   scale_fill_manual(values = method_class_colors)
 
-ggsave(plot = fig4f,
-       filename = "../sim-article/figures/Fig4f.pdf",
+ggsave(plot = fig4b,
+       filename = "../sim-article/figures/Fig4b.pdf",
        width = 7,
        height = 7,
        units = "cm")
 
 ###--------------------------------------------------------------------------###
-###                           Fig4f-Supplementary
+###                                Fig4c
 ###--------------------------------------------------------------------------###
 library(ggrepel)
 library(ggpmisc)
 spatial_accuracy_data <- readRDS("Chunk8-Data Analysis/2-accuracy/spatial_accuracy_plot_data.rds")
-fig4f_supp_data <- fig4f_data %>% 
+fig4c <- fig4b_data %>% 
   select(-3) %>% 
   left_join(spatial_accuracy_data %>% select(1:2), by = "Method") %>% 
   rename(., `ST technology` = accuracy)
 
-fig4f_supp <- ggplot(fig4f_supp_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
+fig4c <- ggplot(fig4c, aes(x = `ST technology`, y = `scRNA-seq`)) +
   geom_smooth(method = 'lm', linewidth = 0.3, color = "red") +
   geom_point(size = 0.8) +
   stat_cor(method = "pearson", size = 2) +
@@ -301,153 +296,29 @@ fig4f_supp <- ggplot(fig4f_supp_data, aes(x = `ST technology`, y = `scRNA-seq`))
   ylab("Accuracy scores on the scRNA-seq datasets") +
   scale_fill_manual(values = method_class_colors)
 
-ggsave(plot = fig4f_supp,
-       filename = "../sim-article/figures/Fig4f_supp.pdf",
+ggsave(plot = fig4c,
+       filename = "../sim-article/figures/Fig4c.pdf",
        width = 7,
        height = 7,
        units = "cm")
 
 
-###--------------------------------------------------------------------------###
-###                                    Fig4g
-###--------------------------------------------------------------------------###
-### fig4f
-fig4g_data <- overall_data %>% 
-  select(all_of(c("id", "Category", platforms))) %>% 
-  pivot_longer(cols = 3:ncol(.), names_to = "Platform", values_to = "platform_score") %>% 
-  rename(., Method = id)
-fig4g_data$Method <- factor(fig4g_data$Method, levels = overall_data$id)
-fig4g_data <- fig4g_data %>% 
-  mutate(
-    technology = case_when(
-      Platform %in% platforms[1:13] ~ "scRNA-seq",
-      Platform %in% platforms[14:24] ~ "ST technology"
-    )
-  )
-sample_size <- fig4g_data %>%
-  drop_na() %>% 
-  group_by(technology, Category) %>%
-  summarize(num = n()) %>% 
-  mutate(y = 0.1)
-fig4g <- ggplot(fig4g_data, aes(x = Category, y = platform_score, color = technology)) +
-  geom_boxplot(outlier.alpha = 0,
-               width = 1,
-               size = 0.1) +
-  geom_jitter(data = fig4g_data,
-              aes(x = Category, y = platform_score, color = technology),
-              pch = 19,
-              size = 0.08,
-              position = position_jitterdodge(dodge.width = 0.9)) +
-  geom_text(data = sample_size, aes(x = Category, y = y, label = num), size = 1) +
-  theme_bw() +
-  scale_color_manual(values = technique_colors) +
-  theme(
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 5, color = "black"),
-    axis.text.y = element_text(size = 5, color = "black"),
-    axis.title.y = element_text(size = 6.5),
-    legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5),
-    legend.position = "bottom",
-    legend.background = element_blank(),
-    legend.box.background = element_blank(),
-    legend.box = "horizontal",
-    legend.key = element_rect(fill = NA),
-    panel.grid = element_blank(),
-    axis.title.x = element_blank(),
-    axis.ticks = element_line(linewidth = 0.3, lineend = 0.5)
-  ) +
-  stat_compare_means(data = fig4g_data,
-                     mapping = aes(group = technology),
-                     method = "wilcox.test",
-                     label = "p.signif",
-                     hide.ns = TRUE)+
-  ylab("Accuracy score")
-
-ggsave(plot = fig4g,
-       filename = "../sim-article/figures/Fig4g.pdf",
-       width = 6,
-       height = 8,
-       units = "cm")
-
 
 ###--------------------------------------------------------------------------###
-###                                    Fig4h
+###                                    Fig4d
 ###--------------------------------------------------------------------------###
-#### Fig4d boxplot
-fig4h_data <- fig4g_data
-odds <- seq(1, 49, 2)
-rect <- fig4h_data[odds, ]
-sample_size <- fig4h_data %>%
-  drop_na() %>% 
-  group_by(Method, technology) %>%
-  summarize(num = n()) %>% 
-  mutate(y = 0.1)
-fig4h <- ggplot(fig4h_data, aes(x = Method, y = platform_score, color = technology))+
-  geom_rect(data = rect,
-            xmin = odds - 0.5,
-            xmax = odds + 0.5,
-            ymin = -Inf,
-            ymax = +Inf,
-            fill = "gray60",
-            alpha = 0.3,
-            inherit.aes = F) +
-  geom_boxplot(outlier.alpha = 0,
-               width = 1,
-               size = 0.1) +
-  geom_jitter(aes(group = technology),
-              pch = 19,
-              size = 0.05,
-              position = position_jitterdodge(dodge.width=0.9)) +
-  stat_compare_means(mapping = aes(group = technology),
-                     method = "wilcox.test",
-                     label = "p.signif",
-                     hide.ns = TRUE) +
-  scale_color_manual(values = technique_colors) +
-  geom_text(data = sample_size, aes(x = Method, y = y, label = num), size = 1) +
-  theme_bw() +
-  theme(
-    axis.text.x = element_text(angle = 45,
-                               vjust = 1,
-                               hjust = 1,
-                               size = 4.5,
-                               color = "black"),
-    axis.text.y = element_text(size = 4, color = "black"),
-    axis.title.y = element_text(size = 5),
-    axis.ticks = element_line(linewidth = 0.05, lineend = 0.01, color = "black"),
-    axis.title.x = element_blank(),
-    legend.title = element_text(size = 5),
-    legend.text = element_text(size = 4),
-    legend.position = c(0.5, -0.5),
-    legend.direction = "horizontal",
-    legend.background = element_blank(),
-    legend.box.background = element_blank(),
-    legend.box = "horizontal",
-    legend.key = element_rect(fill = NA),
-    legend.key.size = unit(0.3, 'cm'),
-    panel.grid = element_blank()
-  )
-
-ggsave(plot = fig4h,
-       filename = "../sim-article/figures/Fig4h.pdf",
-       width = 18,
-       height = 5,
-       units = "cm")
-
-###--------------------------------------------------------------------------###
-###                                    Fig4h-Supp
-###--------------------------------------------------------------------------###
-#### Fig4h
-Fig4h_data <- spatial_accuracy_data
-colnames(Fig4h_data)[9:19] <- str_split(colnames(Fig4h_data)[9:19], "_", simplify = TRUE)[, 2]
-Fig4h_data <- overall_data %>% 
+#### Fig4d
+Fig4d_data <- spatial_accuracy_data
+colnames(Fig4d_data)[9:19] <- str_split(colnames(Fig4d_data)[9:19], "_", simplify = TRUE)[, 2]
+Fig4d_data <- overall_data %>% 
   select(all_of(c("id", platforms[1:13]))) %>% 
   rename(Method = id) %>% 
-  full_join(Fig4h_data, by = "Method")
-Fig4h_data <- Fig4h_data %>% 
+  full_join(Fig4d_data, by = "Method")
+Fig4d_data <- Fig4d_data %>% 
   select(-c(15:21)) %>% 
   pivot_longer(cols = 2:ncol(.), names_to = "Platform", values_to = "platform_score")
-Fig4h_data$Method <- factor(Fig4h_data$Method, levels = overall_data$id)
-Fig4h_data <- Fig4h_data %>% 
+Fig4d_data$Method <- factor(Fig4d_data$Method, levels = overall_data$id)
+Fig4d_data <- Fig4d_data %>% 
   mutate(
     technology = case_when(
       Platform %in% platforms[1:13] ~ "scRNA-seq",
@@ -455,8 +326,8 @@ Fig4h_data <- Fig4h_data %>%
     )
   )
 odds <- seq(1, 49, 2)
-rect <- Fig4h_data[odds, ]
-fig4h <- ggplot(Fig4h_data, aes(x = Method, y = platform_score, color = technology))+
+rect <- Fig4d_data[odds, ]
+fig4d <- ggplot(Fig4d_data, aes(x = Method, y = platform_score, color = technology))+
   geom_rect(data = rect,
             xmin = odds - 0.5,
             xmax = odds + 0.5,
@@ -500,14 +371,14 @@ fig4h <- ggplot(Fig4h_data, aes(x = Method, y = platform_score, color = technolo
     panel.grid = element_blank()
   )
 
-ggsave(plot = fig4h,
-       filename = "../sim-article/figures/Fig4h_revised.pdf",
+ggsave(plot = fig4d,
+       filename = "../sim-article/figures/Fig4d.pdf",
        width = 18,
        height = 6,
        units = "cm")
 
 ###--------------------------------------------------------------------------###
-###                             Supplementary Fig. 5
+###                             Supplementary Fig 6
 ###--------------------------------------------------------------------------###
 accuracy <- readRDS("Chunk8-Data Analysis/2-accuracy/accuracy_long_data.rds")
 data_info <- openxlsx::read.xlsx("./Chunk1-Data preparation/evaluation_datasets.xlsx", rowNames = TRUE, sep.names = " ") %>% 
@@ -532,7 +403,7 @@ accuracy <- accuracy %>%
   ) %>% 
   relocate(Type, .after = "Platform")
 
-supp5_data <- accuracy %>% 
+supp6_data <- accuracy %>% 
   group_by(Method, metric, Platform, Type, Data, `Quantification Strategy`) %>% 
   summarise(
     value = mean(value, na.rm = TRUE),
@@ -548,17 +419,17 @@ supp5_data <- accuracy %>%
   ) %>% 
   drop_na()
 
-supp5_data$Method <- factor(supp5_data$Method, levels = overall_data$id)
+supp6_data$Method <- factor(supp6_data$Method, levels = overall_data$id)
 odds <- seq(1, 47, 2)
-rect <- supp5_data[odds, ]
+rect <- supp6_data[odds, ]
 
-sample_size <- supp5_data %>%
+sample_size <- supp6_data %>%
   drop_na() %>% 
   group_by(Method, `Quantification Strategy`) %>%
   summarize(num = n()) %>% 
   mutate(y = 0)
 
-supp5 <- ggplot(supp5_data, aes(x = Method, y = value, color = `Quantification Strategy`))+
+supp6 <- ggplot(supp6_data, aes(x = Method, y = value, color = `Quantification Strategy`))+
   geom_rect(data = rect,
             xmin = odds - 0.5,
             xmax = odds + 0.5,
@@ -604,8 +475,8 @@ supp5 <- ggplot(supp5_data, aes(x = Method, y = value, color = `Quantification S
   ) +
   ylim(0, 1)
 
-ggsave(plot = supp5,
-       filename = "../sim-article/figures/Supp_Fig_5.pdf",
+ggsave(plot = supp6,
+       filename = "../sim-article/figures/Supp_Fig_6.pdf",
        width = 18,
        height = 8,
        units = "cm")

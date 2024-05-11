@@ -42,7 +42,7 @@ technique_colors <- c("#7DAEF4", "#E0709E")
 method_class_colors <- c(RColorBrewer::brewer.pal(12, "Set3")[4],
                          "#94D3C7","#AAAAE0","#ADCE65","#EAC5E3")
 ###--------------------------------------------------------------------------###
-###                                    Fig5a
+###                                    Fig6a
 ###--------------------------------------------------------------------------###
 functionality <- c("Group", "DEGs", "Batch", "Trajectory")
 
@@ -118,13 +118,13 @@ function_bar_plot <- map(functionality, .f = function(x){
 })
 
 ggsave(plot = (function_bar_plot[[1]] | function_bar_plot[[2]]) / (function_bar_plot[[3]] | function_bar_plot[[4]]) + plot_layout(heights = c(2,1)),
-       filename = "../sim-article/figures/Fig5a.pdf",
+       filename = "../sim-article/figures/Fig6a.pdf",
        width = 7,
        height = 9,
        units = "cm")
 
 ###--------------------------------------------------------------------------###
-###                                    Fig5b
+###                        Fig6b and Supplementary Fig 8
 ###--------------------------------------------------------------------------###
 library(ggrepel)
 library(ggpmisc)
@@ -132,7 +132,7 @@ library(ggpmisc)
 functionality_scores <- c("Group_score", "DEGs_score", "Batch_score", "Trajectory_score")
 combn_func <- combn(functionality_scores,2)
 
-fig5b <- map(1:4, function(x){
+fig6b <- map(1:4, function(x){
   x1 <- combn_func[, x][1]
   x2 <- combn_func[, x][2]
   data <- function_data %>% 
@@ -169,8 +169,8 @@ fig5b <- map(1:4, function(x){
     scale_fill_manual(values = method_class_colors)
 })
 
-ggsave(plot = patchwork::wrap_plots(fig5b, ncol = 2),
-       filename = "../sim-article/figures/Fig5b_revised.pdf",
+ggsave(plot = patchwork::wrap_plots(fig6b, ncol = 2),
+       filename = "../sim-article/figures/Fig6b.pdf",
        width = 14,
        height = 14,
        units = "cm")
@@ -178,7 +178,7 @@ ggsave(plot = patchwork::wrap_plots(fig5b, ncol = 2),
 
 
 ###--------------------------------------------------------------------------###
-###                                    Fig5c
+###                                    Fig6c
 ###--------------------------------------------------------------------------###
 arrange_by_group <- function(tibble){
   groups <- unique(tibble %>% pull("Category"))
@@ -225,8 +225,8 @@ col <- list(Technique.Platform = c(`scRNA-seq` = technique_colors[1],
                       class3 = method_class_colors[3],
                       class4 = method_class_colors[4]))
 
-pdf(file = "../sim-article/figures/Fig5b.pdf", width = 7.2, height = 8.5)
-p5_b <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
+pdf(file = "../sim-article/figures/fig6c.pdf", width = 7.2, height = 8.5)
+p6_c <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  show_colnames = TRUE,
                                  show_rownames = TRUE,
                                  scale = "none",
@@ -240,28 +240,27 @@ p5_b <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  gaps_row = c(15, 25, 34), 
                                  color = c(colorRampPalette(c("#0f86a9", "white", "#ed8b10"))(40)),
                                  na_col = "grey80")
-print(p5_b)
+print(p6_c)
 dev.off()
 
 
 
 ###--------------------------------------------------------------------------###
-###                                    Fig5c
+###                           Supplementary Fig 11
 ###--------------------------------------------------------------------------###
-#### Fig5c boxplot
 methods <- openxlsx::read.xlsx("./Chunk1-Data preparation/methods.xlsx")
 
 ### normalize every metrics to [0, 1]
-platform_p5c_data <- function_data %>% 
+platform_supp11_data <- function_data %>% 
   rename(., Method = id) %>% 
   select(c(1:2, 35:58)) %>% 
   pivot_longer(cols = 3:26, names_to = "Platform", values_to = "platform_score") %>% 
   filter(Platform != "MERFISH", Platform != "Microwell-seq", Platform != "Stereo-seq", Platform != "STRT-seq",)
 
-platform_p5c_data$Method <- factor(platform_p5c_data$Method, levels = overall_data$id)
-platform_p5c_data$Category <- factor(platform_p5c_data$Category, levels = paste0("Class ", 1:5))
-platform_p5c_data$Platform <- factor(platform_p5c_data$Platform, levels = platforms)
-P5_c <- ggboxplot(data = platform_p5c_data,
+platform_supp11_data$Method <- factor(platform_supp11_data$Method, levels = overall_data$id)
+platform_supp11_data$Category <- factor(platform_supp11_data$Category, levels = paste0("Class ", 1:5))
+platform_supp11_data$Platform <- factor(platform_supp11_data$Platform, levels = platforms)
+supp_fig_11 <- ggboxplot(data = platform_supp11_data,
                   x = "Category",
                   y = "platform_score",
                   color = "Category",
@@ -297,14 +296,14 @@ P5_c <- ggboxplot(data = platform_p5c_data,
         plot.margin = unit(c(0.6,0.1,0.1,0.1), 'cm')) +
   ylab("Platform scores")
 
-ggsave(plot = P5_c,
-       filename = "../sim-article/figures/Fig5c.pdf",
+ggsave(plot = supp_fig_11,
+       filename = "../sim-article/figures/Supp_Fig_11.pdf",
        width = 6,
        height = 9,
        units = "cm")
 
 ###--------------------------------------------------------------------------###
-###                         Fig5c (Moran'C statistics)
+###                         Supplementary Fig 10 (Moran'C statistics)
 ###--------------------------------------------------------------------------###
 data_list <- list.files("../spatial_autocorrelation/")
 moransC_data <- map_dfr(data_list, function(x){
@@ -347,77 +346,24 @@ ggplot(spatial_auto, aes(x = method, y = Moran))+
   ) +
   ylab("Moran's C statistics")
 
-ggsave(filename = "../sim-article/figures/Fig5c_revised.pdf",
+ggsave(filename = "../sim-article/figures/Supp_Fig_10.pdf",
        width = 6,
        height = 6)
 
 
-
 ###--------------------------------------------------------------------------###
-###                                    Fig5d
-###--------------------------------------------------------------------------###
-source("./Chunk8-Data Analysis/3-functionality/07-utils_functions.R")
-group_long_data <- readRDS("Chunk8-Data Analysis/3-functionality/group_long_data.rds")
-
-fig5d_data <- data_process(function_data = group_long_data,
-                           functionality = "Group",
-                           info = "platform")
-
-fig5d <- ggboxplot(data = fig5d_data,
-                   x = "Category",
-                   y = "value",
-                   color = "Category",
-                   ggtheme = theme_pubr(),
-                   size = 0.2,
-                   alpha = 0.6,
-                   width = 0.8,
-                   bxp.errorbar = FALSE,
-                   outlier.size = 0,
-                   add = "jitter",
-                   add.params = list(size = 0.15))+
-  stat_n_text(size = 1, vjust = 0, color = "black") +
-  ylab("Metric values") +
-  scale_color_manual(values = method_class_colors) +
-  scale_fill_manual(values = method_class_colors) +
-  facet_wrap(.~ Platform, ncol = 4, strip.position = "top") +
-  theme(axis.text = element_text(size = 3),
-        axis.text.x = element_text(angle = 30, hjust = 1),
-        axis.title = element_text(size = 5),
-        axis.title.x = element_blank(),
-        axis.ticks = element_line(linewidth = 0.1),
-        axis.ticks.length = unit(0.05, 'cm'),
-        axis.line = element_line(linewidth = 0.2),
-        legend.text = element_text(size = 4),
-        legend.position = c(0.5, 1.05),
-        legend.direction = "horizontal",
-        legend.background = element_blank(),
-        legend.title = element_text(size = 4),
-        legend.key.size = unit(0.3, 'cm'),
-        strip.background = element_rect(fill = "white", color = "white"),
-        strip.text = element_text(size = 3),
-        strip.text.x = element_text(margin = margin(-0.01,0,-0.01,0, "cm")),
-        plot.margin = unit(c(0.6,0.1,0.1,0.1), 'cm')) +
-  ylab("Platform scores")
-
-ggsave(plot = fig5d,
-       filename = "../sim-article/figures/Fig5d.pdf",
-       width = 5,
-       height = 7,
-       units = "cm")
-
-###--------------------------------------------------------------------------###
-###                                    Fig5e
+###                                    Fig6d
 ###--------------------------------------------------------------------------###
 library(ggrepel)
 library(ggpmisc)
-fig5e_data <- function_data %>% 
+fig6d_data <- function_data %>% 
   select(all_of(c("id", "scRNA-seq data", "spatial transcriptome data", "Category"))) %>% 
   rename(., `ST technology` = `spatial transcriptome data`) %>% 
   rename(., `scRNA-seq` = `scRNA-seq data`) %>% 
   rename(., Method = id) %>% 
   drop_na()
 
-fig5e <- ggplot(fig5e_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
+fig6d <- ggplot(fig6d_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
   geom_smooth(method = 'lm', linewidth = 0.6, color = "red") +
   geom_point(size = 0.8) +
   stat_cor(method = "pearson", size = 2) +
@@ -446,8 +392,8 @@ fig5e <- ggplot(fig5e_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
   ylab("Functionality scores on the scRNA-seq datasets") +
   scale_fill_manual(values = method_class_colors)
 
-ggsave(plot = fig5e,
-       filename = "../sim-article/figures/Fig5e.pdf",
+ggsave(plot = fig6d,
+       filename = "../sim-article/figures/Fig6d.pdf",
        width = 7,
        height = 7,
        units = "cm")
@@ -455,7 +401,7 @@ ggsave(plot = fig5e,
 
 
 ###--------------------------------------------------------------------------###
-###                                  Fig5f
+###                             Supplementary Fig 12a
 ###--------------------------------------------------------------------------###
 source("Chunk8-Data Analysis/3-functionality/07-utils_functions.R")
 techniques_data <- data_process(function_data = group_long_data,
@@ -468,7 +414,7 @@ cor_data <- cor_data %>%
     across(all_of(c("scRNA-seq", "ST technology")), ~ replace_na(.x, 0))
   ) %>% 
   filter(`scRNA-seq` != 0, `ST technology` != 0)
-fig5f <- ggplot(cor_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
+supp_fig12a <- ggplot(cor_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
   geom_smooth(method = 'lm', linewidth = 0.6, color = "red") +
   geom_point(size = 0.8) +
   stat_cor(method = "pearson", size = 2) +
@@ -497,8 +443,8 @@ fig5f <- ggplot(cor_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
   ylab("Group scores on the scRNA-seq datasets") +
   scale_fill_manual(values = method_class_colors)
 
-ggsave(plot = fig5f,
-       filename = "../sim-article/figures/Fig5f.pdf",
+ggsave(plot = supp_fig12a,
+       filename = "../sim-article/figures/Supp_Fig_12a.pdf",
        width = 7,
        height = 7,
        units = "cm")
@@ -525,19 +471,19 @@ traj <- function_metric_for_datasets(function_data = trajectory_long_data,
                                      functionality = "Trajectory")
 
 ###--------------------------------------------------------------------------###
-###                             Supp_Fig8
+###                             Supp_Fig_12bc
 ###--------------------------------------------------------------------------###
 
 ggsave(plot = wrap_plots(DEGs$fig + traj$fig) + plot_annotation(tag_levels = "a"),
-       filename = "../sim-article/figures/Supp_Fig_8.pdf",
+       filename = "../sim-article/figures/Supp_Fig_12bc.pdf",
        width = 16,
        height = 10,
        units = "cm")
 
 ###--------------------------------------------------------------------------###
-###                             Supp_Fig9
+###                             Supp_Fig_13
 ###--------------------------------------------------------------------------###
 
 ggsave(plot = wrap_plots(group$technique_bar / DEGs$technique_bar / traj$technique_bar) +
          plot_annotation(tag_levels = "a"),
-       filename = "../sim-article/figures/Supp_Fig_9.pdf")
+       filename = "../sim-article/figures/Supp_Fig_13.pdf")

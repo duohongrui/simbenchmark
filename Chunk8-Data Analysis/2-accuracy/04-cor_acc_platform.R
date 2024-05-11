@@ -10,7 +10,7 @@ platform <- colnames(overall_data)[39:62]
 
 source("./Chunk8-Data Analysis/2-accuracy/05-utils.plot.R")
 ###--------------------------------------------------------------------------###
-###             Supplementary Fig.4 (platform linear regression)
+###             Supplementary Fig.5 (platform linear regression)
 ###--------------------------------------------------------------------------###
 
 platform_cor_plot <- cor_plot(data = overall_data,
@@ -21,7 +21,7 @@ platform_cor_plot <- cor_plot(data = overall_data,
                               ncol = 4)
 
 ggsave(plot = platform_cor_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_4.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_5.pdf",
        units = "cm",
        width = 18,
        height = 19)

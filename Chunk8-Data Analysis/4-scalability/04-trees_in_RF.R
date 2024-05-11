@@ -56,7 +56,7 @@ line_data <- RF_gradient_result %>%
 line_data$tree <- as.numeric(line_data$tree)
 
 ################################################################################
-###################    Supplementary Figures 21-24   ###########################
+###################    Supplementary Figures 26-29   ###########################
 ################################################################################
 ### estimation-time
 est_time_plots <- RF_tree_plot_function(Step = "estimation",
@@ -68,7 +68,7 @@ ggsave(plot = wrap_plots(est_time_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Supp_Fig_21.pdf")
+       filename = "../sim-article/figures/Supp_Fig_26.pdf")
 
 ### estimation-memory
 est_memory_plots <- RF_tree_plot_function(Step = "estimation",
@@ -80,7 +80,7 @@ ggsave(plot = wrap_plots(est_memory_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Supp_Fig_22.pdf")
+       filename = "../sim-article/figures/Supp_Fig_27.pdf")
 
 ### simulation-time
 sim_time_plots <- RF_tree_plot_function(Step = "simulation",
@@ -92,7 +92,7 @@ ggsave(plot = wrap_plots(sim_time_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Supp_Fig_23.pdf")
+       filename = "../sim-article/figures/Supp_Fig_28.pdf")
 
 
 ### simulation-memory
@@ -105,4 +105,4 @@ ggsave(plot = wrap_plots(sim_memory_plots, ncol = 5),
        width = 18,
        height = 22,
        units = "cm",
-       filename = "../sim-article/figures/Supp_Fig_24.pdf")
+       filename = "../sim-article/figures/Supp_Fig_29.pdf")

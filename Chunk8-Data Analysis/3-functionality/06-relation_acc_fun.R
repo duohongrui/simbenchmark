@@ -1,5 +1,5 @@
 ###--------------------------------------------------------------------------###
-###                         Supplementary Figure 7
+###                         Supplementary Figure 9
 ###--------------------------------------------------------------------------###
 library(tidyverse)
 library(ggrepel)
@@ -35,7 +35,7 @@ p <- ggplot(overall_data, aes(x = accuracy, y = functionality)) +
   ylab("Accuracy scores of functionality")
 
 ggsave(plot = p,
-       filename = "../sim-article/figures/Supp_Fig_7.pdf",
+       filename = "../sim-article/figures/Supp_Fig_9.pdf",
        width = 7,
        height = 7,
        units = "cm")

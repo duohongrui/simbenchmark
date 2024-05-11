@@ -194,7 +194,7 @@ scalability_long_data <- scalability_long_data %>%
 saveRDS(scalability_long_data, file = "Chunk8-Data Analysis/4-scalability/scalability_long_data.rds")
 
 ###################################################################
-################   Supplementary Figures 10-17   ##################
+################   Supplementary Figures 14-21   ##################
 ###################################################################
 source("./Chunk8-Data Analysis/4-scalability/utils_functions.R")
 class_palette <- c("<linear" = "#3d87a6",
@@ -211,7 +211,7 @@ est_time_cell <- plot_trend(scalability_long_data = scalability_long_data,
                             dim = "gene_num",
                             class_palette = class_palette)
 ggsave(plot = wrap_plots(est_time_cell, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_10.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_14.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -224,7 +224,7 @@ est_time_gene <- plot_trend(scalability_long_data = scalability_long_data,
                             dim = "cell_num",
                             class_palette = class_palette)
 ggsave(plot = wrap_plots(est_time_gene, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_11.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_15.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -237,7 +237,7 @@ est_memory_cell <- plot_trend(scalability_long_data = scalability_long_data,
                               dim = "gene_num",
                               class_palette = class_palette)
 ggsave(plot = wrap_plots(est_memory_cell, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_12.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_16.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -250,7 +250,7 @@ est_memory_gene <- plot_trend(scalability_long_data = scalability_long_data,
                               dim = "cell_num",
                               class_palette = class_palette)
 ggsave(plot = wrap_plots(est_memory_gene, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_13.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_17.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -263,7 +263,7 @@ sim_time_cell <- plot_trend(scalability_long_data = scalability_long_data,
                             dim = "gene_num",
                             class_palette = class_palette)
 ggsave(plot = wrap_plots(sim_time_cell, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_14.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_18.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -276,7 +276,7 @@ sim_time_gene <- plot_trend(scalability_long_data = scalability_long_data,
                             dim = "cell_num",
                             class_palette = class_palette)
 ggsave(plot = wrap_plots(sim_time_gene, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_15.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_19.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -289,7 +289,7 @@ sim_memory_cell <- plot_trend(scalability_long_data = scalability_long_data,
                               dim = "gene_num",
                               class_palette = class_palette)
 ggsave(plot = wrap_plots(sim_memory_cell, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_16.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_20.pdf",
        width = 8,
        height = 10,
        units = "in")
@@ -302,7 +302,7 @@ sim_memory_gene <- plot_trend(scalability_long_data = scalability_long_data,
                               dim = "cell_num",
                               class_palette = class_palette)
 ggsave(plot = wrap_plots(sim_memory_gene, ncol = 7),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_17.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_21.pdf",
        width = 8,
        height = 10,
        units = "in")

@@ -1,6 +1,6 @@
 library(tidyverse)
 ################################################################################
-###############################    Figure 4b  ##################################
+###############################    Figure 5d  ##################################
 ################################################################################
 overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds") %>% 
   select(1:67)
@@ -50,8 +50,8 @@ col <- list(Technique.Platform = c(`scRNA-seq` = technique_colors[1],
                                    `ST technology` = technique_colors[2]))
 
 
-pdf(file = "../sim-article/figures/Fig4b.pdf", width = 7, height = 3.2)
-p4_b <- ComplexHeatmap::pheatmap(platform_score_per_model %>% as.matrix(),
+pdf(file = "../sim-article/figures/Fig5d.pdf", width = 7, height = 3.2)
+p5_d <- ComplexHeatmap::pheatmap(platform_score_per_model %>% as.matrix(),
                                  show_colnames = TRUE,
                                  show_rownames = TRUE,
                                  scale = "none",
@@ -64,11 +64,11 @@ p4_b <- ComplexHeatmap::pheatmap(platform_score_per_model %>% as.matrix(),
                                  border_color = "white",
                                  color = c(colorRampPalette(c("#0f86a9", "white", "#ed8b10"))(40)),
                                  na_col = "gray80")
-print(p4_b)
+print(p5_d)
 dev.off()
 
 ################################################################################
-###############################    Figure 4a  ##################################
+###############################    Figure 5a  ##################################
 ################################################################################
 accuracy_per_model <- overall_data[, c("id", "Model Category", "accuracy")]
 
@@ -94,13 +94,13 @@ ggplot(accuracy_per_model, aes(fill = `Model Category`,
         axis.text.x = element_text(angle = 30, hjust = 1)) +
   ylab("Accuracy scores") +
   xlab("Model Category")
-ggsave(filename = "../sim-article/figures/Fig4c_revised.pdf", width = 5, height = 5)
+ggsave(filename = "../sim-article/figures/Fig5a.pdf", width = 5, height = 5)
 
 
 
 
 ################################################################################
-###############################    Figure 4d  ##################################
+###############################    Figure 5b  ##################################
 ################################################################################
 ### read data
 accuracy_data <- readRDS("./Chunk8-Data Analysis/2-accuracy/accuracy_long_data.rds")
@@ -128,7 +128,7 @@ property <- accuracy_summary_per_property %>%
   pivot_wider(names_from = "property", values_from = "value") %>% 
   column_to_rownames(var = "Model Category")
 
-pdf(file = "../sim-article/figures/Fig4c.pdf", width = 5, height = 6.3)
+pdf(file = "../sim-article/figures/Fig5b.pdf", width = 5, height = 6.3)
 ComplexHeatmap::pheatmap(property %>% as.matrix() %>% t(),
                          show_colnames = TRUE,
                          show_rownames = TRUE,
@@ -147,6 +147,9 @@ dev.off()
 
 
 
+################################################################################
+###############################    Figure 5c  ##################################
+################################################################################
 ### summarize accuracy scores for each model class
 accuracy_summary_per_metric <- accuracy_data %>% 
   group_by(Method, metric, `Model Category`, Data) %>% 
@@ -166,7 +169,7 @@ model_accuracy <- accuracy_summary_per_metric %>%
   pivot_wider(names_from = "metric", values_from = "value") %>% 
   column_to_rownames(var = "Model Category")
 library(ComplexHeatmap)
-pdf(file = "../sim-article/figures/Fig4d.pdf", width = 6, height = 5)
+pdf(file = "../sim-article/figures/Fig5c.pdf", width = 6, height = 5)
 ComplexHeatmap::pheatmap(model_accuracy %>% as.matrix() %>% t(),
                          show_colnames = TRUE,
                          show_rownames = TRUE,

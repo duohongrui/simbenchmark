@@ -1,6 +1,6 @@
 ################################################################################
 ##########    Shape constrained additive models and Random Forest   ############
-#####################        Supplementary Figures 18-19   #####################
+#####################        Supplementary Figures 22-23   #####################
 ################################################################################
 source("./Chunk8-Data Analysis/4-scalability/05-utils_functions.R")
 scalability_data <- readRDS("./Chunk8-Data Analysis/4-scalability/scalability_data.rds")
@@ -136,7 +136,7 @@ scam_model <- list("estimation_time_model" = list("estimation_time_model" = esti
 # saveRDS(scam_model, file = "./Chunk8-Data Analysis/4-scalability/scam_model.rds")
 
 ggsave(plot = wrap_plots(map(scam_model, function(x){x[[3]][[2]]}), ncol = 2, byrow = TRUE) + plot_annotation(tag_levels = "a"),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_18.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_22.pdf",
        height = 8,
        width = 8,
        units = "in")
@@ -196,7 +196,7 @@ RF_model <- list("estimation_time_model" = list("estimation_time_model" = estima
                                                   "sim_memory_correlation" = sim_memory_correlation))
 saveRDS(RF_model, file = "/Volumes/Elements/sim_bench/RF_model.rds")
 ggsave(plot = wrap_plots(map(RF_model, function(x){x[[3]][[2]]}), nrow = 2, byrow = TRUE) + plot_annotation(tag_levels = "a"),
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_19.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Supp_Fig_23.pdf",
        height = 8,
        width = 8,
        units = "in")

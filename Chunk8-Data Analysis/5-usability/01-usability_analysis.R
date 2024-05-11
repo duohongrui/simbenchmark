@@ -50,7 +50,7 @@ usability <- usability_score %>%
 saveRDS(usability, file = "Chunk8-Data Analysis/5-usability/usability.rds")
 
 ###################################################################
-###################   Supplementary Figure 20   ###################
+###################   Supplementary Figure 24   ###################
 ###################################################################
 
 ########################   detailed plot   ##################################
@@ -178,4 +178,4 @@ usability_plot <- wrap_plots(barplot, g,
                              design = layout)+
   plot_annotation(tag_levels = 'a')
 usability_plot
-ggsave(usability_plot, filename = "../sim-article/figures/Supp_Fig_20.pdf", width = 15, height = 15, units = "in")
+ggsave(usability_plot, filename = "../sim-article/figures/Supp_Fig_24.pdf", width = 15, height = 15, units = "in")
