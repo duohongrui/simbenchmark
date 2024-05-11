@@ -4,7 +4,7 @@ source("./Chunk8-Data Analysis/3-functionality/07-utils_functions.R")
 overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds")
 
 function_data <- overall_data %>% 
-  select(c(1:3, 13, 73:128)) %>% 
+  select(c(1:3, 14, 74:129)) %>% 
   slice(1:43)
 colnames(function_data)[33:60] <- str_split(colnames(function_data)[33:60], "_", simplify = TRUE)[, 2]
 
@@ -63,9 +63,9 @@ function_bar_plot <- map(functionality, .f = function(x){
   sub_data$id <- factor(sub_data$id, levels = rev(sub_data$id))
   sub_data$Category <- factor(sub_data$Category, levels = paste0("Class ", 1:4))
   if(x == "Trajectory"){
-    color <- method_class_colors[2]
+    color <- method_class_colors[1]
   }else if(x == "Batch"){
-    color <- method_class_colors[c(1,3,4)]
+    color <- method_class_colors[c(2,3,4)]
   }else{
     color <- method_class_colors[-5]
   }
@@ -123,10 +123,62 @@ ggsave(plot = (function_bar_plot[[1]] | function_bar_plot[[2]]) / (function_bar_
        height = 9,
        units = "cm")
 
+###--------------------------------------------------------------------------###
+###                                    Fig5b
+###--------------------------------------------------------------------------###
+library(ggrepel)
+library(ggpmisc)
+
+functionality_scores <- c("Group_score", "DEGs_score", "Batch_score", "Trajectory_score")
+combn_func <- combn(functionality_scores,2)
+
+fig5b <- map(1:4, function(x){
+  x1 <- combn_func[, x][1]
+  x2 <- combn_func[, x][2]
+  data <- function_data %>% 
+    select(all_of(c("id", x1, x2, "Category"))) %>% 
+    rename(., Method = id) %>% 
+    drop_na()
+  ggplot(data, aes(x = get(x1), y = get(x2))) +
+    geom_smooth(method = 'lm', linewidth = 0.6, color = "red") +
+    geom_point(size = 0.8) +
+    stat_cor(method = "pearson", size = 2) +
+    geom_label_repel(aes(label = Method,
+                         fill = Category),
+                     color = "black",
+                     size = 1,
+                     box.padding = unit(0.2, "lines"),
+                     point.padding = unit(0.1, "lines"),
+                     label.padding = unit(0.1, "lines"),
+                     segment.colour = "black",
+                     max.overlaps = 50,
+                     segment.size = 0.2) +
+    theme_bw() +
+    theme(legend.position = c(0.1, 0.86),
+          axis.text = element_text(size = 4, color = "black"),
+          axis.title = element_text(size = 5),
+          legend.title = element_text(size = 4),
+          legend.text = element_text(size = 4),
+          legend.background = element_blank(),
+          panel.grid = element_blank(),
+          legend.key.size = unit(0.2, 'cm'),
+          axis.ticks = element_line(color = "black", linewidth = 0.1, lineend = 0.3),
+          axis.line = element_line(color = "black", linewidth = 0.08)) +
+    xlab(paste0("Scores of ", x1, " functionality")) +
+    ylab(paste0("Scores of ", x2, " functionality")) +
+    scale_fill_manual(values = method_class_colors)
+})
+
+ggsave(plot = patchwork::wrap_plots(fig5b, ncol = 2),
+       filename = "../sim-article/figures/Fig5b_revised.pdf",
+       width = 14,
+       height = 14,
+       units = "cm")
+
 
 
 ###--------------------------------------------------------------------------###
-###                                    Fig5b
+###                                    Fig5c
 ###--------------------------------------------------------------------------###
 arrange_by_group <- function(tibble){
   groups <- unique(tibble %>% pull("Category"))
@@ -155,12 +207,12 @@ rownames(meta_data) <- colnames(per_platform_score)
 
 ### row metadata
 row_meta <- data.frame(
-  `class` = c(rep("class1", 10),
-              rep("class2", 15),
+  `class` = c(rep("class1", 15),
+              rep("class2", 10),
               rep("class3", 9),
               rep("class4", 9)),
-  `color` = c(rep(method_class_colors[1], 10),
-              rep(method_class_colors[2], 15),
+  `color` = c(rep(method_class_colors[1], 15),
+              rep(method_class_colors[2], 10),
               rep(method_class_colors[3], 9),
               rep(method_class_colors[4], 9))
 )
@@ -173,7 +225,7 @@ col <- list(Technique.Platform = c(`scRNA-seq` = technique_colors[1],
                       class3 = method_class_colors[3],
                       class4 = method_class_colors[4]))
 
-pdf(file = "../sim-article/figures/Fig5b.pdf", width = 7.6, height = 8)
+pdf(file = "../sim-article/figures/Fig5b.pdf", width = 7.2, height = 8.5)
 p5_b <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  show_colnames = TRUE,
                                  show_rownames = TRUE,
@@ -185,7 +237,7 @@ p5_b <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  annotation_row = row_meta %>% select(1),
                                  treeheight_row = 20,
                                  border_color = "white",
-                                 gaps_row = c(10, 25, 34), 
+                                 gaps_row = c(15, 25, 34), 
                                  color = c(colorRampPalette(c("#0f86a9", "white", "#ed8b10"))(40)),
                                  na_col = "grey80")
 print(p5_b)
@@ -250,6 +302,55 @@ ggsave(plot = P5_c,
        width = 6,
        height = 9,
        units = "cm")
+
+###--------------------------------------------------------------------------###
+###                         Fig5c (Moran'C statistics)
+###--------------------------------------------------------------------------###
+data_list <- list.files("../spatial_autocorrelation/")
+moransC_data <- map_dfr(data_list, function(x){
+  tmp_data <- readRDS(file.path("../spatial_autocorrelation", x))
+  tmp_data
+})
+spatial_auto <- moransC_data %>% 
+  group_by(method, data) %>% 
+  summarise(
+    Moran = mean(Moran, na.rm = TRUE)
+  ) %>% 
+  ungroup()
+spatial_auto <- overall_data %>% 
+  select(id, Category) %>% 
+  rename(method = id) %>% 
+  right_join(spatial_auto, by = "method")
+
+spatial_auto_rank <- spatial_auto %>% 
+  group_by(method) %>% 
+  summarise(
+    Moran = mean(Moran, na.rm = TRUE)
+  ) %>% 
+  ungroup() %>% 
+  arrange(Moran) %>% 
+  pull(method)
+
+spatial_auto$method <- factor(spatial_auto$method, levels = spatial_auto_rank)
+ggplot(spatial_auto, aes(x = method, y = Moran))+
+  geom_boxplot(aes(color = Category), outlier.size = 0, width = 0.5) +
+  geom_point(aes(color = Category), size = 0.8) +
+  scale_color_manual(values = method_class_colors) +
+  coord_flip() +
+  theme_bw() +
+  theme(
+    axis.title = element_text(color = "black"),
+    axis.title.y = element_blank(),
+    axis.text = element_text(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    legend.position = "top"
+  ) +
+  ylab("Moran's C statistics")
+
+ggsave(filename = "../sim-article/figures/Fig5c_revised.pdf",
+       width = 6,
+       height = 6)
+
 
 
 ###--------------------------------------------------------------------------###

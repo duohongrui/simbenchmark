@@ -12,8 +12,10 @@ library(EnvStats)
 ############   Figure 4 --- Accuracy Scores in Diff Data Types  ################
 ################################################################################
 overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds") %>% 
-  select(1:66)
-colnames(overall_data)[39:66] <- str_split(colnames(overall_data)[39:66], "_", simplify = TRUE)[, 2]
+  select(1:67)
+colnames(overall_data)[40:67] <- str_split(colnames(overall_data)[40:67], "_", simplify = TRUE)[, 2]
+method_class_colors <- c(RColorBrewer::brewer.pal(12, "Set3")[4],
+                         "#94D3C7","#AAAAE0","#ADCE65","#EAC5E3")
 platforms <- c("MARS-seq",
                "10X Genomics",
                "Smart-seq2",
@@ -42,7 +44,7 @@ platforms <- c("MARS-seq",
 ###                                    Fig4a
 ###--------------------------------------------------------------------------###
 fig4a <- overall_data %>% 
-  select(c(1,2, 16:23)) %>% 
+  select(c(1,2, 17:24)) %>% 
   pivot_longer(cols = 3:ncol(.), names_to = "metric", values_to = "value")
 fig4a$Category <- factor(fig4a$Category, levels = paste0("Class ", 1:5))
 fig4a$metric <- factor(fig4a$metric, levels = c("MAD", "MAE", "RMSE", "KS", "OV", "bhattacharyya", "KDE", "multiKS"))
@@ -90,7 +92,7 @@ p4_a <- ggboxplot(data = fig4a,
 ###                                    Fig4b
 ###--------------------------------------------------------------------------###
 fig4b <- overall_data %>% 
-  select(c(1,2, 24:38)) %>% 
+  select(c(1,2, 25:39)) %>% 
   pivot_longer(cols = 3:ncol(.), names_to = "property", values_to = "value")
 fig4b$Category <- factor(fig4b$Category, levels = paste0("Class ", 1:5))
 fig4b$property <- factor(fig4b$property)
@@ -138,6 +140,7 @@ ggsave(plot = p4_a / p4_b + plot_layout(height = c(1,2)),
 ###--------------------------------------------------------------------------###
 
 
+
 ###--------------------------------------------------------------------------###
 ###                                    Fig4e
 ###--------------------------------------------------------------------------###
@@ -172,13 +175,13 @@ rownames(meta_data) <- colnames(per_platform_score)
 
 ### row metadata
 row_meta <- data.frame(
-  `class` = c(rep("class1", 10),
-              rep("class2", 15),
+  `class` = c(rep("class1", 15),
+              rep("class2", 10),
               rep("class3", 9),
               rep("class4", 9),
               rep("class5", 6)),
-  `color` = c(rep(method_class_colors[1], 10),
-              rep(method_class_colors[2], 15),
+  `color` = c(rep(method_class_colors[1], 15),
+              rep(method_class_colors[2], 10),
               rep(method_class_colors[3], 9),
               rep(method_class_colors[4], 9),
               rep(method_class_colors[5], 6))
@@ -205,7 +208,7 @@ p4_e <- ComplexHeatmap::pheatmap(per_platform_score %>% as.matrix(),
                                  annotation_row = row_meta %>% select(1),
                                  treeheight_row = 20,
                                  border_color = "white",
-                                 gaps_row = c(10, 25, 34, 43), 
+                                 gaps_row = c(15, 25, 34, 43), 
                                  color = c(colorRampPalette(c("#0f86a9", "white", "#ed8b10"))(40)),
                                  na_col = "gray80")
 print(p4_e)
@@ -258,6 +261,52 @@ ggsave(plot = fig4f,
        width = 7,
        height = 7,
        units = "cm")
+
+###--------------------------------------------------------------------------###
+###                           Fig4f-Supplementary
+###--------------------------------------------------------------------------###
+library(ggrepel)
+library(ggpmisc)
+spatial_accuracy_data <- readRDS("Chunk8-Data Analysis/2-accuracy/spatial_accuracy_plot_data.rds")
+fig4f_supp_data <- fig4f_data %>% 
+  select(-3) %>% 
+  left_join(spatial_accuracy_data %>% select(1:2), by = "Method") %>% 
+  rename(., `ST technology` = accuracy)
+
+fig4f_supp <- ggplot(fig4f_supp_data, aes(x = `ST technology`, y = `scRNA-seq`)) +
+  geom_smooth(method = 'lm', linewidth = 0.3, color = "red") +
+  geom_point(size = 0.8) +
+  stat_cor(method = "pearson", size = 2) +
+  geom_label_repel(aes(label = Method,
+                       fill = Category),
+                   color = "black",
+                   size = 1,
+                   box.padding = unit(0.4, "lines"),
+                   point.padding = unit(0.1, "lines"),
+                   label.padding = unit(0.1, "lines"),
+                   segment.colour = "black",
+                   max.overlaps = 50,
+                   segment.size = 0.2) +
+  theme_bw() +
+  theme(legend.position = c(0.1, 0.86),
+        axis.text = element_text(size = 4, color = "black"),
+        axis.ticks = element_line(color = "black"),
+        axis.title = element_text(size = 5),
+        legend.title = element_text(size = 4),
+        legend.text = element_text(size = 4),
+        legend.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.key.size = unit(0.2, 'cm')) +
+  xlab("Accuracy scores on the spatial datasets \n (calculated by spatial-level metrics)") +
+  ylab("Accuracy scores on the scRNA-seq datasets") +
+  scale_fill_manual(values = method_class_colors)
+
+ggsave(plot = fig4f_supp,
+       filename = "../sim-article/figures/Fig4f_supp.pdf",
+       width = 7,
+       height = 7,
+       units = "cm")
+
 
 ###--------------------------------------------------------------------------###
 ###                                    Fig4g
@@ -384,7 +433,78 @@ ggsave(plot = fig4h,
        height = 5,
        units = "cm")
 
+###--------------------------------------------------------------------------###
+###                                    Fig4h-Supp
+###--------------------------------------------------------------------------###
+#### Fig4h
+Fig4h_data <- spatial_accuracy_data
+colnames(Fig4h_data)[9:19] <- str_split(colnames(Fig4h_data)[9:19], "_", simplify = TRUE)[, 2]
+Fig4h_data <- overall_data %>% 
+  select(all_of(c("id", platforms[1:13]))) %>% 
+  rename(Method = id) %>% 
+  full_join(Fig4h_data, by = "Method")
+Fig4h_data <- Fig4h_data %>% 
+  select(-c(15:21)) %>% 
+  pivot_longer(cols = 2:ncol(.), names_to = "Platform", values_to = "platform_score")
+Fig4h_data$Method <- factor(Fig4h_data$Method, levels = overall_data$id)
+Fig4h_data <- Fig4h_data %>% 
+  mutate(
+    technology = case_when(
+      Platform %in% platforms[1:13] ~ "scRNA-seq",
+      Platform %in% platforms[14:24] ~ "ST technology"
+    )
+  )
+odds <- seq(1, 49, 2)
+rect <- Fig4h_data[odds, ]
+fig4h <- ggplot(Fig4h_data, aes(x = Method, y = platform_score, color = technology))+
+  geom_rect(data = rect,
+            xmin = odds - 0.5,
+            xmax = odds + 0.5,
+            ymin = -Inf,
+            ymax = +Inf,
+            fill = "gray60",
+            alpha = 0.3,
+            inherit.aes = F) +
+  geom_boxplot(outlier.alpha = 0,
+               width = 1,
+               size = 0.1) +
+  geom_jitter(aes(group = technology),
+              pch = 19,
+              size = 0.05,
+              position = position_jitterdodge(dodge.width=0.9)) +
+  stat_compare_means(mapping = aes(group = technology),
+                     method = "wilcox.test",
+                     label = "p.signif",
+                     hide.ns = TRUE) +
+  scale_color_manual(values = technique_colors) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45,
+                               vjust = 1,
+                               hjust = 1,
+                               size = 4.5,
+                               color = "black"),
+    axis.text.y = element_text(size = 4, color = "black"),
+    axis.title.y = element_text(size = 5),
+    axis.ticks = element_line(linewidth = 0.05, lineend = 0.01, color = "black"),
+    axis.title.x = element_blank(),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 4),
+    legend.position = c(0.5, -0.5),
+    legend.direction = "horizontal",
+    legend.background = element_blank(),
+    legend.box.background = element_blank(),
+    legend.box = "horizontal",
+    legend.key = element_rect(fill = NA),
+    legend.key.size = unit(0.3, 'cm'),
+    panel.grid = element_blank()
+  )
 
+ggsave(plot = fig4h,
+       filename = "../sim-article/figures/Fig4h_revised.pdf",
+       width = 18,
+       height = 6,
+       units = "cm")
 
 ###--------------------------------------------------------------------------###
 ###                             Supplementary Fig. 5

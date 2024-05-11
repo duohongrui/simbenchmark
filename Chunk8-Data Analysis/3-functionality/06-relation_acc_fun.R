@@ -5,7 +5,8 @@ library(tidyverse)
 library(ggrepel)
 library(ggpmisc)
 overall_data <- readRDS("Chunk8-Data Analysis/overall_data.rds")
-
+method_class_colors <- c(RColorBrewer::brewer.pal(12, "Set3")[4],
+                         "#94D3C7","#AAAAE0","#ADCE65","#EAC5E3")
 p <- ggplot(overall_data, aes(x = accuracy, y = functionality)) +
   geom_smooth(method = 'lm', linewidth = 0.6, color = "red") +
   geom_point(size = 0.8) +
@@ -29,6 +30,7 @@ p <- ggplot(overall_data, aes(x = accuracy, y = functionality)) +
         legend.background = element_blank(),
         panel.grid = element_blank(),
         legend.key.size = unit(0.2, 'cm')) +
+  scale_fill_manual(values = method_class_colors) +
   xlab("Accuracy scores of accuracy") +
   ylab("Accuracy scores of functionality")
 

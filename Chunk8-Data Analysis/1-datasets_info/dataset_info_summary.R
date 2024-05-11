@@ -144,7 +144,7 @@ p6 <- ggplot(category, mapping = aes(x = label, y = y, fill = label))+
 
 
 ggsave(
-  filename = "../sim-article/figures/Supp_Fig_1.pdf",
+  filename = "../sim-article/figures/Supp_Fig_1_revised.pdf",
   plot = (p1+p2+p3)/(p5+p6)+plot_layout(heights = c(1,1,1)),
   height = 15,
   width = 10,

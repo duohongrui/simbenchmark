@@ -112,3 +112,37 @@ accuracy_long_data <- accuracy_data %>%
 accuracy_long_data <- accuracy_long_data %>% 
   separate(., col = metric_property, sep = "_", into = c("metric", "property"))
 saveRDS(accuracy_long_data, file = "Chunk8-Data Analysis/2-accuracy/accuracy_long_data.rds")
+
+
+
+###--------------------------------------------------------------------------###
+###                      Accuracy scores for spatial data
+###--------------------------------------------------------------------------###
+data_list <- list.files("../spatial_metrics_results/")
+all_result <- list()
+for (i in data_list) {
+  result <- readRDS(file.path("../spatial_metrics_results", i))
+  all_result[[i]] <- result
+}
+spatial_accuracy <- map_dfr(all_result, function(x){x}) %>% 
+  filter(data_property != "libraryvscellzero")
+spatial_accuracy <- spatial_accuracy %>% 
+  group_by(Data, data_property) %>% 
+  mutate(
+    across(all_of("spatial_KDE"), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+  )
+spatial_accuracy <- spatial_accuracy %>% 
+  group_by(Data, data_property) %>% 
+  mutate(
+    across(all_of(colnames(spatial_accuracy)[4:5]), ~ 1 - .x)
+  )
+### scale for every metric [0, 1]
+spatial_accuracy <- spatial_accuracy %>% 
+  group_by(Data, data_property) %>% 
+  mutate(
+    across(all_of(colnames(spatial_accuracy)[4:5]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
+  )
+spatial_accuracy <- spatial_accuracy %>% 
+  pivot_longer(cols = c(4:5), names_to = "metric", values_to = "value") %>% 
+  rename(., property = data_property)
+saveRDS(spatial_accuracy, file = "Chunk8-Data Analysis/2-accuracy/spatial_accuracy_data.rds")

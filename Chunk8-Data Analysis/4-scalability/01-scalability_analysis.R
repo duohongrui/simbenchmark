@@ -27,14 +27,6 @@ saveRDS(scalability_data, file = "./Chunk8-Data Analysis/4-scalability/scalabili
 scalability_data <- scalability_data %>% 
   filter(!is.na(cell_num), !is.na(gene_num))
 
-score_data <- scalability_data %>%
-  mutate(
-    across(all_of(c("estimation_time",
-                    "estimation_memory",
-                    "simulation_time",
-                    "simulation_memory")), ~ log2(.x))
-  )
-
 #### aggregate by repeat time
 score_data <- scalability_data %>% 
   group_by(method, cell_num, gene_num) %>% 
@@ -44,7 +36,17 @@ score_data <- scalability_data %>%
     simulation_time = mean(simulation_time, na.rm = TRUE),
     simulation_memory = mean(simulation_memory, na.rm = TRUE)
   ) %>% 
-  ungroup() %>% 
+  ungroup()
+
+score_data <- score_data %>%
+  mutate(
+    across(all_of(c("estimation_time",
+                    "estimation_memory",
+                    "simulation_time",
+                    "simulation_memory")), ~ log2(.x))
+  )
+
+score_data <- score_data %>% 
   group_by(cell_num, gene_num) %>% 
   mutate(
     across(all_of(c("estimation_time",
@@ -54,34 +56,14 @@ score_data <- scalability_data %>%
   ) %>% 
   ungroup()
 
-# score_data <- score_data %>%
-#   mutate(
-#     across(all_of(c("estimation_time",
-#                     "estimation_memory",
-#                     "simulation_time",
-#                     "simulation_memory")), ~ log2(.x))
-#   )
-# score_data <- score_data %>% 
-#   group_by(cell_num, gene_num) %>% 
-#   mutate(
-#     across(all_of(c("estimation_time",
-#                     "estimation_memory",
-#                     "simulation_time",
-#                     "simulation_memory")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
-#   ) %>% 
-#   ungroup()
-  
+
 ### scale for every metric [0, 1]
 score_data <- score_data %>%
   # group_by(cell_num, gene_num) %>%
   mutate(
     across(all_of(colnames(score_data)[4:7]), ~ (.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE)))
   )
-# score_data <- score_data %>% 
-#   group_by(cell_num, gene_num) %>% 
-#   mutate(
-#     across(all_of(colnames(score_data)[4:7]), ~ 1 - ((.x - min(.x, na.rm = TRUE)) / (max(.x, na.rm = TRUE) - min(.x, na.rm = TRUE))))
-#   )
+
 
 #### aggregate by method
 score_data <- score_data %>% 
@@ -94,22 +76,8 @@ score_data <- score_data %>%
   ) %>% 
   ungroup()
 score_data[44, c(3,5)] <- NaN
+
 ### time and memory score
-
-gm_mean <- function(x, na.rm = TRUE, zero.propagate = FALSE){
-  if(any(x < 0, na.rm = TRUE)){
-    return(NaN)
-  }
-  if(zero.propagate){
-    if(any(x == 0, na.rm = TRUE)){
-      return(0)
-    }
-    exp(mean(log(x), na.rm = na.rm))
-  } else {
-    exp(sum(log(x[x > 0]), na.rm = na.rm) / sum(!is.na(x)))
-  }
-}
-
 score_data <- score_data %>% 
   mutate(
     time_score = apply(.[, -1], MARGIN = 1, function(x){mean(c(x[1], x[3]), na.rm = TRUE)}),
@@ -117,15 +85,6 @@ score_data <- score_data %>%
     scalability_score = apply(.[, -1], MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
   )
 
-score_data <- score_data %>% 
-  mutate(
-    time_score = apply(.[, -1], MARGIN = 1, function(x){gm_mean(c(x[1], x[3]), na.rm = TRUE)}),
-    memory_score = apply(.[, -1], MARGIN = 1, function(x){gm_mean(c(x[2], x[4]), na.rm = TRUE)}),
-    scalability_score = apply(.[, -1], MARGIN = 1, function(x){gm_mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
-  )
-scalability <- pnorm((log2(score_data$scalability_score) - mean(log2(score_data$scalability_score))) / sd(log2(score_data$scalability_score)))
-score_data$scalability_score <- scalability
-# scalability <- score_data
 
 ### correlation values derived from "Shape constrained additive models and Random Forest" section
 RF_model <- readRDS("/Volumes/Elements/sim_bench/RF_model.rds")

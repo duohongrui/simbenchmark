@@ -11,11 +11,42 @@ colnames(usability_data) <- gsub(x = colnames(usability_data), pattern = "[.]", 
 ### weight data
 weight_data <- openxlsx::read.xlsx("Chunk7-Usability/Usability-scoringsheet.xlsx")
 
-### summarize usability score
-usability_score <- as.matrix(usability_data) %*% matrix(weight_data$Weight, ncol = 1)/sum(weight_data$Weight)
-usability_score <- pnorm((log2(usability_score) - mean(log2(usability_score))) / sd(log2(usability_score)))
-usability <- tibble(method = rownames(usability_data),
-                    usability_score = usability_score[,1])
+usability_score <- t(t(as.matrix(usability_data)) * weight_data$Weight)
+
+usability_score <- usability_score %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var = "method") %>% 
+  pivot_longer(2:ncol(.), names_to = "content", values_to = "score") %>% 
+  mutate(
+    category = rep(c(rep("Avalability", 7),
+                     rep("Code", 7),
+                     rep("Evaluation", 3),
+                     rep("Maintenance", 3),
+                     rep("Documentation", 5),
+                     rep("Paper", 2)), 49)
+  ) %>% 
+  group_by(method, category) %>% 
+  summarise(
+    score = sum(score)
+  )
+usability_score <- usability_score %>% 
+  group_by(category) %>% 
+  mutate(
+    across("score", ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+  ) %>% 
+  ungroup()%>% 
+  pivot_wider(names_from = "category", values_from = "score")
+
+usability <- usability_score %>% 
+  mutate(
+    usability = rowMeans(usability_score[-1])
+  )
+# ### summarize usability score
+# usability_score <- as.matrix(usability_data) %*% matrix(weight_data$Weight, ncol = 1)
+# usability_score <- log2(usability_score)
+# usability_score <- pnorm((usability_score - mean(usability_score)) / sd(usability_score))
+# usability <- tibble(method = rownames(usability_data),
+#                     usability_score = usability_score[,1])
 saveRDS(usability, file = "Chunk8-Data Analysis/5-usability/usability.rds")
 
 ###################################################################
@@ -119,8 +150,7 @@ g <- ggplot()+
 
 ########################   usability barplot   ##################################
 
-usability_score_data <- data.frame("method" = rownames(usability_score),
-                              "score" = usability_score[, 1])
+usability_score_data <- data.frame("method" = usability %>% pull(method), "score" = usability %>% pull(usability))
 
 barplot <- ggplot(usability_score_data, aes(x = reorder(method, -score), y = score, fill = score))+
   geom_bar(stat = "identity", width = 0.8)+

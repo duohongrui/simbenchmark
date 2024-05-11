@@ -41,13 +41,14 @@ batch_data <- purrr::map_dfr(1:length(all_result), .f = function(index){
   )
 
 ### normalize some values
-#### cms, MM, LISI, pcr
+#### cms, MM, pcr, shannon_entropy
 batch_data <- batch_data %>% 
   group_by(Data) %>% 
   mutate(
-    across(all_of(c("cms", "mm", "LISI", "pcr")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
+    across(all_of(c("cms", "mm", "pcr", "shannon_entropy")), ~ pnorm((.x - mean(.x, na.rm = TRUE))/sd(.x, na.rm = TRUE)))
   ) %>% 
   ungroup()
+batch_data$LISI <- batch_data$LISI / 2
 #### AWS_batch
 batch_data <- batch_data %>% 
   mutate(

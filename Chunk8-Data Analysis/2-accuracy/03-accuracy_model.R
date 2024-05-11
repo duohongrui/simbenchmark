@@ -3,8 +3,8 @@ library(tidyverse)
 ###############################    Figure 4b  ##################################
 ################################################################################
 overall_data <- readRDS("./Chunk8-Data Analysis/overall_data.rds") %>% 
-  select(1:66)
-colnames(overall_data)[39:66] <- str_split(colnames(overall_data)[39:66], "_", simplify = TRUE)[, 2]
+  select(1:67)
+colnames(overall_data)[40:67] <- str_split(colnames(overall_data)[40:67], "_", simplify = TRUE)[, 2]
 platforms <- c("MARS-seq",
                "10X Genomics",
                "Smart-seq2",
@@ -68,7 +68,7 @@ print(p4_b)
 dev.off()
 
 ################################################################################
-###############################    Figure 4c  ##################################
+###############################    Figure 4a  ##################################
 ################################################################################
 accuracy_per_model <- overall_data[, c("id", "Model Category", "accuracy")]
 
@@ -81,7 +81,7 @@ ggplot(accuracy_per_model, aes(fill = `Model Category`,
                colour = "black",
                width = 0.2,
                position = position_dodge(1)) +
-  geom_point(size = 3.5,
+  geom_point(size = 2,
              color = "black",
              shape = 21,
              stroke = 0.01,
@@ -94,7 +94,7 @@ ggplot(accuracy_per_model, aes(fill = `Model Category`,
         axis.text.x = element_text(angle = 30, hjust = 1)) +
   ylab("Accuracy scores") +
   xlab("Model Category")
-ggsave(filename = "../sim-article/figures/Fig4c_revised.pdf")
+ggsave(filename = "../sim-article/figures/Fig4c_revised.pdf", width = 5, height = 5)
 
 
 
@@ -106,13 +106,8 @@ ggsave(filename = "../sim-article/figures/Fig4c_revised.pdf")
 accuracy_data <- readRDS("./Chunk8-Data Analysis/2-accuracy/accuracy_long_data.rds")
 method <- openxlsx::read.xlsx("Chunk1-Data preparation/methods.xlsx", sheet = 1, colNames = TRUE, sep.names = " ") %>% 
   select(-2)
-### exclude MFA as it do not use zero inflated model by default
 accuracy_data <- accuracy_data %>% 
-  left_join(method %>% select(Method, `Model Category`), by = "Method") %>% 
-  filter(Method != "MFA")
-
-# accuracy_data <- accuracy_data %>% 
-#   left_join(method %>% select(Method, `Model Category`), by = "Method")
+  left_join(method %>% select(Method, `Model Category`), by = "Method")
 
 ### property
 accuracy_summary_per_property <- accuracy_data %>% 

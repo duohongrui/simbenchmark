@@ -12,9 +12,10 @@ library(funkyheatmap)
 ################################################################################
 source("Chunk8-Data Analysis/7-main_figure/04-utils.R")
 accuracy <- readRDS("Chunk8-Data Analysis/2-accuracy/accuracy_long_data.rds")
+spatial_accuracy <- readRDS("Chunk8-Data Analysis/2-accuracy/spatial_accuracy_data.rds")
 functionality <- readRDS("Chunk8-Data Analysis/3-functionality/functionality_long_data.rds")
 scalability <- readRDS("Chunk8-Data Analysis/4-scalability/score_data.rds")
-usability <- readRDS("Chunk8-Data Analysis/5-usability/usability_long_data.rds")
+usability <- readRDS("Chunk8-Data Analysis/5-usability/usability.rds")
 method <- openxlsx::read.xlsx("Chunk1-Data preparation/methods.xlsx", sheet = 1, colNames = TRUE) %>% 
   select(-2)
 colnames(method) <- c("Method",
@@ -22,6 +23,7 @@ colnames(method) <- c("Method",
                       "Language",
                       "Model",
                       "Model Category",
+                      "SRT/Omics Simulator",
                       "Prior Information",
                       "Simulate Groups",
                       "Simulate DEGs",
@@ -50,8 +52,28 @@ accuracy <- accuracy %>%
   ) %>% 
   relocate(Type, .after = "Platform")
 
-accuracy_plot <- accuracy_process_function(accuracy)
+spatial_accuracy <- spatial_accuracy %>% 
+  full_join(data_info, by = "Data") %>% 
+  relocate(Platform, .after = "Data") %>% 
+  mutate(
+    Platform = case_when(
+      Platform == "Smart-seq2\r\n10X Genomics" ~ "Mix sources1",
+      Platform == "CEL-seq\r\nCEL-seq2" ~ "Mix sources2",
+      TRUE ~ Platform
+    ),
+    Type = case_when(
+      Data %in% paste0("data", 1:101) ~ "scRNA-seq data",
+      Data %in% paste0("data", 101:152) ~ "spatial transcriptome data"
+    )
+  ) %>% 
+  relocate(Type, .after = "Platform")
 
+accuracy_plot <- accuracy_process_function(accuracy)
+spatial_accuracy_plot <- accuracy_process_function(spatial_accuracy)
+spatial_accuracy_plot <- spatial_accuracy_plot %>% 
+  select(c(1:4, 6:9, 11:21)) %>% 
+  slice(-42)
+saveRDS(spatial_accuracy_plot, file = "Chunk8-Data Analysis/2-accuracy/spatial_accuracy_plot_data.rds")
 
 ############################# errors
 errors <- openxlsx::read.xlsx(xlsxFile = "./Chunk8-Data Analysis/6-error_reason/error.xlsx", sheet = 1)
@@ -179,17 +201,6 @@ scalability$`Cor(time_simulation)` <- as.character(scalability$`Cor(time_simulat
 scalability$`Cor(memory_simulation)` <- as.character(scalability$`Cor(memory_simulation)`)
 
 ### usability
-usability <- usability %>% 
-  group_by(method, category) %>% 
-  summarise(
-    score = mean(score, na.rm = TRUE)
-  ) %>% 
-  ungroup() %>% 
-  pivot_wider(names_from = "category", values_from = score)
-
-usability_score <- readRDS("./Chunk8-Data Analysis/5-usability/usability.rds")
-usability <- left_join(usability, usability_score, by = "method")
-colnames(usability)[8] <- "usability"
 colnames(usability)[1] <- "Method"
 
 
@@ -206,12 +217,12 @@ overall_data <- method %>%
 
 overall_data <- overall_data %>% 
   mutate(
-    overall = apply(overall_data %>% select(11:14), MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
+    overall = apply(overall_data %>% select(12:15), MARGIN = 1, function(x){mean(c(x[1], x[2], x[3], x[4]), na.rm = TRUE)})
   ) %>% 
   relocate(overall, .after = `Simulate Trajectory`)
 
 
-overall_data <- overall_data%>% 
+overall_data <- overall_data %>% 
   mutate(
     id = Method,
   ) %>% 
@@ -255,6 +266,7 @@ column_info <- tribble(
   "id",                    "method",           "",                        "text",      NA,          list(hjust = 0, width = 3),
   "Language",              "method_info",      "Language",                "text",      NA,          list(width = 1.5),
   "Model",                 "method_info",      "Model",                   "text",      NA,          list(width = 6),
+  "SRT/Omics Simulator",   "method_info",      "SRT/Omics Simulator",     "text",      NA,          list(width = 0.5),
   "Prior Information",     "method_info",      "Prior Information",       "text",      NA,          list(width = 6),
   "Simulate Groups",       "function",         "Groups",                  "text",      NA,          list(width = 1),
   "Simulate DEGs",         "function",         "DEGs",                    "text",      NA,          list(width = 1),
@@ -269,7 +281,7 @@ column_info <- tribble(
   "usability_score",       "overall",          "Usability Score",         "text",      NA,          list(width = 1.2),
   "usability",             "overall",          NA,                        "bar",       "palette4",  list(width = 5),
   "overall_score",         "overall",          "Overall Score",           "text",      NA,          list(width = 1.2),
-  "overall",               "overall",          NA,                        "bar",       "palette1",  list(width = 5),
+  "overall",               "overall",          NA,                        "bar",       "palette1",  list(width = 4.2),
 )
 
 ### column grouping
@@ -285,53 +297,53 @@ column_groups <- tribble(
 ### row info
 row_info <- tribble(
    ~group,         ~ id,                   
-   "Class 1",      "SPARSim",
-   "Class 1",      "Splat",
-   "Class 1",      "SCRIP-BP",
-   "Class 1",      "SCRIP-GP-commonBCV",
-   "Class 1",      "SCRIP-GP-trendedBCV",
-   "Class 1",      "SplatPop",
-   "Class 1",      "SCRIP-BGP-commonBCV",
-   "Class 1",      "SCRIP-BGP-trendedBCV",
-   "Class 1",      "powsimR",
-   "Class 1",      "SPsimSeq",
-   "Class 2",      "SCRIP-paths",
-   "Class 2",      "scDesign3-tree",
-   "Class 2",      "Splat-paths",
-   "Class 2",      "ESCO-tree",
-   "Class 2",      "PROSSTT",
-   "Class 2",      "SplatPop-paths",
-   "Class 2",      "ESCO-traj",
-   "Class 2",      "phenopath",
-   "Class 2",      "TedSim",
-   "Class 2",      "MFA",
-   "Class 2",      "dyntoy",
-   "Class 2",      "scMultiSim-tree",
-   "Class 2",      "SymSim",
-   "Class 2",      "VeloSim",
-   "Class 2",      "dyngen",
+   "Class 1",      "PROSSTT",
+   "Class 1",      "Splat-paths",
+   "Class 1",      "scDesign3-tree",
+   "Class 1",      "phenopath",
+   "Class 1",      "SCRIP-paths",
+   "Class 1",      "ESCO-tree",
+   "Class 1",      "SplatPop-paths",
+   "Class 1",      "ESCO-traj",
+   "Class 1",      "MFA",
+   "Class 1",      "dyngen",
+   "Class 1",      "scMultiSim-tree",
+   "Class 1",      "SymSim",
+   "Class 1",      "TedSim",
+   "Class 1",      "dyntoy",
+   "Class 1",      "VeloSim",
+   "Class 2",      "Splat",
+   "Class 2",      "SPARSim",
+   "Class 2",      "SCRIP-BP",
+   "Class 2",      "SCRIP-GP-commonBCV",
+   "Class 2",      "SCRIP-GP-trendedBCV",
+   "Class 2",      "SplatPop",
+   "Class 2",      "SCRIP-BGP-commonBCV",
+   "Class 2",      "SCRIP-BGP-trendedBCV",
+   "Class 2",      "powsimR",
+   "Class 2",      "SPsimSeq",
    "Class 3",      "Lun",
    "Class 3",      "muscat",
    "Class 3",      "scDesign",
-   "Class 3",      "ESCO",
-   "Class 3",      "zingeR",
    "Class 3",      "scDD",
+   "Class 3",      "ESCO",
    "Class 3",      "scDesign3",
    "Class 3",      "scMultiSim",
+   "Class 3",      "zingeR",
    "Class 3",      "zinbwaveZinger",
    "Class 4",      "SRTsim",
    "Class 4",      "Lun2",
    "Class 4",      "scDesign2",
-   "Class 4",      "BASiCS",
    "Class 4",      "POWSC",
+   "Class 4",      "BASiCS",
    "Class 4",      "hierarchicell",
    "Class 4",      "SparseDC",
    "Class 4",      "scGAN",
    "Class 4",      "SimBPDD",
+   "Class 5",      "Simple",
    "Class 5",      "Kersplat",
    "Class 5",      "zinbwave",
    "Class 5",      "dropsim",
-   "Class 5",      "Simple",
    "Class 5",      "BEARscc",
    "Class 5",      "CancerInSilico"
 )
@@ -476,7 +488,7 @@ fig2_plot <- funky_heatmap(data = overall_data,
                            col_annot_offset = 4)
 
 ggsave(fig2_plot,
-       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig3_1.pdf",
+       filename = "/Users/duohongrui/Desktop/sim-article/figures/Fig3_revised.pdf",
        units = "in",
        width = 16,
        height = 19)
